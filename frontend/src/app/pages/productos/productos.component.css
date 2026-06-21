@@ -4,6 +4,20 @@
   padding: 80px 0;
 }
 
+.page-head-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 48px;
+  align-items: center;
+}
+
+.page-head-media img {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 24px 50px rgba(0, 0, 0, 0.45));
+}
+
 .page-title {
   font-size: clamp(2.2rem, 4.6vw, 3.4rem);
   font-weight: 800;
@@ -95,5 +109,12 @@
 @media (max-width: 920px) {
   .cards {
     grid-template-columns: 1fr;
+  }
+  .page-head-grid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+  .page-head-media {
+    max-width: 420px;
   }
 }
