@@ -1,0 +1,32 @@
+<header class="nav">
+  <nav class="nav-inner container">
+    <a routerLink="/" class="brand" (click)="closeMenu()">
+      <span class="brand-mark"></span>
+      <span class="brand-name">AMANTIX</span>
+    </a>
+
+    <div class="nav-links">
+      <a routerLink="/productos" routerLinkActive="active" class="nav-link">Productos</a>
+      <a routerLink="/planes" routerLinkActive="active" class="nav-link">Planes</a>
+      <a routerLink="/nosotros" routerLinkActive="active" class="nav-link">Nosotros</a>
+      <a routerLink="/contacto" routerLinkActive="active" class="nav-link">Contacto</a>
+      <a routerLink="/contacto" class="btn btn-primary nav-cta">Solicitar demo</a>
+    </div>
+
+    <button type="button" class="burger" (click)="toggleMenu()" aria-label="Abrir menú">
+      <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
+        <path d="M2 5h16M2 10h16M2 15h16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+      </svg>
+    </button>
+  </nav>
+
+  @if (menuOpen()) {
+    <div class="mobile-menu">
+      <a routerLink="/productos" class="mobile-link" (click)="closeMenu()">Productos</a>
+      <a routerLink="/planes" class="mobile-link" (click)="closeMenu()">Planes</a>
+      <a routerLink="/nosotros" class="mobile-link" (click)="closeMenu()">Nosotros</a>
+      <a routerLink="/contacto" class="mobile-link" (click)="closeMenu()">Contacto</a>
+      <a routerLink="/contacto" class="btn btn-primary mobile-cta" (click)="closeMenu()">Solicitar demo</a>
+    </div>
+  }
+</header>
