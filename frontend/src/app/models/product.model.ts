@@ -3,6 +3,12 @@ export interface ProductFeature {
   readonly description: string;
 }
 
+export interface ProductScreenshot {
+  readonly title: string;
+  readonly description: string;
+  readonly image: string;
+}
+
 export interface Product {
   readonly slug: string;
   readonly code: string;
@@ -11,6 +17,8 @@ export interface Product {
   readonly shortDescription: string;
   readonly description: string;
   readonly image: string;
+  readonly heroImage: string;
   readonly features: readonly ProductFeature[];
+  readonly screenshots: readonly ProductScreenshot[];
   readonly productionUrl: string;
 }
