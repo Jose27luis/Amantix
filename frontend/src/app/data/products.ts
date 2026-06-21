@@ -99,6 +99,12 @@ export const PRODUCTS: readonly Product[] = [
         image: '/productos/restaurante/sumaqta-cobro.png',
       },
       {
+        title: 'Historial de mesas',
+        description:
+          'Consulta la actividad de cada mesa por rango de fechas: cuáles tuvieron movimiento y cuántas ventas, con acceso a su historial.',
+        image: '/productos/restaurante/sumaqta-historial-mesas.png',
+      },
+      {
         title: 'Para llevar y delivery',
         description:
           'Registra y consulta las ventas para llevar con su comanda, canal y total del día, separadas del salón.',
