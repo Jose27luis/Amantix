@@ -1,0 +1,143 @@
+.page-head {
+  background: var(--ink);
+  color: var(--cloud);
+  padding: 80px 0;
+}
+
+.page-title {
+  font-size: clamp(2.1rem, 4.4vw, 3.2rem);
+  font-weight: 800;
+  margin: 14px 0 18px;
+  max-width: 22ch;
+}
+
+.page-lead {
+  color: var(--line-2);
+  font-size: 1.08rem;
+  max-width: 60ch;
+  margin: 0;
+}
+
+.facts {
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+}
+
+.facts-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.fact {
+  padding: 32px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border-right: 1px solid var(--line);
+}
+
+.fact:last-child {
+  border-right: 0;
+}
+
+.fact-value {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.8rem;
+  color: var(--ink);
+}
+
+.fact-label {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--slate-2);
+}
+
+.story {
+  padding: 80px 0;
+}
+
+.story-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+}
+
+.story-block p {
+  font-size: 1.1rem;
+  color: var(--steel);
+  margin: 14px 0 0;
+}
+
+.values {
+  background: var(--surface);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding: 80px 0;
+}
+
+.values-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+  margin-top: 28px;
+}
+
+.value {
+  background: var(--cloud);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 26px;
+}
+
+.value-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin: 0 0 8px;
+}
+
+.value-desc {
+  color: var(--slate);
+  font-size: 0.96rem;
+  margin: 0;
+}
+
+.where {
+  padding: 80px 0;
+}
+
+.where-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.where-title {
+  font-size: clamp(1.7rem, 3.2vw, 2.4rem);
+  font-weight: 700;
+  margin: 12px 0 12px;
+}
+
+.where-desc {
+  color: var(--slate);
+  font-size: 1.05rem;
+  max-width: 48ch;
+  margin: 0;
+}
+
+@media (max-width: 920px) {
+  .facts-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .fact:nth-child(2) {
+    border-right: 0;
+  }
+  .story-grid,
+  .values-grid {
+    grid-template-columns: 1fr;
+  }
+}
