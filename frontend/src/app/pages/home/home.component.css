@@ -61,11 +61,44 @@
 
 .hero-visual {
   position: relative;
+  animation: fadeUp 0.9s ease both, floatVisual 8s ease-in-out 0.9s infinite;
+}
+
+.hero-visual::before {
+  content: '';
+  position: absolute;
+  inset: -16% -12%;
+  background:
+    radial-gradient(42% 48% at 72% 28%, rgba(176, 137, 79, 0.4), transparent 70%),
+    radial-gradient(46% 54% at 24% 82%, rgba(47, 110, 104, 0.32), transparent 72%);
+  filter: blur(30px);
+  z-index: 0;
+}
+
+.visual-frame {
+  position: relative;
+  z-index: 1;
+  padding: 1.5px;
+  border-radius: 18px;
+  background: linear-gradient(145deg, rgba(176, 137, 79, 0.9), rgba(47, 110, 104, 0.45) 48%, rgba(255, 255, 255, 0.08) 82%);
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.45);
+}
+
+.visual-inner {
+  position: relative;
   border-radius: 16px;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.38);
-  animation: fadeUp 0.9s ease both;
+  background: var(--ink-2);
+}
+
+.visual-inner::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(15, 29, 46, 0.42) 0%, transparent 24%, transparent 66%, rgba(15, 29, 46, 0.62) 100%),
+    radial-gradient(125% 80% at 50% 0%, transparent 56%, rgba(15, 29, 46, 0.45));
+  pointer-events: none;
 }
 
 .brand-render {
@@ -74,17 +107,39 @@
   height: auto;
 }
 
+.frame-tag {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 2;
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.14em;
+  color: var(--line-2);
+  background: rgba(15, 29, 46, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 6px 10px;
+  border-radius: 6px;
+}
+
 .render-badge {
   position: absolute;
-  left: 16px;
-  bottom: 16px;
+  right: 14px;
+  bottom: 14px;
+  z-index: 2;
   font-family: var(--font-mono);
-  font-size: 0.72rem;
-  letter-spacing: 0.1em;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
   color: var(--ink);
   background: var(--brass);
   padding: 7px 12px;
   border-radius: 999px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes floatVisual {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
 }
 
 .trust-bar {
