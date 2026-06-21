@@ -1,10 +1,15 @@
 <section class="page-head">
-  <div class="container">
-    <span class="eyebrow">Catálogo · 03 sistemas</span>
-    <h1 class="page-title">Productos Amantix</h1>
-    <p class="page-lead">
-      Tres sistemas en producción para facturar, atender y manejar caja. Elige el tuyo o combínalos.
-    </p>
+  <div class="container page-head-grid">
+    <div class="page-head-copy">
+      <span class="eyebrow">Catálogo · 03 sistemas</span>
+      <h1 class="page-title">Productos Amantix</h1>
+      <p class="page-lead">
+        Tres sistemas en producción para facturar, atender y manejar caja. Elige el tuyo o combínalos.
+      </p>
+    </div>
+    <div class="page-head-media">
+      <img src="/productos/catalogo.png" alt="Los tres sistemas de Amantix" width="1000" height="848" />
+    </div>
   </div>
 </section>
 
@@ -18,6 +23,9 @@
         </header>
         <h2 class="credential-name">{{ product.name }}</h2>
         <p class="credential-desc">{{ product.shortDescription }}</p>
+        <div class="credential-media">
+          <img [src]="product.image" [alt]="product.name" width="900" height="491" loading="lazy" />
+        </div>
         <div class="credential-actions">
           <a [routerLink]="['/productos', product.slug]" class="btn btn-ghost">Ver detalle</a>
           <a [href]="product.productionUrl" target="_blank" rel="noopener" class="credential-link">Ir al sistema ↗</a>
