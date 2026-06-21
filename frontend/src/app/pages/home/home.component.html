@@ -48,6 +48,9 @@
           </header>
           <h3 class="credential-name">{{ product.name }}</h3>
           <p class="credential-desc">{{ product.shortDescription }}</p>
+          <div class="credential-media">
+            <img [src]="product.image" [alt]="product.name" width="900" height="491" loading="lazy" />
+          </div>
           <a [routerLink]="['/productos', product.slug]" class="credential-link">Ver producto →</a>
         </article>
       }
