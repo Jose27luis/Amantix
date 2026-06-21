@@ -1,0 +1,85 @@
+<section class="contact">
+  <div class="container contact-grid">
+    <div class="contact-intro">
+      <span class="eyebrow">Contacto</span>
+      <h1 class="contact-title">Cuéntanos qué necesita tu negocio.</h1>
+      <p class="contact-lead">
+        Te respondemos el mismo día. Cuéntanos qué sistema te interesa y coordinamos una demo sin compromiso.
+      </p>
+
+      <ul class="trust-list">
+        <li><span class="trust-tag">Datos minimizados (ISO 27001)</span></li>
+        <li><span class="trust-tag">Envío cifrado HTTPS</span></li>
+        <li><span class="trust-tag">Respuesta el mismo día</span></li>
+      </ul>
+
+      <div class="contact-direct">
+        <div>
+          <span class="direct-label">WhatsApp</span>
+          <a href="https://wa.me/51931110735" target="_blank" rel="noopener" class="direct-value">931 110 735</a>
+        </div>
+        <div>
+          <span class="direct-label">Correo</span>
+          <a href="mailto:jtecoluisgarciajoae@gmail.com" class="direct-value">jtecoluisgarciajoae&#64;gmail.com</a>
+        </div>
+      </div>
+    </div>
+
+    <form class="contact-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <div class="field">
+        <label for="name">Nombre</label>
+        <input id="name" type="text" formControlName="name" autocomplete="name" />
+        @if (isInvalid('name')) {
+          <span class="error">Indica tu nombre.</span>
+        }
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="company">Empresa</label>
+          <input id="company" type="text" formControlName="company" autocomplete="organization" />
+        </div>
+        <div class="field">
+          <label for="phone">Teléfono</label>
+          <input id="phone" type="tel" formControlName="phone" autocomplete="tel" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="email">Correo</label>
+        <input id="email" type="email" formControlName="email" autocomplete="email" />
+        @if (isInvalid('email')) {
+          <span class="error">Ingresa un correo válido.</span>
+        }
+      </div>
+
+      <div class="field">
+        <label for="product">Producto de interés</label>
+        <select id="product" formControlName="productInterest">
+          <option value="" disabled>Selecciona un sistema…</option>
+          @for (option of productOptions; track option) {
+            <option [value]="option">{{ option }}</option>
+          }
+        </select>
+        @if (isInvalid('productInterest')) {
+          <span class="error">Elige un sistema.</span>
+        }
+      </div>
+
+      <div class="field">
+        <label for="message">Mensaje</label>
+        <textarea id="message" rows="4" formControlName="message"></textarea>
+        @if (isInvalid('message')) {
+          <span class="error">Escribe tu mensaje.</span>
+        }
+      </div>
+
+      <button type="submit" class="btn btn-primary form-submit">Enviar solicitud</button>
+
+      <p class="privacy">
+        Usaremos tus datos solo para responder tu solicitud. Consulta nuestra
+        <a routerLink="/nosotros">política de privacidad</a>.
+      </p>
+    </form>
+  </div>
+</section>
