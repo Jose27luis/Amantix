@@ -1,13 +1,27 @@
 <section class="detail-head">
-  <div class="container">
-    <a routerLink="/productos" class="back">← Productos</a>
-    <span class="eyebrow">{{ product.code }} · sys · {{ product.systemRef }}</span>
-    <h1 class="detail-title">{{ product.name }}</h1>
-    <p class="detail-desc">{{ product.description }}</p>
-    <div class="detail-actions">
-      <a routerLink="/contacto" class="btn btn-primary">Solicitar demo</a>
-      <a [href]="product.productionUrl" target="_blank" rel="noopener" class="btn btn-ghost-light">Ir al sistema ↗</a>
+  <div class="container" [class.detail-head-grid]="!!product.heroImage">
+    <div class="detail-head-copy reveal reveal-left">
+      <a routerLink="/productos" class="back">← Productos</a>
+      <span class="eyebrow">{{ product.code }} · sys · {{ product.systemRef }}</span>
+      <h1 class="detail-title">{{ product.name }}</h1>
+      <p class="detail-desc">{{ product.description }}</p>
+      <div class="detail-actions">
+        <a routerLink="/contacto" class="btn btn-primary">Solicitar demo</a>
+        <a [href]="product.productionUrl" target="_blank" rel="noopener" class="btn btn-ghost-light">Ir al sistema ↗</a>
+      </div>
     </div>
+
+    @if (product.heroImage) {
+      <div class="browser reveal reveal-right">
+        <div class="browser-bar">
+          <span class="browser-dot"></span>
+          <span class="browser-dot"></span>
+          <span class="browser-dot"></span>
+          <span class="browser-url">{{ host }}</span>
+        </div>
+        <img [src]="product.heroImage" [alt]="'Panel de ' + product.name" class="browser-shot" width="1024" height="458" />
+      </div>
+    }
   </div>
 </section>
 
@@ -24,6 +38,27 @@
     </div>
   </div>
 </section>
+
+@if (product.screenshots.length) {
+  <section class="showcase">
+    <div class="container">
+      <span class="eyebrow reveal">El sistema por dentro</span>
+      <h2 class="showcase-title reveal">Capturas reales en producción</h2>
+      @for (shot of product.screenshots; track shot.title) {
+        <div class="showcase-row reveal" [class.showcase-reverse]="$odd">
+          <div class="showcase-media">
+            <img [src]="shot.image" [alt]="shot.title" loading="lazy" />
+          </div>
+          <div class="showcase-copy">
+            <span class="showcase-index">0{{ $index + 1 }}</span>
+            <h3 class="showcase-name">{{ shot.title }}</h3>
+            <p class="showcase-text">{{ shot.description }}</p>
+          </div>
+        </div>
+      }
+    </div>
+  </section>
+}
 
 <section class="detail-cta">
   <div class="container detail-cta-inner reveal">
