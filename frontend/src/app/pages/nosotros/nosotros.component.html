@@ -12,7 +12,7 @@
 <section class="facts">
   <div class="container facts-grid">
     @for (fact of facts; track fact.label) {
-      <div class="fact">
+      <div class="fact reveal" [style.transition-delay.ms]="$index * 70">
         <span class="fact-value">{{ fact.value }}</span>
         <span class="fact-label">{{ fact.label }}</span>
       </div>
@@ -22,14 +22,14 @@
 
 <section class="story">
   <div class="container story-grid">
-    <div class="story-block">
+    <div class="story-block reveal reveal-left">
       <span class="eyebrow">Misión</span>
       <p>
         Construir software empresarial confiable que cualquier negocio del Perú pueda facturar, operar y controlar —
         con seguridad por diseño y precisión en cada sistema.
       </p>
     </div>
-    <div class="story-block">
+    <div class="story-block reveal reveal-right">
       <span class="eyebrow">Cómo trabajamos</span>
       <p>
         Una sola base tecnológica (Angular + Laravel) para todos los productos. Reutilizamos componentes probados
@@ -44,7 +44,7 @@
     <span class="eyebrow">Valores</span>
     <div class="values-grid">
       @for (value of values; track value.title) {
-        <div class="value">
+        <div class="value reveal" [style.transition-delay.ms]="$index * 80">
           <h2 class="value-title">{{ value.title }}</h2>
           <p class="value-desc">{{ value.description }}</p>
         </div>
@@ -54,7 +54,7 @@
 </section>
 
 <section class="where">
-  <div class="container where-inner">
+  <div class="container where-inner reveal">
     <div>
       <span class="eyebrow">Dónde estamos</span>
       <h2 class="where-title">Puerto Maldonado, Perú</h2>
