@@ -1,0 +1,67 @@
+<section class="page-head">
+  <div class="container">
+    <span class="eyebrow">Nosotros · desde 2026</span>
+    <h1 class="page-title">Una casa de software peruana que se toma en serio tu dinero.</h1>
+    <p class="page-lead">
+      Nacimos en Puerto Maldonado en 2026 con una idea simple: los negocios merecen sistemas que cuadren, cumplan
+      con SUNAT y no fallen cuando hay dinero de por medio.
+    </p>
+  </div>
+</section>
+
+<section class="facts">
+  <div class="container facts-grid">
+    @for (fact of facts; track fact.label) {
+      <div class="fact">
+        <span class="fact-value">{{ fact.value }}</span>
+        <span class="fact-label">{{ fact.label }}</span>
+      </div>
+    }
+  </div>
+</section>
+
+<section class="story">
+  <div class="container story-grid">
+    <div class="story-block">
+      <span class="eyebrow">Misión</span>
+      <p>
+        Construir software empresarial confiable que cualquier negocio del Perú pueda facturar, operar y controlar —
+        con la disciplina de seguridad de una norma ISO 27001.
+      </p>
+    </div>
+    <div class="story-block">
+      <span class="eyebrow">Cómo trabajamos</span>
+      <p>
+        Una sola base tecnológica (Angular + Laravel) para todos los productos. Reutilizamos componentes probados
+        para que cada sistema sea robusto y mantenible.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="values">
+  <div class="container">
+    <span class="eyebrow">Valores</span>
+    <div class="values-grid">
+      @for (value of values; track value.title) {
+        <div class="value">
+          <h2 class="value-title">{{ value.title }}</h2>
+          <p class="value-desc">{{ value.description }}</p>
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<section class="where">
+  <div class="container where-inner">
+    <div>
+      <span class="eyebrow">Dónde estamos</span>
+      <h2 class="where-title">Puerto Maldonado, Perú</h2>
+      <p class="where-desc">
+        Operamos para todo el país. Escríbenos por WhatsApp o correo y te respondemos el mismo día.
+      </p>
+    </div>
+    <a routerLink="/contacto" class="btn btn-primary">Contáctanos</a>
+  </div>
+</section>
