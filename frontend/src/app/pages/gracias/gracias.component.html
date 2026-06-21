@@ -1,0 +1,34 @@
+<section class="gracias">
+  <div class="container gracias-inner">
+    <span class="seal-check" aria-hidden="true">
+      <svg width="34" height="34" viewBox="0 0 24 24" fill="none">
+        <path d="M20 6 9 17l-5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </span>
+    <span class="eyebrow">Solicitud recibida</span>
+    <h1 class="gracias-title">Gracias. Te contactaremos hoy mismo.</h1>
+    <p class="gracias-lead">
+      Registramos tu solicitud de forma segura. Un asesor de Amantix se comunicará contigo a la brevedad.
+    </p>
+
+    <div class="receipt">
+      <div class="receipt-row">
+        <span class="receipt-label">N° de registro</span>
+        <span class="receipt-value">{{ receipt.registration }}</span>
+      </div>
+      <div class="receipt-row">
+        <span class="receipt-label">Producto</span>
+        <span class="receipt-value">{{ receipt.productLabel }}</span>
+      </div>
+      <div class="receipt-row">
+        <span class="receipt-label">Origen</span>
+        <span class="receipt-value">{{ receipt.source }}</span>
+      </div>
+    </div>
+
+    <div class="gracias-actions">
+      <a routerLink="/" class="btn btn-ghost">Volver al inicio</a>
+      <a routerLink="/productos" class="btn btn-primary">Ver productos</a>
+    </div>
+  </div>
+</section>
