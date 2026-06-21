@@ -147,3 +147,203 @@ message, source (contacto|demo|cotizacion), created_at, updated_at
 3. Maquetar Home + páginas de producto.
 4. Implementar formularios de contacto/demo → API `leads` + notificación.
 5. Configurar SEO (SSR, metadatos, sitemap) y desplegar con nginx en el dominio Amantix.
+
+---
+
+## 10. Diagramas
+
+Diagramas en Mermaid (se renderizan en GitHub y en cualquier visor compatible).
+
+### 10.1. Casos de uso
+
+```mermaid
+flowchart LR
+    visitante(["Visitante"])
+    lead(["Cliente potencial"])
+    ventas(["Ventas / Admin"])
+
+    subgraph Sitio["Sitio web Amantix"]
+        uc1["Ver inicio"]
+        uc2["Ver catálogo de productos"]
+        uc3["Ver detalle de producto"]
+        uc4["Ver planes y precios"]
+        uc5["Solicitar demo"]
+        uc6["Solicitar cotización"]
+        uc7["Enviar mensaje de contacto"]
+        uc8["Ir al sistema en producción"]
+        uc9["Gestionar leads"]
+        uc10["Recibir notificación de lead"]
+    end
+
+    visitante --> uc1
+    visitante --> uc2
+    visitante --> uc3
+    visitante --> uc4
+    visitante --> uc8
+
+    lead --> uc5
+    lead --> uc6
+    lead --> uc7
+
+    ventas --> uc9
+    ventas --> uc10
+
+    uc5 -. genera .-> uc10
+    uc6 -. genera .-> uc10
+    uc7 -. genera .-> uc10
+```
+
+### 10.2. Secuencia — Solicitar demo / contacto
+
+```mermaid
+sequenceDiagram
+    actor V as Visitante
+    participant A as Frontend (Angular SSR)
+    participant API as Backend (Laravel API)
+    participant DB as MySQL
+    participant N as Notificación (correo / WhatsApp)
+    actor S as Ventas
+
+    V->>A: Completa formulario (nombre, empresa, correo, producto, mensaje)
+    A->>A: Valida campos en el cliente
+    A->>API: POST /api/leads
+    API->>API: Valida datos (FormRequest)
+    API->>DB: INSERT en tabla leads
+    DB-->>API: id del lead
+    API->>N: Envía notificación del nuevo lead
+    N-->>S: Correo / WhatsApp con los datos
+    API-->>A: 201 Created (ok)
+    A-->>V: Mensaje "Gracias, te contactaremos pronto"
+```
+
+### 10.3. Entidad-relación
+
+```mermaid
+erDiagram
+    PRODUCTS ||--o{ PLANS : "tiene"
+    PRODUCTS ||--o{ LEADS : "interesa a"
+    PRODUCTS ||--o{ FEATURES : "ofrece"
+    USERS ||--o{ LEADS : "atiende"
+
+    PRODUCTS {
+        bigint id PK
+        string slug
+        string name
+        string short_description
+        text description
+        string system_ref "pro8|mozo4|agente"
+        string production_url
+        boolean active
+        timestamp created_at
+    }
+
+    PLANS {
+        bigint id PK
+        bigint product_id FK
+        string name
+        decimal price
+        string period "mensual|anual"
+        json features
+        boolean highlighted
+    }
+
+    FEATURES {
+        bigint id PK
+        bigint product_id FK
+        string title
+        string icon
+        string description
+    }
+
+    LEADS {
+        bigint id PK
+        bigint product_id FK
+        bigint user_id FK
+        string name
+        string company
+        string email
+        string phone
+        string source "contacto|demo|cotizacion"
+        text message
+        string status "nuevo|contactado|cerrado"
+        timestamp created_at
+    }
+
+    USERS {
+        bigint id PK
+        string name
+        string email
+        string role "admin|ventas"
+        timestamp created_at
+    }
+```
+
+### 10.4. Arquitectura de despliegue
+
+```mermaid
+flowchart TD
+    user(["Usuario / Navegador"])
+    user -->|HTTPS| nginx["nginx (servidor Amantix)"]
+
+    nginx -->|"/"| front["Frontend Angular SSR (Node)"]
+    nginx -->|"/api"| back["Backend Laravel (PHP-FPM)"]
+    back --> db[("MySQL — leads, products, plans")]
+    back --> mail["Correo / WhatsApp (notificaciones)"]
+
+    subgraph Productos["Sistemas en producción (enlazados)"]
+        p1["Facturador Amantix - facturito.tokefact.pe"]
+        p2["Restaurant Sumaqta - sumaq.tokefact.pe"]
+        p3["Agente Amantix - agente.tokefacts.com"]
+    end
+
+    front -. enlaza a .-> p1
+    front -. enlaza a .-> p2
+    front -. enlaza a .-> p3
+```
+
+### 10.5. Arquitectura de carpetas
+
+```mermaid
+flowchart TD
+    root["Amantix/"]
+
+    root --> fe["frontend/ (Angular SSR)"]
+    root --> be["backend/ (Laravel API)"]
+    root --> ng["nginx/"]
+    root --> rd["README.md"]
+
+    fe --> fe_src["src/app/"]
+    fe_src --> fe_pages["pages/ (home, productos, producto-detalle, planes, nosotros, contacto)"]
+    fe_src --> fe_comp["components/ (navbar, footer, product-card, hero, cta, whatsapp-button)"]
+    fe_src --> fe_serv["services/ (api, seo)"]
+    fe --> fe_cfg["angular.json"]
+
+    be --> be_ctrl["app/Http/Controllers/ (LeadController, ProductController)"]
+    be --> be_models["app/Models/ (Lead, Product, Plan)"]
+    be --> be_routes["routes/api.php"]
+    be --> be_mig["database/migrations/ (products, plans, leads)"]
+```
+
+### 10.6. Flujo de navegación
+
+```mermaid
+flowchart LR
+    home["Inicio"] --> productos["Productos"]
+    home --> planes["Planes"]
+    home --> nosotros["Nosotros"]
+    home --> contacto["Contacto"]
+
+    productos --> facturador["Facturador Amantix"]
+    productos --> sumaqta["Restaurant Sumaqta"]
+    productos --> agenteUI["Agente Amantix"]
+
+    facturador --> demo["Solicitar demo"]
+    sumaqta --> demo
+    agenteUI --> demo
+    planes --> cotizar["Solicitar cotización"]
+    contacto --> enviar["Enviar mensaje"]
+
+    demo --> gracias["Confirmación"]
+    cotizar --> gracias
+    enviar --> gracias
+```
