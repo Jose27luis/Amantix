@@ -11,11 +11,34 @@
   align-items: center;
 }
 
+.page-head-media {
+  position: relative;
+}
+
+.page-head-media::before {
+  content: '';
+  position: absolute;
+  inset: -12% -8%;
+  background:
+    radial-gradient(44% 50% at 70% 30%, rgba(176, 137, 79, 0.32), transparent 70%),
+    radial-gradient(48% 56% at 28% 78%, rgba(47, 110, 104, 0.28), transparent 72%);
+  filter: blur(34px);
+  z-index: 0;
+}
+
 .page-head-media img {
+  position: relative;
+  z-index: 1;
   display: block;
   width: 100%;
   height: auto;
   filter: drop-shadow(0 24px 50px rgba(0, 0, 0, 0.45));
+  animation: floatProducts 8s ease-in-out infinite;
+}
+
+@keyframes floatProducts {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
 }
 
 .page-title {
