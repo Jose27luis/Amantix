@@ -10,6 +10,7 @@ export interface Product {
   readonly name: string;
   readonly shortDescription: string;
   readonly description: string;
+  readonly image: string;
   readonly features: readonly ProductFeature[];
   readonly productionUrl: string;
 }
