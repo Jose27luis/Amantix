@@ -64,7 +64,7 @@ export const PRODUCTS: readonly Product[] = [
     description:
       'Sistema de gestión para restaurantes. El mozo toma la comanda desde el celular y la cocina o caja la imprime al instante.',
     image: '/productos/prod-restaurante.png',
-    heroImage: '',
+    heroImage: '/productos/restaurante/sumaqta-hero.png',
     features: [
       {
         title: 'Comandas móviles',
@@ -79,7 +79,44 @@ export const PRODUCTS: readonly Product[] = [
         description: 'Emite el comprobante electrónico al cerrar la cuenta, conectado a SUNAT.',
       },
     ],
-    screenshots: [],
+    screenshots: [
+      {
+        title: 'Punto de venta por carta',
+        description:
+          'Arma el pedido tocando los platos por categoría, controla el stock disponible y envía la comanda a cocina en segundos.',
+        image: '/productos/restaurante/sumaqta-pos.png',
+      },
+      {
+        title: 'División de cuentas por comensal',
+        description:
+          'Reparte los productos de la mesa entre varias personas, factura a cada una por separado o cobra el restante.',
+        image: '/productos/restaurante/sumaqta-division.png',
+      },
+      {
+        title: 'Cobro con boleta electrónica',
+        description:
+          'Elige boleta o factura, registra el pago y emite el comprobante electrónico al instante, conectado a SUNAT.',
+        image: '/productos/restaurante/sumaqta-cobro.png',
+      },
+      {
+        title: 'Para llevar y delivery',
+        description:
+          'Registra y consulta las ventas para llevar con su comanda, canal y total del día, separadas del salón.',
+        image: '/productos/restaurante/sumaqta-delivery.png',
+      },
+      {
+        title: 'Carta y productos',
+        description:
+          'Administra la carta con precios, categorías, stock y visibilidad de cada plato en el restaurante.',
+        image: '/productos/restaurante/sumaqta-carta.png',
+      },
+      {
+        title: 'Control de insumos',
+        description:
+          'Lleva el stock de insumos con costo, merma y stock mínimo, con historial de movimientos por insumo.',
+        image: '/productos/restaurante/sumaqta-insumos.png',
+      },
+    ],
     productionUrl: 'https://sumaq.tokefact.pe',
   },
   {
