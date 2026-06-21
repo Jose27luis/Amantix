@@ -11,6 +11,7 @@ export const PRODUCTS: readonly Product[] = [
     description:
       'Sistema de facturación electrónica integral para Perú, conectado a SUNAT. Cada empresa opera con su propio RUC y base de datos aislada.',
     image: '/productos/prod-facturador.png',
+    heroImage: '/productos/facturador/facturador-hero.png',
     features: [
       {
         title: 'Comprobantes y guías',
@@ -25,6 +26,32 @@ export const PRODUCTS: readonly Product[] = [
         description: 'Almacenes, listas de precios, punto de venta, reportes y panel del contador.',
       },
     ],
+    screenshots: [
+      {
+        title: 'Comprobantes conectados a SUNAT',
+        description:
+          'Emite y consulta facturas, boletas y notas; descarga XML y PDF, y valida en lote. El estado de cada comprobante se sincroniza con SUNAT en producción.',
+        image: '/productos/facturador/facturador-comprobantes.png',
+      },
+      {
+        title: 'SIRE — registro de compras y ventas',
+        description:
+          'Importa el XML descargado desde SUNAT y crea los productos en el catálogo automáticamente, con base imponible e IGV calculados.',
+        image: '/productos/facturador/facturador-sire.png',
+      },
+      {
+        title: 'Punto de venta ágil',
+        description:
+          'Vende por categorías, arma el carrito, cambia de moneda y cobra en segundos. Pensado para mostrador y atención rápida.',
+        image: '/productos/facturador/facturador-pos.png',
+      },
+      {
+        title: 'Módulo de hotel y recepción',
+        description:
+          'Vista general de recepción: ocupación, check-in y check-out, estados de habitación e ingresos del día. Un sistema para varios giros de negocio.',
+        image: '/productos/facturador/facturador-hotel.png',
+      },
+    ],
     productionUrl: 'https://facturito.tokefact.pe',
   },
   {
@@ -37,6 +64,7 @@ export const PRODUCTS: readonly Product[] = [
     description:
       'Sistema de gestión para restaurantes. El mozo toma la comanda desde el celular y la cocina o caja la imprime al instante.',
     image: '/productos/prod-restaurante.png',
+    heroImage: '',
     features: [
       {
         title: 'Comandas móviles',
@@ -51,6 +79,7 @@ export const PRODUCTS: readonly Product[] = [
         description: 'Emite el comprobante electrónico al cerrar la cuenta, conectado a SUNAT.',
       },
     ],
+    screenshots: [],
     productionUrl: 'https://sumaq.tokefact.pe',
   },
   {
@@ -63,6 +92,7 @@ export const PRODUCTS: readonly Product[] = [
     description:
       'Plataforma SaaS para operar agentes multibancarios en Perú. Multi-tenant por subdominio, cada empresa con su base de datos aislada.',
     image: '/productos/prod-agente.png',
+    heroImage: '',
     features: [
       {
         title: 'Caja multibilletera',
@@ -77,6 +107,7 @@ export const PRODUCTS: readonly Product[] = [
         description: 'Cuadre por billetera y cierre diario pensado para no perder un sol.',
       },
     ],
+    screenshots: [],
     productionUrl: 'https://agente.tokefacts.com',
   },
 ];
