@@ -1,0 +1,152 @@
+.contact {
+  padding: 72px 0 96px;
+}
+
+.contact-grid {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 56px;
+  align-items: start;
+}
+
+.contact-title {
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 800;
+  margin: 14px 0 16px;
+  max-width: 18ch;
+}
+
+.contact-lead {
+  color: var(--slate);
+  font-size: 1.05rem;
+  margin: 0 0 28px;
+}
+
+.trust-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.trust-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  color: var(--steel);
+}
+
+.trust-tag::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--teal);
+}
+
+.contact-direct {
+  display: flex;
+  gap: 40px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+}
+
+.direct-label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--slate-2);
+  margin-bottom: 6px;
+}
+
+.direct-value {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.contact-form {
+  background: var(--cloud);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--steel);
+}
+
+input,
+select,
+textarea {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 11px 13px;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgba(47, 110, 104, 0.15);
+}
+
+textarea {
+  resize: vertical;
+}
+
+.error {
+  font-size: 0.8rem;
+  color: var(--danger);
+}
+
+.form-submit {
+  margin-top: 4px;
+}
+
+.privacy {
+  font-size: 0.82rem;
+  color: var(--slate);
+  margin: 0;
+}
+
+.privacy a {
+  color: var(--teal);
+  font-weight: 600;
+}
+
+@media (max-width: 920px) {
+  .contact-grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+}
