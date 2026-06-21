@@ -39,47 +39,32 @@
   animation: fadeUp 0.8s ease both;
 }
 
-.seal {
-  display: flex;
-  justify-content: center;
+.hero-visual {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.38);
   animation: fadeUp 0.9s ease both;
 }
 
-.seal-draw {
-  stroke-dasharray: 578;
-  animation: drawSeal 1.6s ease both;
+.brand-render {
+  display: block;
+  width: 100%;
+  height: auto;
 }
 
-@keyframes drawSeal {
-  from { stroke-dashoffset: 578; }
-  to { stroke-dashoffset: 0; }
-}
-
-.seal-ring {
+.render-badge {
+  position: absolute;
+  left: 16px;
+  bottom: 16px;
   font-family: var(--font-mono);
-  font-size: 8.6px;
-  letter-spacing: 0.16em;
-}
-
-.seal-num {
-  font-family: var(--font-display);
-  font-weight: 800;
-  font-size: 34px;
-  fill: var(--cloud);
-}
-
-.seal-label {
-  font-family: var(--font-mono);
-  font-size: 9px;
-  letter-spacing: 0.18em;
-  fill: var(--teal-light);
-}
-
-.seal-cert {
-  font-family: var(--font-mono);
-  font-size: 8px;
+  font-size: 0.72rem;
   letter-spacing: 0.1em;
-  fill: var(--slate-2);
+  color: var(--ink);
+  background: var(--brass);
+  padding: 7px 12px;
+  border-radius: 999px;
 }
 
 .trust-bar {
@@ -320,8 +305,8 @@
   .hero-inner {
     grid-template-columns: 1fr;
   }
-  .seal {
-    display: none;
+  .hero-visual {
+    max-width: 460px;
   }
   .cards,
   .pillars,
