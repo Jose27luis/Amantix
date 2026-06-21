@@ -10,6 +10,7 @@ export const PRODUCTS: readonly Product[] = [
       'Comprobantes electrónicos, GRE y SIRE conectados a SUNAT, con inventario y POS. Multi-tenant por RUC.',
     description:
       'Sistema de facturación electrónica integral para Perú, conectado a SUNAT. Cada empresa opera con su propio RUC y base de datos aislada.',
+    image: '/productos/prod-facturador.png',
     features: [
       {
         title: 'Comprobantes y guías',
@@ -35,6 +36,7 @@ export const PRODUCTS: readonly Product[] = [
       'Punto de venta gastronómico: comandas desde el móvil, impresión en cocina y caja, mesas y carta.',
     description:
       'Sistema de gestión para restaurantes. El mozo toma la comanda desde el celular y la cocina o caja la imprime al instante.',
+    image: '/productos/prod-restaurante.png',
     features: [
       {
         title: 'Comandas móviles',
@@ -60,6 +62,7 @@ export const PRODUCTS: readonly Product[] = [
       'Plataforma para agentes multibancarios: caja por billeteras, boletas SUNAT, préstamos y cierre diario.',
     description:
       'Plataforma SaaS para operar agentes multibancarios en Perú. Multi-tenant por subdominio, cada empresa con su base de datos aislada.',
+    image: '/productos/prod-agente.png',
     features: [
       {
         title: 'Caja multibilletera',
