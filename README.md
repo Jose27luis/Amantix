@@ -347,3 +347,132 @@ flowchart LR
     cotizar --> gracias
     enviar --> gracias
 ```
+
+---
+
+## 11. Guía de estilos (para generar las interfaces)
+
+Sistema de diseño del sitio. Sirve de brief para producir las pantallas. La meta: **corporativo, sobrio y premium**, que transmita confianza en un software que maneja dinero e impuestos — **no** el look genérico de IA, **sin** colores chillones.
+
+### 11.1. Concepto
+
+**Tesis: "confianza diseñada".** Amantix construye sistemas que manejan facturación SUNAT, caja y operaciones bancarias. El diseño comunica **precisión, seguridad y solvencia**, no entretenimiento. El elemento firma es un **sello de cumplimiento** (estilo ISO/IEC 27001) y micro-etiquetas monoespaciadas tipo código de registro; las tarjetas de producto se ven como **credenciales**.
+
+Evitar explícitamente los clichés de IA: fondo crema + serif de alto contraste + terracota; negro con acento verde ácido; layout de periódico con filetes. No usarlos.
+
+### 11.2. Paleta — complementario apagado (regla 60/30/10)
+
+Relación de color: **complementario desaturado** (navy frío ↔ latón cálido), equilibrado por un campo neutro gris-niebla y un teal de respaldo solo para señales de seguridad. Proporción: **60%** neutros (niebla/blanco), **30%** navy, **10%** latón; teal < 5%.
+
+| Token | Hex | Uso |
+|---|---|---|
+| `--ink` | `#0F1D2E` | Navy profundo. Hero, footer, texto principal sobre claro. |
+| `--steel` | `#2A3F54` | Navy-pizarra. Superficies sobre oscuro, bordes en secciones dark. |
+| `--brass` | `#B0894F` | Latón apagado. Acento firma, CTAs, subrayados. **Con restricción.** |
+| `--teal` | `#2F6E68` | Teal apagado. Señales de seguridad/ISO, hover de enlaces. |
+| `--mist` | `#EEF1F3` | Gris-niebla frío. Fondo de página (NO crema). |
+| `--cloud` | `#FFFFFF` | Tarjetas y superficies. |
+| `--slate-600` | `#5A6B7B` | Texto secundario / apoyo. |
+| `--line` | `#DCE2E6` | Filetes y divisores (1px). |
+
+Reglas de color:
+- **Latón solo en acentos** (títulos clave, CTA, sello). Nunca como fondo de bloques grandes ni en texto de cuerpo.
+- **CTA**: fondo latón con texto `--ink` (texto oscuro sobre latón = buen contraste). El hover oscurece levemente.
+- **Teal** reservado a confianza/seguridad (badges "Datos protegidos", certificaciones), no decorativo.
+- Contraste mínimo **AA**: cuerpo `--ink` sobre `--mist`/`--cloud`; latón solo en texto grande o sobre `--ink`.
+
+### 11.3. Tipografía
+
+Pareja deliberada, ligada al rubro (software empresarial + cifras):
+
+| Rol | Fuente | Uso |
+|---|---|---|
+| **Display** | **Archivo** (700–800) | Titulares. Sensación industrial-corporativa, confiada. |
+| **Cuerpo** | **IBM Plex Sans** (400/500/600) | Texto, párrafos, UI. Herencia "enterprise/seguridad". |
+| **Datos / etiquetas** | **IBM Plex Mono** (500) | Cifras (RUC, montos, N° de comprobante), micro-etiquetas, códigos de sección. |
+
+Escala (desktop; usar `clamp()` para responsive):
+
+| Nivel | Tamaño | Peso / detalle |
+|---|---|---|
+| Hero | `clamp(2.75rem, 6vw, 4.75rem)` | Archivo 800, tracking `-0.02em`, line-height 1.04 |
+| H1 | 2.5rem | Archivo 700 |
+| H2 | 2rem | Archivo 700 |
+| H3 | 1.5rem | Archivo 600 |
+| Cuerpo | 1.0625rem / 1.7 | Plex Sans 400 |
+| Pequeño | 0.875rem | Plex Sans 400 |
+| Micro-etiqueta | 0.75rem | Plex Mono 500, MAYÚSCULAS, tracking `0.12em` |
+
+### 11.4. Layout, espaciado y forma
+
+- **Grid base 4px.** Contenedor máx. 1200px. Columnas de 12.
+- **Aire generoso:** padding de sección 96–128px en desktop, 56–72px en móvil.
+- **Radio controlado:** 8px tarjetas, 6px inputs/botones, pill (999px) solo en badges. Ni 0 (periódico) ni excesivo.
+- **Sombra discreta:** `0 1px 2px rgba(15,29,46,.06)` en tarjetas; elevación leve en hover.
+- **Filetes 1px** `--line` para estructurar, sin abusar.
+
+Estructura significativa (no decorativa): **eyebrows monoespaciados** que codifican algo real, p. ej. `01 · FACTURACIÓN`, `REG. ISO/IEC 27001`, `RUC · SUNAT`. Numerar solo cuando hay secuencia real (procesos), no por adorno.
+
+### 11.5. Componentes
+
+- **Navbar**: logo + navegación + CTA "Solicitar demo" (latón). Fondo `--cloud`, hairline inferior; al hacer scroll, fondo `--ink` translúcido.
+- **Hero**: titular-tesis + subtítulo + dos CTAs (primaria latón, secundaria contorno) + **sello de cumplimiento** (firma). Fondo `--ink`, micro-etiqueta mono arriba.
+- **Tarjeta de producto (credencial)**: encabezado mono con código (`01 · FACTURADOR`), nombre, descripción corta, 3 features, CTA. Borde `--line`, acento latón al hover.
+- **Sección de confianza**: badges de seguridad (ISO 27001, SUNAT, SSL) en teal/neutro.
+- **Planes**: 3 columnas; plan destacado con borde latón y micro-etiqueta "Recomendado".
+- **Formularios** (contacto/demo): labels visibles (sin placeholder como etiqueta), foco visible, nota de privacidad (ver 11.7).
+- **Footer**: `--ink`, navegación, contacto, sello + leyenda de registro.
+- **Botón flotante de WhatsApp**: discreto, esquina inferior derecha.
+
+### 11.6. Movimiento (con restricción)
+
+- Reveal sutil al hacer scroll (fade + 8px de subida).
+- El **sello** se dibuja una vez al cargar el hero.
+- Hover: elevación leve y aparición del acento latón en tarjetas.
+- **Respetar `prefers-reduced-motion`** (desactivar animaciones).
+
+### 11.7. ISO/IEC 27001 — implicaciones de diseño
+
+Traducción de la norma a reglas concretas de interfaz (la web es marketing, pero debe reflejar la cultura de seguridad de la empresa):
+
+- **Minimización de datos**: los formularios piden solo lo necesario (nombre, empresa, correo, teléfono, producto, mensaje). Nada de campos de más.
+- **Consentimiento y propósito**: junto al botón de envío, nota visible: *"Usaremos tus datos solo para responder tu solicitud."* + enlace a política de privacidad.
+- **Señales de confianza visibles**: badges de **ISO/IEC 27001**, conexión segura (HTTPS) y SUNAT en la sección de confianza y el footer.
+- **No exponer datos sensibles** en la UI ni en URLs; los envíos van por HTTPS a la API.
+- **Mensajería de seguridad** clara en estados: confirmación tras enviar ("Recibimos tu solicitud"), errores que explican qué pasó y cómo resolver, sin tecnicismos.
+- **Trazabilidad**: cada lead se registra con fecha/origen (refleja control, no se muestra al visitante).
+
+### 11.8. Usabilidad y accesibilidad (piso de calidad)
+
+- **Responsive** completo hasta móvil.
+- **Foco de teclado visible** (anillo `--teal`), navegación por tab coherente.
+- **Contraste AA** en todo texto; objetivos táctiles ≥ 44px.
+- **Jerarquía clara**: un solo CTA primario por vista; lenguaje en voz activa ("Solicitar demo", no "Enviar").
+- **Estados vacíos/errores** con dirección, no disculpas.
+
+### 11.9. Boceto del hero (referencia)
+
+```
+┌───────────────────────────────────────────────────────────────┐
+│  AMANTIX            Productos  Planes  Nosotros   [Solicitar demo]│
+├───────────────────────────────────────────────────────────────┤
+│  REG. ISO/IEC 27001 · SOFTWARE EMPRESARIAL          (mono, latón) │
+│                                                                  │
+│  Software que tu                                  ◜───────◝       │
+│  negocio puede                                    │  SELLO  │     │
+│  facturar, operar                                 │ 27001   │     │
+│  y controlar.                                     ◟───────◞       │
+│                                                                  │
+│  Facturación SUNAT, restaurante y agente bancario, en una sola   │
+│  casa de software.                                               │
+│                                                                  │
+│  [ Solicitar demo ]   [ Ver productos ]                          │
+│                                                                  │
+│  ── FACTURADOR ──  ── SUMAQTA ──  ── AGENTE ──   (mono, filetes)  │
+└───────────────────────────────────────────────────────────────┘
+```
+
+### 11.10. Resumen para el generador
+
+> Diseño **corporativo y premium** para una casa de software peruana que maneja dinero e impuestos. Paleta **complementaria apagada**: navy `#0F1D2E` + latón `#B0894F` sobre niebla `#EEF1F3`, teal `#2F6E68` solo para seguridad; **sin colores chillones**, regla 60/30/10. Tipografía **Archivo** (display) + **IBM Plex Sans** (cuerpo) + **IBM Plex Mono** (cifras/etiquetas). Firma: **sello de cumplimiento ISO 27001** + micro-etiquetas mono tipo código de registro; tarjetas de producto como **credenciales**. Cumplir **ISO 27001** en la UI (minimización de datos, consentimiento, señales de confianza) y un **piso de accesibilidad AA**. Evitar los clichés de IA (crema+serif+terracota, negro+verde ácido, periódico).
+
