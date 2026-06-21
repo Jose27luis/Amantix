@@ -16,7 +16,7 @@
     <span class="eyebrow">Qué incluye</span>
     <div class="feature-grid">
       @for (feature of product.features; track feature.title) {
-        <div class="feature">
+        <div class="feature reveal" [style.transition-delay.ms]="$index * 80">
           <h2 class="feature-title">{{ feature.title }}</h2>
           <p class="feature-desc">{{ feature.description }}</p>
         </div>
@@ -26,7 +26,7 @@
 </section>
 
 <section class="detail-cta">
-  <div class="container detail-cta-inner">
+  <div class="container detail-cta-inner reveal">
     <h2 class="detail-cta-title">¿Quieres ver {{ product.name }} en acción?</h2>
     <a routerLink="/contacto" class="btn btn-primary">Solicitar demo</a>
   </div>
