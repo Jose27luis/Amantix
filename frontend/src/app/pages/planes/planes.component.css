@@ -1,0 +1,156 @@
+.page-head {
+  background: var(--ink);
+  color: var(--cloud);
+  padding: 80px 0 64px;
+}
+
+.page-title {
+  font-size: clamp(2.2rem, 4.6vw, 3.4rem);
+  font-weight: 800;
+  margin: 14px 0 16px;
+}
+
+.page-lead {
+  color: var(--line-2);
+  font-size: 1.08rem;
+  max-width: 56ch;
+  margin: 0 0 28px;
+}
+
+.toggle {
+  display: inline-flex;
+  background: var(--ink-2);
+  border: 1px solid var(--steel);
+  border-radius: 8px;
+  padding: 4px;
+  gap: 4px;
+}
+
+.toggle-btn {
+  background: none;
+  border: 0;
+  border-radius: 6px;
+  padding: 10px 18px;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--line-2);
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.toggle-btn.active {
+  background: var(--brass);
+  color: var(--ink);
+}
+
+.plans {
+  padding: 72px 0 96px;
+}
+
+.plans-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+  align-items: start;
+}
+
+.plan {
+  background: var(--cloud);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 30px;
+}
+
+.plan.highlighted {
+  border-color: var(--brass);
+  box-shadow: 0 12px 30px rgba(15, 29, 46, 0.1);
+}
+
+.plan-flag {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  color: var(--brass);
+  margin-bottom: 12px;
+}
+
+.plan-name {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 8px;
+}
+
+.plan-desc {
+  color: var(--slate);
+  font-size: 0.94rem;
+  margin: 0 0 20px;
+  min-height: 48px;
+}
+
+.plan-price {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 22px;
+}
+
+.plan-amount {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 2.4rem;
+  color: var(--ink);
+}
+
+.plan-period {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--slate-2);
+}
+
+.plan-features {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+
+.plan-features li {
+  position: relative;
+  padding-left: 24px;
+  color: var(--steel);
+  font-size: 0.94rem;
+}
+
+.plan-features li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 7px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--teal);
+}
+
+.plan .btn {
+  width: 100%;
+}
+
+.plans-note {
+  color: var(--slate);
+  font-size: 0.9rem;
+  max-width: 70ch;
+  margin: 40px auto 0;
+}
+
+@media (max-width: 920px) {
+  .plans-grid {
+    grid-template-columns: 1fr;
+  }
+}
