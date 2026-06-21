@@ -1,0 +1,39 @@
+<footer class="footer">
+  <div class="container footer-grid">
+    <div class="footer-brand">
+      <a routerLink="/" class="brand">
+        <span class="brand-mark"></span>
+        <span class="brand-name">AMANTIX</span>
+      </a>
+      <p class="footer-text">
+        Software empresarial que tu negocio puede facturar, operar y controlar. Hecho en Puerto Maldonado, Perú.
+      </p>
+      <span class="footer-reg">REG. ISO/IEC 27001</span>
+    </div>
+
+    <div class="footer-col">
+      <span class="footer-title">Productos</span>
+      @for (product of products; track product.slug) {
+        <a [routerLink]="['/productos', product.slug]" class="footer-link">{{ product.name }}</a>
+      }
+    </div>
+
+    <div class="footer-col">
+      <span class="footer-title">Empresa</span>
+      <a routerLink="/nosotros" class="footer-link">Nosotros</a>
+      <a routerLink="/planes" class="footer-link">Planes</a>
+      <a routerLink="/contacto" class="footer-link">Contacto</a>
+    </div>
+
+    <div class="footer-col">
+      <span class="footer-title">Contacto</span>
+      <a href="https://wa.me/51931110735" class="footer-link" target="_blank" rel="noopener">WhatsApp · 931 110 735</a>
+      <a href="mailto:jtecoluisgarciajoae@gmail.com" class="footer-link">jtecoluisgarciajoae&#64;gmail.com</a>
+    </div>
+  </div>
+
+  <div class="container footer-bottom">
+    <span>© {{ year }} Amantix. Puerto Maldonado, Perú.</span>
+    <span class="footer-mono">SOFTWARE EMPRESARIAL · SUNAT</span>
+  </div>
+</footer>
