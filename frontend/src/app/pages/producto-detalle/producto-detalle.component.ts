@@ -17,6 +17,10 @@ export class ProductoDetalleComponent {
 
   protected readonly product: Product;
 
+  protected get host(): string {
+    return this.product.productionUrl.replace(/^https?:\/\//, '');
+  }
+
   constructor() {
     const slug = this.route.snapshot.paramMap.get('slug');
     const match = PRODUCTS.find((item) => item.slug === slug);
