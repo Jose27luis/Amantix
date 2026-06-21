@@ -30,6 +30,6 @@ export class NosotrosComponent {
     { label: 'Fundación', value: '2026' },
     { label: 'Sistemas', value: '03' },
     { label: 'Sede', value: 'Pto. Maldonado' },
-    { label: 'Reg.', value: 'ISO 27001' },
+    { label: 'Conexión', value: 'SUNAT' },
   ];
 }
