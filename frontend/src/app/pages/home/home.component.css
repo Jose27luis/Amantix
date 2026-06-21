@@ -163,6 +163,16 @@
   letter-spacing: 0.08em;
   color: var(--steel);
   box-shadow: 0 1px 2px rgba(15, 29, 46, 0.06);
+  cursor: default;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.trust-badge:hover {
+  background: var(--brass);
+  border-color: var(--brass);
+  color: var(--ink);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(176, 137, 79, 0.35);
 }
 
 .trust-dot {
@@ -170,6 +180,11 @@
   height: 7px;
   border-radius: 50%;
   background: var(--teal);
+  transition: background 0.2s ease;
+}
+
+.trust-badge:hover .trust-dot {
+  background: var(--ink);
 }
 
 .catalog {
