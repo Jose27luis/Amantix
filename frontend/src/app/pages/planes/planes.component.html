@@ -1,0 +1,49 @@
+<section class="page-head">
+  <div class="container">
+    <span class="eyebrow">Planes y precios</span>
+    <h1 class="page-title">Precios claros, sin sorpresas.</h1>
+    <p class="page-lead">
+      Elige el plan y aplícalo a cualquiera de los tres sistemas. Paga al mes o ahorra dos meses al año.
+    </p>
+
+    <div class="toggle" role="group" aria-label="Periodo de facturación">
+      <button type="button" class="toggle-btn" [class.active]="period() === 'mensual'" (click)="setPeriod('mensual')">
+        Mensual
+      </button>
+      <button type="button" class="toggle-btn" [class.active]="period() === 'anual'" (click)="setPeriod('anual')">
+        Anual · ahorra 2 meses
+      </button>
+    </div>
+  </div>
+</section>
+
+<section class="plans">
+  <div class="container plans-grid">
+    @for (plan of plans; track plan.name) {
+      <article class="plan" [class.highlighted]="plan.highlighted">
+        @if (plan.highlighted) {
+          <span class="plan-flag">★ Recomendado</span>
+        }
+        <h2 class="plan-name">{{ plan.name }}</h2>
+        <p class="plan-desc">{{ plan.description }}</p>
+        <div class="plan-price">
+          <span class="plan-amount">{{ priceLabel()(plan) }}</span>
+          <span class="plan-period">/ {{ period() === 'anual' ? 'año' : 'mes' }}</span>
+        </div>
+        <ul class="plan-features">
+          @for (feature of plan.features; track feature) {
+            <li>{{ feature }}</li>
+          }
+        </ul>
+        <a routerLink="/contacto" class="btn" [class.btn-primary]="plan.highlighted" [class.btn-ghost]="!plan.highlighted">
+          Solicitar cotización
+        </a>
+      </article>
+    }
+  </div>
+
+  <p class="container plans-note">
+    Todos los precios en soles (S/) y excluyen IGV. La implementación de SUNAT, capacitación inicial y enlaces a
+    sistemas en producción están incluidos en cada plan.
+  </p>
+</section>
