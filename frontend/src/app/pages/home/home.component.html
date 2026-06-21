@@ -1,0 +1,116 @@
+<section class="hero">
+  <div class="container hero-inner">
+    <div class="hero-copy">
+      <span class="eyebrow">REG. ISO/IEC 27001 · SOFTWARE EMPRESARIAL</span>
+      <h1 class="hero-title">Software que tu negocio puede facturar, operar y controlar.</h1>
+      <p class="hero-sub">
+        Facturación SUNAT, restaurante y agente bancario en una sola casa de software. Sistemas multi-tenant que
+        manejan tu dinero y tus impuestos con precisión.
+      </p>
+      <div class="hero-actions">
+        <a routerLink="/contacto" class="btn btn-primary">Solicitar demo</a>
+        <a routerLink="/productos" class="btn btn-ghost-light">Ver productos</a>
+      </div>
+    </div>
+
+    <div class="seal" aria-hidden="true">
+      <svg viewBox="0 0 240 240" width="240" height="240">
+        <defs>
+          <path id="sealRing" d="M120,120 m-92,0 a92,92 0 1,1 184,0 a92,92 0 1,1 -184,0" />
+        </defs>
+        <circle cx="120" cy="120" r="112" fill="none" stroke="var(--brass)" stroke-width="1" opacity="0.5" />
+        <circle class="seal-draw" cx="120" cy="120" r="92" fill="none" stroke="var(--brass)" stroke-width="1.5" />
+        <text class="seal-ring" fill="var(--brass)">
+          <textPath href="#sealRing">· ISO / IEC 27001 · SISTEMA DE GESTIÓN · SEGURIDAD DE LA INFORMACIÓN · AMANTIX</textPath>
+        </text>
+        <text x="120" y="116" text-anchor="middle" class="seal-num">27001</text>
+        <text x="120" y="138" text-anchor="middle" class="seal-label">CUMPLIMIENTO</text>
+        <text x="120" y="156" text-anchor="middle" class="seal-cert">CERT. Nº AMX-2026</text>
+      </svg>
+    </div>
+  </div>
+
+  <div class="container trust-bar">
+    @for (badge of badges; track badge) {
+      <span class="trust-badge"><span class="trust-dot"></span>{{ badge }}</span>
+    }
+  </div>
+</section>
+
+<section class="catalog">
+  <div class="container">
+    <span class="eyebrow">El catálogo · Tres sistemas</span>
+    <h2 class="section-title">Cada sistema, una credencial de confianza.</h2>
+    <p class="section-lead">
+      Tres productos en producción, hoy. Aislados por empresa, conectados a SUNAT y listos para operar.
+    </p>
+
+    <div class="cards">
+      @for (product of products; track product.slug) {
+        <article class="credential">
+          <header class="credential-head">
+            <span class="credential-code">{{ product.code }}</span>
+            <span class="credential-sys">sys · {{ product.systemRef }}</span>
+          </header>
+          <h3 class="credential-name">{{ product.name }}</h3>
+          <p class="credential-desc">{{ product.shortDescription }}</p>
+          <a [routerLink]="['/productos', product.slug]" class="credential-link">Ver producto →</a>
+        </article>
+      }
+    </div>
+  </div>
+</section>
+
+<section class="why">
+  <div class="container">
+    <span class="eyebrow">Por qué Amantix</span>
+    <h2 class="section-title">Una sola casa de software, una sola disciplina.</h2>
+    <p class="section-lead">
+      Misma base tecnológica para todos los productos: Angular y Laravel sobre MySQL. Reutilizamos conocimiento y
+      componentes para que tu sistema sea robusto desde el primer día.
+    </p>
+
+    <div class="pillars">
+      @for (pillar of pillars; track pillar.code) {
+        <div class="pillar">
+          <span class="pillar-code">{{ pillar.code }}</span>
+          <h3 class="pillar-title">{{ pillar.title }}</h3>
+          <p class="pillar-desc">{{ pillar.description }}</p>
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<section class="security">
+  <div class="container security-grid">
+    <div class="security-copy">
+      <span class="eyebrow">Seguridad de la información</span>
+      <h2 class="security-title">Cultura ISO 27001, no solo un sello.</h2>
+      <p class="security-lead">
+        Manejamos facturación, caja e impuestos. Eso exige disciplina: pedimos solo los datos necesarios, los
+        enviamos cifrados y dejamos trazabilidad de cada operación.
+      </p>
+    </div>
+    <div class="controls">
+      @for (control of controls; track control.tag) {
+        <div class="control">
+          <span class="control-tag">{{ control.tag }}</span>
+          <h3 class="control-title">{{ control.title }}</h3>
+          <p class="control-desc">{{ control.description }}</p>
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<section class="cta-band">
+  <div class="container cta-inner">
+    <span class="eyebrow">REG. ISO/IEC 27001 · HTTPS</span>
+    <h2 class="cta-title">¿Listo para operar con software que cuadra?</h2>
+    <div class="hero-actions">
+      <a routerLink="/contacto" class="btn btn-primary">Solicitar demo</a>
+      <a routerLink="/planes" class="btn btn-ghost-light">Ver planes</a>
+    </div>
+  </div>
+</section>
