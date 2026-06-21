@@ -11,7 +11,7 @@
 <section class="list">
   <div class="container cards">
     @for (product of products; track product.slug) {
-      <article class="credential">
+      <article class="credential reveal reveal-scale" [style.transition-delay.ms]="$index * 80">
         <header class="credential-head">
           <span class="credential-code">{{ product.code }}</span>
           <span class="credential-sys">sys · {{ product.systemRef }}</span>
