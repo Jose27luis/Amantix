@@ -356,7 +356,7 @@ Sistema de diseño del sitio. Sirve de brief para producir las pantallas. La met
 
 ### 11.1. Concepto
 
-**Tesis: "confianza diseñada".** Amantix construye sistemas que manejan facturación SUNAT, caja y operaciones bancarias. El diseño comunica **precisión, seguridad y solvencia**, no entretenimiento. El elemento firma es un **sello de cumplimiento** (estilo ISO/IEC 27001) y micro-etiquetas monoespaciadas tipo código de registro; las tarjetas de producto se ven como **credenciales**.
+**Tesis: "confianza diseñada".** Amantix construye sistemas que manejan facturación SUNAT, caja y operaciones bancarias. El diseño comunica **precisión, seguridad y solvencia**, no entretenimiento. El elemento firma es un **sello de validez SUNAT** y micro-etiquetas monoespaciadas tipo código de registro; las tarjetas de producto se ven como **credenciales**.
 
 Evitar explícitamente los clichés de IA: fondo crema + serif de alto contraste + terracota; negro con acento verde ácido; layout de periódico con filetes. No usarlos.
 
@@ -369,7 +369,7 @@ Relación de color: **complementario desaturado** (navy frío ↔ latón cálido
 | `--ink` | `#0F1D2E` | Navy profundo. Hero, footer, texto principal sobre claro. |
 | `--steel` | `#2A3F54` | Navy-pizarra. Superficies sobre oscuro, bordes en secciones dark. |
 | `--brass` | `#B0894F` | Latón apagado. Acento firma, CTAs, subrayados. **Con restricción.** |
-| `--teal` | `#2F6E68` | Teal apagado. Señales de seguridad/ISO, hover de enlaces. |
+| `--teal` | `#2F6E68` | Teal apagado. Señales de seguridad, hover de enlaces. |
 | `--mist` | `#EEF1F3` | Gris-niebla frío. Fondo de página (NO crema). |
 | `--cloud` | `#FFFFFF` | Tarjetas y superficies. |
 | `--slate-600` | `#5A6B7B` | Texto secundario / apoyo. |
@@ -378,7 +378,7 @@ Relación de color: **complementario desaturado** (navy frío ↔ latón cálido
 Reglas de color:
 - **Latón solo en acentos** (títulos clave, CTA, sello). Nunca como fondo de bloques grandes ni en texto de cuerpo.
 - **CTA**: fondo latón con texto `--ink` (texto oscuro sobre latón = buen contraste). El hover oscurece levemente.
-- **Teal** reservado a confianza/seguridad (badges "Datos protegidos", certificaciones), no decorativo.
+- **Teal** reservado a confianza/seguridad (badges "Datos protegidos", validez SUNAT), no decorativo.
 - Contraste mínimo **AA**: cuerpo `--ink` sobre `--mist`/`--cloud`; latón solo en texto grande o sobre `--ink`.
 
 ### 11.3. Tipografía
@@ -411,14 +411,14 @@ Escala (desktop; usar `clamp()` para responsive):
 - **Sombra discreta:** `0 1px 2px rgba(15,29,46,.06)` en tarjetas; elevación leve en hover.
 - **Filetes 1px** `--line` para estructurar, sin abusar.
 
-Estructura significativa (no decorativa): **eyebrows monoespaciados** que codifican algo real, p. ej. `01 · FACTURACIÓN`, `REG. ISO/IEC 27001`, `RUC · SUNAT`. Numerar solo cuando hay secuencia real (procesos), no por adorno.
+Estructura significativa (no decorativa): **eyebrows monoespaciados** que codifican algo real, p. ej. `01 · FACTURACIÓN`, `VÁLIDO ANTE SUNAT`, `RUC · SUNAT`. Numerar solo cuando hay secuencia real (procesos), no por adorno.
 
 ### 11.5. Componentes
 
 - **Navbar**: logo + navegación + CTA "Solicitar demo" (latón). Fondo `--cloud`, hairline inferior; al hacer scroll, fondo `--ink` translúcido.
-- **Hero**: titular-tesis + subtítulo + dos CTAs (primaria latón, secundaria contorno) + **sello de cumplimiento** (firma). Fondo `--ink`, micro-etiqueta mono arriba.
+- **Hero**: titular-tesis + subtítulo + dos CTAs (primaria latón, secundaria contorno) + **sello de validez SUNAT** (firma). Fondo `--ink`, micro-etiqueta mono arriba.
 - **Tarjeta de producto (credencial)**: encabezado mono con código (`01 · FACTURADOR`), nombre, descripción corta, 3 features, CTA. Borde `--line`, acento latón al hover.
-- **Sección de confianza**: badges de seguridad (ISO 27001, SUNAT, SSL) en teal/neutro.
+- **Sección de confianza**: badges de confianza (SUNAT, HTTPS · SSL, multi-tenant) en teal/neutro.
 - **Planes**: 3 columnas; plan destacado con borde latón y micro-etiqueta "Recomendado".
 - **Formularios** (contacto/demo): labels visibles (sin placeholder como etiqueta), foco visible, nota de privacidad (ver 11.7).
 - **Footer**: `--ink`, navegación, contacto, sello + leyenda de registro.
@@ -431,13 +431,13 @@ Estructura significativa (no decorativa): **eyebrows monoespaciados** que codifi
 - Hover: elevación leve y aparición del acento latón en tarjetas.
 - **Respetar `prefers-reduced-motion`** (desactivar animaciones).
 
-### 11.7. ISO/IEC 27001 — implicaciones de diseño
+### 11.7. Seguridad por diseño — implicaciones de UI
 
-Traducción de la norma a reglas concretas de interfaz (la web es marketing, pero debe reflejar la cultura de seguridad de la empresa):
+Reglas concretas de interfaz que reflejan la disciplina con la que tratamos datos de facturación, caja e impuestos (la web es marketing, pero debe reflejar esa cultura de seguridad):
 
 - **Minimización de datos**: los formularios piden solo lo necesario (nombre, empresa, correo, teléfono, producto, mensaje). Nada de campos de más.
 - **Consentimiento y propósito**: junto al botón de envío, nota visible: *"Usaremos tus datos solo para responder tu solicitud."* + enlace a política de privacidad.
-- **Señales de confianza visibles**: badges de **ISO/IEC 27001**, conexión segura (HTTPS) y SUNAT en la sección de confianza y el footer.
+- **Señales de confianza visibles**: badges de **validez SUNAT**, conexión segura (HTTPS) y multi-tenant en la sección de confianza y el footer.
 - **No exponer datos sensibles** en la UI ni en URLs; los envíos van por HTTPS a la API.
 - **Mensajería de seguridad** clara en estados: confirmación tras enviar ("Recibimos tu solicitud"), errores que explican qué pasó y cómo resolver, sin tecnicismos.
 - **Trazabilidad**: cada lead se registra con fecha/origen (refleja control, no se muestra al visitante).
@@ -456,11 +456,11 @@ Traducción de la norma a reglas concretas de interfaz (la web es marketing, per
 ┌───────────────────────────────────────────────────────────────┐
 │  AMANTIX            Productos  Planes  Nosotros   [Solicitar demo]│
 ├───────────────────────────────────────────────────────────────┤
-│  REG. ISO/IEC 27001 · SOFTWARE EMPRESARIAL          (mono, latón) │
+│  CONECTADO A SUNAT · SOFTWARE EMPRESARIAL           (mono, latón) │
 │                                                                  │
 │  Software que tu                                  ◜───────◝       │
 │  negocio puede                                    │  SELLO  │     │
-│  facturar, operar                                 │ 27001   │     │
+│  facturar, operar                                 │  SUNAT  │     │
 │  y controlar.                                     ◟───────◞       │
 │                                                                  │
 │  Facturación SUNAT, restaurante y agente bancario, en una sola   │
@@ -474,5 +474,5 @@ Traducción de la norma a reglas concretas de interfaz (la web es marketing, per
 
 ### 11.10. Resumen para el generador
 
-> Diseño **corporativo y premium** para una casa de software peruana que maneja dinero e impuestos. Paleta **complementaria apagada**: navy `#0F1D2E` + latón `#B0894F` sobre niebla `#EEF1F3`, teal `#2F6E68` solo para seguridad; **sin colores chillones**, regla 60/30/10. Tipografía **Archivo** (display) + **IBM Plex Sans** (cuerpo) + **IBM Plex Mono** (cifras/etiquetas). Firma: **sello de cumplimiento ISO 27001** + micro-etiquetas mono tipo código de registro; tarjetas de producto como **credenciales**. Cumplir **ISO 27001** en la UI (minimización de datos, consentimiento, señales de confianza) y un **piso de accesibilidad AA**. Evitar los clichés de IA (crema+serif+terracota, negro+verde ácido, periódico).
+> Diseño **corporativo y premium** para una casa de software peruana que maneja dinero e impuestos. Paleta **complementaria apagada**: navy `#0F1D2E` + latón `#B0894F` sobre niebla `#EEF1F3`, teal `#2F6E68` solo para seguridad; **sin colores chillones**, regla 60/30/10. Tipografía **Archivo** (display) + **IBM Plex Sans** (cuerpo) + **IBM Plex Mono** (cifras/etiquetas). Firma: **sello de validez SUNAT** + micro-etiquetas mono tipo código de registro; tarjetas de producto como **credenciales**. Aplicar **seguridad por diseño** en la UI (minimización de datos, consentimiento, señales de confianza) y un **piso de accesibilidad AA**. Evitar los clichés de IA (crema+serif+terracota, negro+verde ácido, periódico).
 
