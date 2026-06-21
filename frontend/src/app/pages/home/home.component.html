@@ -33,15 +33,15 @@
 
 <section class="catalog">
   <div class="container">
-    <span class="eyebrow">El catálogo · Tres sistemas</span>
-    <h2 class="section-title">Cada sistema, una credencial de confianza.</h2>
-    <p class="section-lead">
+    <span class="eyebrow reveal">El catálogo · Tres sistemas</span>
+    <h2 class="section-title reveal">Cada sistema, una credencial de confianza.</h2>
+    <p class="section-lead reveal">
       Tres productos en producción, hoy. Aislados por empresa, conectados a SUNAT y listos para operar.
     </p>
 
     <div class="cards">
       @for (product of products; track product.slug) {
-        <article class="credential">
+        <article class="credential reveal reveal-scale" [style.transition-delay.ms]="$index * 80">
           <header class="credential-head">
             <span class="credential-code">{{ product.code }}</span>
             <span class="credential-sys">sys · {{ product.systemRef }}</span>
@@ -57,16 +57,16 @@
 
 <section class="why">
   <div class="container">
-    <span class="eyebrow">Por qué Amantix</span>
-    <h2 class="section-title">Una sola casa de software, una sola disciplina.</h2>
-    <p class="section-lead">
+    <span class="eyebrow reveal">Por qué Amantix</span>
+    <h2 class="section-title reveal">Una sola casa de software, una sola disciplina.</h2>
+    <p class="section-lead reveal">
       Misma base tecnológica para todos los productos: Angular y Laravel sobre MySQL. Reutilizamos conocimiento y
       componentes para que tu sistema sea robusto desde el primer día.
     </p>
 
     <div class="pillars">
       @for (pillar of pillars; track pillar.code) {
-        <div class="pillar">
+        <div class="pillar reveal" [style.transition-delay.ms]="$index * 80">
           <span class="pillar-code">{{ pillar.code }}</span>
           <h3 class="pillar-title">{{ pillar.title }}</h3>
           <p class="pillar-desc">{{ pillar.description }}</p>
@@ -78,7 +78,7 @@
 
 <section class="security">
   <div class="container security-grid">
-    <div class="security-copy">
+    <div class="security-copy reveal reveal-left">
       <span class="eyebrow">Seguridad por diseño</span>
       <h2 class="security-title">Protegemos tu información desde el primer día.</h2>
       <p class="security-lead">
@@ -88,7 +88,7 @@
     </div>
     <div class="controls">
       @for (control of controls; track control.tag) {
-        <div class="control">
+        <div class="control reveal" [style.transition-delay.ms]="$index * 80">
           <span class="control-tag">{{ control.tag }}</span>
           <h3 class="control-title">{{ control.title }}</h3>
           <p class="control-desc">{{ control.description }}</p>
@@ -99,7 +99,7 @@
 </section>
 
 <section class="cta-band">
-  <div class="container cta-inner">
+  <div class="container cta-inner reveal">
     <span class="eyebrow">CONECTADO A SUNAT · HTTPS</span>
     <h2 class="cta-title">¿Listo para operar con software que cuadra?</h2>
     <div class="hero-actions">
