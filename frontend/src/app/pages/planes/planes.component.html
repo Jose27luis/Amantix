@@ -20,7 +20,7 @@
 <section class="plans">
   <div class="container plans-grid">
     @for (plan of plans; track plan.name) {
-      <article class="plan" [class.highlighted]="plan.highlighted">
+      <article class="plan reveal" [class.highlighted]="plan.highlighted" [style.transition-delay.ms]="$index * 90">
         @if (plan.highlighted) {
           <span class="plan-flag">★ Recomendado</span>
         }
@@ -42,7 +42,7 @@
     }
   </div>
 
-  <p class="container plans-note">
+  <p class="container plans-note reveal">
     Todos los precios en soles (S/) y excluyen IGV. La implementación de SUNAT, capacitación inicial y enlaces a
     sistemas en producción están incluidos en cada plan.
   </p>
