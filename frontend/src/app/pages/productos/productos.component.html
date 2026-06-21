@@ -1,0 +1,28 @@
+<section class="page-head">
+  <div class="container">
+    <span class="eyebrow">Catálogo · 03 sistemas</span>
+    <h1 class="page-title">Productos Amantix</h1>
+    <p class="page-lead">
+      Tres sistemas en producción para facturar, atender y manejar caja. Elige el tuyo o combínalos.
+    </p>
+  </div>
+</section>
+
+<section class="list">
+  <div class="container cards">
+    @for (product of products; track product.slug) {
+      <article class="credential">
+        <header class="credential-head">
+          <span class="credential-code">{{ product.code }}</span>
+          <span class="credential-sys">sys · {{ product.systemRef }}</span>
+        </header>
+        <h2 class="credential-name">{{ product.name }}</h2>
+        <p class="credential-desc">{{ product.shortDescription }}</p>
+        <div class="credential-actions">
+          <a [routerLink]="['/productos', product.slug]" class="btn btn-ghost">Ver detalle</a>
+          <a [href]="product.productionUrl" target="_blank" rel="noopener" class="credential-link">Ir al sistema ↗</a>
+        </div>
+      </article>
+    }
+  </div>
+</section>
