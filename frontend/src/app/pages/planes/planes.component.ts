@@ -25,14 +25,14 @@ export class PlanesComponent {
   protected readonly plans: readonly Plan[] = [
     {
       name: 'Esencial',
-      monthly: 89,
+      monthly: 80,
       description: 'Para empezar a facturar y operar con un solo sistema.',
       features: ['Un sistema a elección', 'Multi-tenant por RUC', 'Comprobantes SUNAT', 'Soporte por WhatsApp'],
       highlighted: false,
     },
     {
       name: 'Negocio',
-      monthly: 169,
+      monthly: 100,
       description: 'Para negocios en crecimiento que combinan sistemas.',
       features: [
         'Hasta dos sistemas',
@@ -45,7 +45,7 @@ export class PlanesComponent {
     },
     {
       name: 'Corporativo',
-      monthly: 299,
+      monthly: 120,
       description: 'Para operaciones grandes con varios locales.',
       features: [
         'Los tres sistemas',
