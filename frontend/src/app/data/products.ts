@@ -135,7 +135,7 @@ export const PRODUCTS: readonly Product[] = [
     description:
       'Plataforma SaaS para operar agentes multibancarios en Perú. Multi-tenant por subdominio, cada empresa con su base de datos aislada.',
     image: '/productos/prod-agente.png',
-    heroImage: '',
+    heroImage: '/productos/agente/agente-hero.png',
     features: [
       {
         title: 'Caja multibilletera',
@@ -150,7 +150,32 @@ export const PRODUCTS: readonly Product[] = [
         description: 'Cuadre por billetera y cierre diario pensado para no perder un sol.',
       },
     ],
-    screenshots: [],
-    productionUrl: 'https://agente.tokefacts.com',
+    screenshots: [
+      {
+        title: 'Atención y nueva operación',
+        description:
+          'Registra depósitos, giros, retiros, pagos de servicio y préstamos contra cualquier billetera: BCP, BBVA, Interbank, Yape, Plin, Tunki y efectivo, con su comisión.',
+        image: '/productos/agente/agente-atencion.png',
+      },
+      {
+        title: 'Historial de operaciones',
+        description:
+          'Consulta y filtra todas las operaciones por fecha, tipo y billetera, con monto, comisión y estado; exporta a PDF o Excel y reimprime el ticket.',
+        image: '/productos/agente/agente-operaciones.png',
+      },
+      {
+        title: 'Billeteras y fuentes de fondos',
+        description:
+          'Administra bancos, billeteras digitales y efectivo con su saldo, y agrega nuevas fuentes según tu operación.',
+        image: '/productos/agente/agente-billeteras.png',
+      },
+      {
+        title: 'Reporte y cierre diario',
+        description:
+          'Resumen del día por billetera y tipo de operación: ingresos, salidas, comisiones y cargos del banco para cuadrar la caja.',
+        image: '/productos/agente/agente-reporte.png',
+      },
+    ],
+    productionUrl: 'https://agente.citec.com.pe',
   },
 ];
