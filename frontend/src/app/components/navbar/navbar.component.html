@@ -12,6 +12,12 @@
       <a routerLink="/nosotros" routerLinkActive="active" class="nav-link">Nosotros</a>
       <a routerLink="/contacto" routerLinkActive="active" class="nav-link">Contacto</a>
       <a routerLink="/contacto" class="btn btn-primary nav-cta">Solicitar demo</a>
+      @if (conSesion()) {
+        <a routerLink="/panel" class="panel-link">
+          <svg width="16" height="16" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 11h5V3H3v8Zm0 6h5v-4H3v4Zm9 0h5V9h-5v8Zm0-14v4h5V3h-5Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" /></svg>
+          Mi panel
+        </a>
+      }
     </div>
 
     <button type="button" class="burger" (click)="toggleMenu()" aria-label="Abrir menú">
@@ -29,6 +35,9 @@
       <a routerLink="/nosotros" class="mobile-link" (click)="closeMenu()">Nosotros</a>
       <a routerLink="/contacto" class="mobile-link" (click)="closeMenu()">Contacto</a>
       <a routerLink="/contacto" class="btn btn-primary mobile-cta" (click)="closeMenu()">Solicitar demo</a>
+      @if (conSesion()) {
+        <a routerLink="/panel" class="btn btn-ghost-light mobile-panel" (click)="closeMenu()">Volver a mi panel</a>
+      }
     </div>
   }
 </header>
