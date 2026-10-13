@@ -27,6 +27,7 @@ class UserController extends Controller
         ]);
 
         $usuarios = User::query()
+            ->with('empresa')
             ->when($filtros['buscar'] ?? null, function (Builder $consulta, string $texto): void {
                 $patron = '%'.$texto.'%';
                 $consulta->where(fn (Builder $grupo): Builder => $grupo->where('nombre', 'like', $patron)->orWhere('correo', 'like', $patron));
