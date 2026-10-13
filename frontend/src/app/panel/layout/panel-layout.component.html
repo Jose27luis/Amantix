@@ -44,6 +44,10 @@
             <span class="badge" [attr.aria-label]="tickets.pendientes() + ' tickets sin responder'">{{ tickets.pendientes() }}</span>
           }
         </a>
+        <a routerLink="/panel/news" routerLinkActive="active" class="nav-link" data-label="Noticias" (click)="cerrarMenu()">
+          <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 4h10v12H5a1 1 0 0 1-1-1V4Zm10 3h2v8a1 1 0 0 1-2 0M7 7h4M7 10h4M7 13h2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
+          <span class="nav-text">Noticias</span>
+        </a>
         <a routerLink="/panel/users" routerLinkActive="active" class="nav-link" data-label="Usuarios" (click)="cerrarMenu()">
           <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 10a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm-6 7c0-3 2.7-5 6-5s6 2 6 5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
           <span class="nav-text">Usuarios</span>
@@ -57,6 +61,10 @@
         <a routerLink="/panel/tickets" routerLinkActive="active" class="nav-link" data-label="Soporte" (click)="cerrarMenu()">
           <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 4h14v10H8l-4 3v-3H3V4Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" /></svg>
           <span class="nav-text">Soporte</span>
+        </a>
+        <a href="/noticias" target="_blank" rel="noopener" class="nav-link" data-label="Noticias (pestaña nueva)" (click)="cerrarMenu()">
+          <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 4h10v12H5a1 1 0 0 1-1-1V4Zm10 3h2v8a1 1 0 0 1-2 0M7 7h4M7 10h4M7 13h2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
+          <span class="nav-text">Noticias<span class="sr-only"> (se abre en una pestaña nueva)</span></span>
         </a>
       }
 
