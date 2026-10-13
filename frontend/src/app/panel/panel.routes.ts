@@ -72,6 +72,24 @@ export const PANEL_ROUTES: Routes = [
         loadComponent: () => import('./pages/ticket-detail/ticket-detail.component').then((m) => m.TicketDetailComponent),
       },
       {
+        path: 'news',
+        canActivate: [passwordGuard, adminGuard],
+        title: 'Noticias · Panel Amantix',
+        loadComponent: () => import('./pages/news-list/news-list.component').then((m) => m.NewsListComponent),
+      },
+      {
+        path: 'news/new',
+        canActivate: [passwordGuard, adminGuard],
+        title: 'Nueva noticia · Panel Amantix',
+        loadComponent: () => import('./pages/news-editor/news-editor.component').then((m) => m.NewsEditorComponent),
+      },
+      {
+        path: 'news/:id',
+        canActivate: [passwordGuard, adminGuard],
+        title: 'Noticia · Panel Amantix',
+        loadComponent: () => import('./pages/news-editor/news-editor.component').then((m) => m.NewsEditorComponent),
+      },
+      {
         path: 'users',
         canActivate: [passwordGuard, adminGuard],
         title: 'Usuarios · Panel Amantix',
