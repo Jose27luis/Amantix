@@ -1,9 +1,9 @@
 import { inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { CanActivateFn, Router, UrlTree } from '@angular/router';
+import { CanActivateFn, CanMatchFn, Router, UrlTree } from '@angular/router';
 import { map } from 'rxjs';
 import { SessionService } from './session.service';
-import { Usuario } from '../models/panel.models';
+import { Rol, Usuario } from '../models/panel.models';
 
 export const authGuard: CanActivateFn = () => {
   if (!isPlatformBrowser(inject(PLATFORM_ID))) {
@@ -25,8 +25,28 @@ export const passwordGuard: CanActivateFn = () => {
 };
 
 export const adminGuard: CanActivateFn = () => {
-  return inject(SessionService).esAdministrador() ? true : inject(Router).createUrlTree(['/panel/profile']);
+  return inject(SessionService).esAdministrador() ? true : inject(Router).createUrlTree(['/panel']);
 };
+
+export const clientGuard: CanActivateFn = () => {
+  return inject(SessionService).usuario()?.rol === 'cliente' ? true : inject(Router).createUrlTree(['/panel']);
+};
+
+function coincideRol(rol: Rol, enServidor: boolean): CanMatchFn {
+  return () => {
+    if (!isPlatformBrowser(inject(PLATFORM_ID))) {
+      return enServidor;
+    }
+
+    return inject(SessionService)
+      .cargar()
+      .pipe(map((usuario: Usuario | null): boolean => usuario === null ? enServidor : usuario.rol === rol));
+  };
+}
+
+export const adminMatch: CanMatchFn = coincideRol('administrador', true);
+
+export const clientMatch: CanMatchFn = coincideRol('cliente', false);
 
 export const guestGuard: CanActivateFn = () => {
   if (!isPlatformBrowser(inject(PLATFORM_ID))) {
