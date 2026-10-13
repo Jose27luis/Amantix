@@ -1,0 +1,65 @@
+<div class="shell" [class.shell-open]="menuAbierto()">
+  <aside class="sidebar">
+    <a routerLink="/panel" class="brand" (click)="cerrarMenu()">
+      <img src="/amantix-logo.png" alt="" class="brand-logo" width="32" height="32" />
+      <span class="brand-name">AMANTIX</span>
+      <span class="brand-tag">PANEL</span>
+    </a>
+
+    <nav class="nav" aria-label="Panel">
+      @if (sesion.esAdministrador()) {
+        <span class="nav-group">Gestión</span>
+        <a routerLink="/panel" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link" (click)="cerrarMenu()">
+          <svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 11h5V3H3v8Zm0 6h5v-4H3v4Zm9 0h5V9h-5v8Zm0-14v4h5V3h-5Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" /></svg>
+          Dashboard
+        </a>
+        <a routerLink="/panel/leads" routerLinkActive="active" class="nav-link" (click)="cerrarMenu()">
+          <svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 5h14M3 10h14M3 15h9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
+          Leads
+          @if (leads.pendientes() > 0) {
+            <span class="badge" [attr.aria-label]="leads.pendientes() + ' leads nuevos'">{{ leads.pendientes() }}</span>
+          }
+        </a>
+        <a routerLink="/panel/users" routerLinkActive="active" class="nav-link" (click)="cerrarMenu()">
+          <svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 10a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm-6 7c0-3 2.7-5 6-5s6 2 6 5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
+          Usuarios
+        </a>
+      }
+
+      <span class="nav-group">Cuenta</span>
+      <a routerLink="/panel/profile" routerLinkActive="active" class="nav-link" (click)="cerrarMenu()">
+        <svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M5 9V7a5 5 0 0 1 10 0v2M4 9h12v8H4V9Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" /></svg>
+        Mi perfil
+      </a>
+      <a routerLink="/" class="nav-link" (click)="cerrarMenu()">
+        <svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M8 4H4v12h12v-4M11 3h6v6M17 3l-8 8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
+        Ver sitio
+      </a>
+    </nav>
+
+    <div class="sidebar-foot">
+      @if (sesion.usuario(); as usuario) {
+        <div class="who">
+          <span class="who-name">{{ usuario.nombre }}</span>
+          <span class="who-role">{{ usuario.rol === 'administrador' ? 'ADMINISTRADOR' : 'CLIENTE' }}</span>
+        </div>
+      }
+      <button type="button" class="logout" (click)="salir()">Cerrar sesión</button>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <button type="button" class="burger" (click)="alternarMenu()" [attr.aria-expanded]="menuAbierto()" aria-label="Abrir menú">
+        <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M2 5h16M2 10h16M2 15h16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
+      </button>
+      <span class="topbar-brand">AMANTIX · PANEL</span>
+    </header>
+
+    <div class="content">
+      <router-outlet />
+    </div>
+  </div>
+
+  <button type="button" class="scrim" aria-label="Cerrar menú" (click)="cerrarMenu()"></button>
+</div>
