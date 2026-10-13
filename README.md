@@ -12,6 +12,7 @@ Una web de **marketing + captación** (no es uno de los sistemas en sí) que:
 - Muestra el **catálogo de productos** (3 sistemas) con sus funcionalidades, planes y casos de uso.
 - Permite **solicitar una demo / cotización** y contactar a ventas.
 - Sirve de punto de entrada (con enlaces) a cada sistema en producción.
+- Incluye un panel con login para el equipo de Amantix y para los clientes (ver sección 12).
 
 ---
 
@@ -60,9 +61,9 @@ Plataforma SaaS para operar **agentes multibancarios** en Perú.
 | Capa | Tecnología |
 |---|---|
 | **Frontend** | **Angular** (SSR para SEO) + TypeScript |
-| **Backend / API** | **Laravel** (PHP) — API REST para formularios de contacto/leads |
+| **Backend / API** | **Laravel** (PHP 8.3) con Sanctum — API REST del sitio y del panel |
 | **Base de datos** | MySQL |
-| **Estilos** | (a definir: Tailwind / SCSS) |
+| **Estilos** | CSS propio con las variables del manual de marca (sección 11) |
 | **Servidor web** | nginx |
 | **Despliegue** | servidor propio (VPS) + dominio Amantix |
 
@@ -76,13 +77,19 @@ Plataforma SaaS para operar **agentes multibancarios** en Perú.
 |---|---|
 | **Inicio (Home)** | Hero con propuesta de valor, resumen de los 3 productos, CTA "Solicitar demo". |
 | **Productos** | Listado de los 3 sistemas con tarjetas (icono, nombre, descripción corta). |
-| **Producto — Facturador Amantix** | Detalle, funcionalidades, capturas, planes, CTA. |
-| **Producto — Restaurant Sumaqta** | Detalle, funcionalidades, capturas, planes, CTA. |
-| **Producto — Agente Amantix** | Detalle, funcionalidades, capturas, planes, CTA. |
+| **Producto — Facturador Amantix** | Detalle, funcionalidades, capturas, planes, preguntas frecuentes, CTA. |
+| **Producto — Restaurant Sumaqta** | Detalle, funcionalidades, capturas, planes, preguntas frecuentes, CTA. |
+| **Producto — Agente Amantix** | Detalle, funcionalidades, capturas, planes, preguntas frecuentes, CTA. |
 | **Planes / Precios** | Comparativa de planes por producto. |
+| **Casos de clientes** | Testimonios de clientes reales con empresa, rubro, producto y cita. |
+| **Noticias** | Listado de publicaciones y página de cada noticia. |
 | **Nosotros** | Quiénes somos, misión, equipo. |
-| **Contacto** | Formulario (nombre, empresa, correo, teléfono, producto de interés, mensaje) → guarda lead y notifica por correo/WhatsApp. |
+| **Contacto** | Formulario (nombre, empresa, correo, teléfono, producto de interés, mensaje). Guarda el lead en el panel. |
 | **Demo / Cotización** | Formulario de solicitud de demo o cotización. |
+| **Política de privacidad** | Qué datos se piden, para qué se usan y cómo pedir su eliminación. |
+| **Panel** | Login y panel de administración y de clientes (sección 12). |
+
+Productos, planes, preguntas frecuentes, casos y noticias se administran desde el panel.
 
 Elementos transversales: navbar con logo + menú, footer con contacto/redes, botón flotante de WhatsApp.
 
@@ -112,21 +119,19 @@ Amantix/
 
 ## 6. Funcionalidades del sitio (alcance)
 
-- **SEO**: Angular SSR, metadatos por página, sitemap, Open Graph (importante por ser sitio de venta).
-- **Catálogo de productos** con páginas de detalle.
-- **Captación de leads**: formularios de contacto y de demo → se guardan en BD (tabla `leads`) y se notifican por correo (y opcionalmente WhatsApp).
+- **SEO**: Angular SSR, título y descripción por página, imagen para compartir (Open Graph), sitemap.
+- **Catálogo de productos** con páginas de detalle y preguntas frecuentes.
+- **Captación de leads**: formularios de contacto y de demo que se guardan en la base y aparecen en el panel con el contador de nuevos. Sin avisos por correo ni WhatsApp por ahora.
+- **Antispam**: campo trampa oculto y límite de envíos por IP.
 - **Responsive** (móvil/escritorio).
 - **Multi-idioma** (opcional, a futuro): español por defecto.
 - **Integración**: enlaces directos a cada sistema en producción.
 
 ---
 
-## 7. Datos de leads (tabla `leads`)
+## 7. Datos de leads
 
-```
-id, name, company, email, phone, product_interest (facturador|restaurant|agente),
-message, source (contacto|demo|cotizacion), created_at, updated_at
-```
+Cada lead guarda nombre, empresa, correo, teléfono, producto de interés, mensaje, origen (contacto, demo o cotización), estado y fecha. El modelo completo está en la sección 12.4.
 
 ---
 
@@ -142,11 +147,16 @@ message, source (contacto|demo|cotizacion), created_at, updated_at
 
 ## 9. Próximos pasos
 
-1. Inicializar el proyecto Angular (SSR) en `frontend/` y la API Laravel en `backend/`.
-2. Definir identidad visual (logo, paleta, tipografía) de Amantix.
-3. Maquetar Home + páginas de producto.
-4. Implementar formularios de contacto/demo → API `leads` + notificación.
-5. Configurar SEO (SSR, metadatos, sitemap) y desplegar con nginx en el dominio Amantix.
+Hecho: sitio público, manual de marca y dominio amantix.pe.
+
+Pendiente, en este orden:
+
+1. API Laravel con login, roles y leads. El formulario de contacto pasa a guardar en la base.
+2. Panel: dashboard, leads y usuarios.
+3. Clientes, suscripciones y soporte.
+4. Contenido editable: productos, planes, preguntas frecuentes, casos y noticias. El sitio público lee de la API.
+5. Reportes.
+6. Sitio público: noticias, casos, preguntas frecuentes, política de privacidad, SEO y Open Graph.
 
 ---
 
@@ -216,69 +226,7 @@ sequenceDiagram
     A-->>V: Mensaje "Gracias, te contactaremos pronto"
 ```
 
-### 10.3. Entidad-relación
-
-```mermaid
-erDiagram
-    PRODUCTS ||--o{ PLANS : "tiene"
-    PRODUCTS ||--o{ LEADS : "interesa a"
-    PRODUCTS ||--o{ FEATURES : "ofrece"
-    USERS ||--o{ LEADS : "atiende"
-
-    PRODUCTS {
-        bigint id PK
-        string slug
-        string name
-        string short_description
-        text description
-        string system_ref "pro8|mozo4|agente"
-        string production_url
-        boolean active
-        timestamp created_at
-    }
-
-    PLANS {
-        bigint id PK
-        bigint product_id FK
-        string name
-        decimal price
-        string period "mensual|anual"
-        json features
-        boolean highlighted
-    }
-
-    FEATURES {
-        bigint id PK
-        bigint product_id FK
-        string title
-        string icon
-        string description
-    }
-
-    LEADS {
-        bigint id PK
-        bigint product_id FK
-        bigint user_id FK
-        string name
-        string company
-        string email
-        string phone
-        string source "contacto|demo|cotizacion"
-        text message
-        string status "nuevo|contactado|cerrado"
-        timestamp created_at
-    }
-
-    USERS {
-        bigint id PK
-        string name
-        string email
-        string role "admin|ventas"
-        timestamp created_at
-    }
-```
-
-### 10.4. Arquitectura de despliegue
+### 10.3. Arquitectura de despliegue
 
 ```mermaid
 flowchart TD
@@ -301,7 +249,7 @@ flowchart TD
     front -. enlaza a .-> p3
 ```
 
-### 10.5. Arquitectura de carpetas
+### 10.4. Arquitectura de carpetas
 
 ```mermaid
 flowchart TD
@@ -324,7 +272,7 @@ flowchart TD
     be --> be_mig["database/migrations/ (products, plans, leads)"]
 ```
 
-### 10.6. Flujo de navegación
+### 10.5. Flujo de navegación
 
 ```mermaid
 flowchart LR
@@ -756,4 +704,324 @@ Cotizaciones, propuestas y contratos:
 | Firma gráfica | Sello de validez SUNAT y micro-etiquetas mono |
 | Voz | De tú, precisa, cercana, sin exagerar |
 | Respaldo | Validez ante SUNAT y seguridad por diseño |
+
+---
+
+## 12. Panel
+
+El panel vive dentro del mismo sitio, detrás de un login. Lo usan el equipo de Amantix y los clientes que ya tienen un producto contratado. Sigue el manual de marca: barra lateral en navy, contenido sobre niebla, botones principales en latón, cifras en Plex Mono.
+
+### 12.1. Roles
+
+| Rol | Quién es | Qué ve |
+|---|---|---|
+| Administrador | Equipo de Amantix | Todo el panel |
+| Cliente | Usuario de una empresa cliente | Sus productos, sus tickets de soporte y las noticias |
+
+Permisos por módulo:
+
+| Módulo | Administrador | Cliente |
+|---|---|---|
+| Dashboard analítico | Completo | Resumen de su cuenta |
+| Leads | Ver, editar, cambiar estado, convertir en cliente | No |
+| Clientes y suscripciones | Ver, crear, editar | Solo su empresa, lectura |
+| Soporte | Todos los tickets, responder, asignar, cerrar | Abrir tickets y responder los suyos |
+| Contenido | Editar productos, planes, preguntas frecuentes y casos | No |
+| Noticias | Crear, editar, publicar | Leer las publicadas |
+| Reportes | Ver y exportar | No |
+| Usuarios | Crear, editar, desactivar, restablecer contraseña | Cambiar su propia contraseña |
+
+Un cliente nunca ve datos de otra empresa. El control se hace en la API, no solo en la pantalla.
+
+### 12.2. Módulos
+
+#### Dashboard analítico
+
+- Indicadores del mes: leads nuevos, tasa de conversión, clientes activos, ingreso mensual recurrente, tickets abiertos, renovaciones de los próximos 30 días.
+- Leads por semana (últimas 12 semanas).
+- Leads por producto y por origen.
+- Embudo de leads por estado.
+- Tickets por estado y tiempo promedio de primera respuesta.
+- Filtro por rango de fechas y por producto.
+
+#### Leads
+
+- Lista con búsqueda por nombre, empresa, correo o teléfono, y filtros por estado, producto, origen y fecha.
+- Contador de leads nuevos en el menú.
+- Detalle con los datos del formulario, historial de cambios de estado y notas internas.
+- Botón para escribir por WhatsApp con el número del lead.
+- Asignación a un administrador.
+- Convertir en cliente: crea la empresa y la suscripción con los datos del lead.
+
+Estados: nuevo, contactado, demo agendada, propuesta enviada, ganado, perdido. Al marcar perdido se pide el motivo.
+
+#### Clientes y suscripciones
+
+- Empresa: razón social, RUC, rubro, dirección, contacto principal, teléfono, correo.
+- Suscripciones por empresa: producto, plan, precio mensual, fecha de alta, próxima renovación, estado (activa, suspendida, de baja).
+- Usuarios cliente de la empresa.
+- Historial de tickets de la empresa.
+- Lista de renovaciones próximas.
+
+#### Soporte
+
+- El cliente abre un ticket con producto, asunto, prioridad (baja, media, alta) y mensaje. Puede adjuntar imágenes o PDF de hasta 5 MB.
+- Conversación por mensajes entre el cliente y el equipo.
+- Notas internas que el cliente no ve.
+- Estados: abierto, en atención, esperando al cliente, resuelto, cerrado.
+- El cliente puede reabrir un ticket resuelto durante 7 días.
+- Contador de tickets sin responder en el menú.
+
+#### Contenido
+
+- Productos: nombre, descripción corta y larga, funcionalidades, capturas, enlace a producción, orden y visibilidad.
+- Planes: producto, nombre, precio, periodo, lista de características, plan destacado.
+- Preguntas frecuentes: producto, pregunta, respuesta, orden.
+- Casos de clientes: empresa, rubro, producto, cita, nombre y cargo de quien la dice, logo o foto, visibilidad.
+
+Los cambios se ven en el sitio público sin volver a compilar.
+
+#### Noticias
+
+- Título, resumen, imagen de portada, contenido con formato básico (títulos, listas, negritas, enlaces, imágenes).
+- Estados: borrador y publicada, con fecha de publicación.
+- Las publicadas aparecen en el sitio público y en el panel del cliente.
+
+#### Reportes
+
+| Reporte | Contenido |
+|---|---|
+| Leads | Leads del periodo por estado, producto y origen, con conversión |
+| Clientes | Clientes activos, altas y bajas del periodo |
+| Ingresos | Ingreso mensual recurrente por producto y plan |
+| Renovaciones | Suscripciones que vencen en el periodo |
+| Soporte | Tickets por estado, producto y prioridad, con tiempos de respuesta |
+
+Todos se filtran por rango de fechas y se exportan a Excel.
+
+#### Usuarios
+
+- Lista de usuarios con rol, empresa (si es cliente), último ingreso y estado.
+- Crear, editar y desactivar. Un usuario desactivado no puede entrar.
+- Restablecer contraseña: el administrador genera una contraseña temporal que se cambia en el primer ingreso.
+- Cada usuario cambia su propia contraseña desde su perfil.
+
+### 12.3. Seguridad
+
+- Contraseñas con hash bcrypt, mínimo 8 caracteres.
+- Sesión por token con vencimiento; al desactivar un usuario se cierran sus sesiones.
+- Bloqueo temporal tras 5 intentos fallidos de login.
+- Registro de acciones: quién cambió el estado de un lead, de un ticket o de una suscripción, y cuándo.
+- Archivos adjuntos fuera de la carpeta pública; solo los descarga quien tiene permiso.
+
+### 12.4. Modelo de datos
+
+```mermaid
+erDiagram
+    EMPRESAS ||--o{ USUARIOS : "tiene"
+    EMPRESAS ||--o{ SUSCRIPCIONES : "contrata"
+    EMPRESAS ||--o{ TICKETS : "abre"
+    PRODUCTOS ||--o{ PLANES : "tiene"
+    PRODUCTOS ||--o{ PREGUNTAS : "tiene"
+    PRODUCTOS ||--o{ CASOS : "aparece en"
+    PRODUCTOS ||--o{ LEADS : "interesa a"
+    PLANES ||--o{ SUSCRIPCIONES : "se contrata en"
+    LEADS ||--o{ NOTAS_LEAD : "tiene"
+    LEADS |o--o| EMPRESAS : "se convierte en"
+    TICKETS ||--o{ MENSAJES_TICKET : "tiene"
+    MENSAJES_TICKET ||--o{ ADJUNTOS : "adjunta"
+    USUARIOS ||--o{ NOTICIAS : "publica"
+    USUARIOS ||--o{ AUDITORIA : "registra"
+
+    USUARIOS {
+        bigint id PK
+        bigint empresa_id FK "solo clientes"
+        string nombre
+        string correo
+        string password
+        string rol "administrador|cliente"
+        boolean activo
+        boolean debe_cambiar_password
+        timestamp ultimo_ingreso
+    }
+
+    EMPRESAS {
+        bigint id PK
+        string razon_social
+        string ruc
+        string rubro
+        string direccion
+        string contacto
+        string telefono
+        string correo
+    }
+
+    PRODUCTOS {
+        bigint id PK
+        string slug
+        string codigo
+        string sistema "pro8|mozo4|agente"
+        string nombre
+        string descripcion_corta
+        text descripcion
+        string imagen
+        string imagen_hero
+        json funcionalidades
+        json capturas
+        string url_produccion
+        int orden
+        boolean visible
+    }
+
+    PLANES {
+        bigint id PK
+        bigint producto_id FK
+        string nombre
+        decimal precio
+        string periodo "mensual|anual"
+        json caracteristicas
+        boolean destacado
+    }
+
+    SUSCRIPCIONES {
+        bigint id PK
+        bigint empresa_id FK
+        bigint plan_id FK
+        decimal precio
+        date fecha_alta
+        date proxima_renovacion
+        string estado "activa|suspendida|baja"
+    }
+
+    LEADS {
+        bigint id PK
+        bigint producto_id FK
+        bigint asignado_a FK
+        bigint empresa_id FK "al convertirse"
+        string codigo "AMX-XXXXXX"
+        string nombre
+        string empresa
+        string correo
+        string telefono
+        text mensaje
+        string origen "contacto|demo|cotizacion"
+        string estado "nuevo|contactado|demo|propuesta|ganado|perdido"
+        string motivo_perdida
+        string ip
+    }
+
+    NOTAS_LEAD {
+        bigint id PK
+        bigint lead_id FK
+        bigint usuario_id FK
+        text nota
+    }
+
+    TICKETS {
+        bigint id PK
+        bigint empresa_id FK
+        bigint producto_id FK
+        bigint creado_por FK
+        bigint asignado_a FK
+        string codigo "TKT-XXXXXX"
+        string asunto
+        string prioridad "baja|media|alta"
+        string estado "abierto|en_atencion|esperando|resuelto|cerrado"
+        timestamp primera_respuesta
+        timestamp resuelto_en
+    }
+
+    MENSAJES_TICKET {
+        bigint id PK
+        bigint ticket_id FK
+        bigint usuario_id FK
+        text mensaje
+        boolean interno
+    }
+
+    ADJUNTOS {
+        bigint id PK
+        bigint mensaje_ticket_id FK
+        string nombre
+        string tipo
+        int tamano
+    }
+
+    PREGUNTAS {
+        bigint id PK
+        bigint producto_id FK
+        string pregunta
+        text respuesta
+        int orden
+    }
+
+    CASOS {
+        bigint id PK
+        bigint producto_id FK
+        string empresa
+        string rubro
+        text cita
+        string autor
+        string cargo
+        string imagen
+        boolean visible
+    }
+
+    NOTICIAS {
+        bigint id PK
+        bigint usuario_id FK
+        string slug
+        string titulo
+        string resumen
+        string portada
+        longtext contenido
+        string estado "borrador|publicada"
+        timestamp publicada_en
+    }
+
+    AUDITORIA {
+        bigint id PK
+        bigint usuario_id FK
+        string accion
+        string entidad
+        bigint entidad_id
+        json detalle
+        timestamp created_at
+    }
+```
+
+Toda tabla lleva `created_at` y `updated_at`, salvo la auditoría, que solo registra la fecha de creación.
+
+### 12.5. Flujo de un lead
+
+```mermaid
+flowchart LR
+    form["Visitante envía el formulario"] --> nuevo["Lead nuevo en el panel"]
+    nuevo --> contactado["Contactado"]
+    contactado --> demo["Demo agendada"]
+    demo --> propuesta["Propuesta enviada"]
+    propuesta --> ganado["Ganado"]
+    propuesta --> perdido["Perdido con motivo"]
+    contactado --> perdido
+    ganado --> cliente["Se crea la empresa, la suscripción y el usuario cliente"]
+    cliente --> soporte["El cliente entra al panel y abre tickets"]
+```
+
+### 12.6. Flujo de soporte
+
+```mermaid
+sequenceDiagram
+    actor C as Cliente
+    participant P as Panel
+    actor A as Administrador
+
+    C->>P: Abre un ticket con producto, asunto y mensaje
+    P-->>A: Aparece en el contador de tickets sin responder
+    A->>P: Toma el ticket y responde
+    P-->>C: Ve la respuesta en su ticket
+    C->>P: Responde o adjunta una captura
+    A->>P: Marca resuelto
+    C->>P: Confirma o reabre dentro de 7 días
+    P->>P: Pasa a cerrado a los 7 días sin respuesta
+```
 
