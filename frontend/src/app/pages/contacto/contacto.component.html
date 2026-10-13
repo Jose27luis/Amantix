@@ -42,6 +42,9 @@
         <div class="field">
           <label for="phone">Teléfono</label>
           <input id="phone" type="tel" formControlName="phone" autocomplete="tel" />
+          @if (isInvalid('phone')) {
+            <span class="error">Ingresa un teléfono válido.</span>
+          }
         </div>
       </div>
 
@@ -57,8 +60,8 @@
         <label for="product">Producto de interés</label>
         <select id="product" formControlName="productInterest">
           <option value="" disabled>Selecciona un sistema…</option>
-          @for (option of productOptions; track option) {
-            <option [value]="option">{{ option }}</option>
+          @for (option of productOptions; track option.value) {
+            <option [value]="option.value">{{ option.label }}</option>
           }
         </select>
         @if (isInvalid('productInterest')) {
@@ -74,7 +77,18 @@
         }
       </div>
 
-      <button type="submit" class="btn btn-primary form-submit">Enviar solicitud</button>
+      <div class="trap" aria-hidden="true">
+        <label for="website">Sitio web</label>
+        <input id="website" type="text" formControlName="website" tabindex="-1" autocomplete="off" />
+      </div>
+
+      @if (errorEnvio(); as mensaje) {
+        <p class="form-error" role="alert">{{ mensaje }}</p>
+      }
+
+      <button type="submit" class="btn btn-primary form-submit" [disabled]="enviando()">
+        {{ enviando() ? 'Enviando…' : 'Solicitar demo' }}
+      </button>
 
       <p class="privacy">
         Usaremos tus datos solo para responder tu solicitud. Consulta nuestra
