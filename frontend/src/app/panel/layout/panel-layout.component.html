@@ -1,60 +1,73 @@
-<div class="shell" [class.shell-open]="menuAbierto()">
-  <aside class="sidebar">
-    <a routerLink="/panel" class="brand" (click)="cerrarMenu()">
+<div class="shell" [class.shell-open]="menuAbierto()" [class.shell-collapsed]="colapsado()">
+  <aside class="sidebar" id="panel-sidebar">
+    <button
+      type="button"
+      class="collapse"
+      (click)="alternarColapso()"
+      [attr.aria-expanded]="!colapsado()"
+      aria-controls="panel-sidebar"
+      [attr.aria-label]="colapsado() ? 'Expandir menú' : 'Contraer menú'"
+    >
+      <svg width="16" height="16" viewBox="0 0 20 20" aria-hidden="true"><path d="m12.5 5-5 5 5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+    </button>
+
+    <a routerLink="/panel" class="brand" (click)="cerrarMenu()" aria-label="Inicio del panel">
       <img src="/amantix-logo.png" alt="" class="brand-logo" width="32" height="32" />
-      <span class="brand-name">AMANTIX</span>
-      <span class="brand-tag">PANEL</span>
+      <span class="brand-text">
+        <span class="brand-name">AMANTIX</span>
+        <span class="brand-tag">PANEL</span>
+      </span>
     </a>
 
     <nav class="nav" aria-label="Panel">
       @if (sesion.esAdministrador()) {
-        <span class="nav-group">Gestión</span>
-        <a routerLink="/panel" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link" (click)="cerrarMenu()">
-          <svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 11h5V3H3v8Zm0 6h5v-4H3v4Zm9 0h5V9h-5v8Zm0-14v4h5V3h-5Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" /></svg>
-          Dashboard
+        <span class="nav-group"><span class="nav-group-text">Gestión</span></span>
+        <a routerLink="/panel" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link" data-label="Dashboard" (click)="cerrarMenu()">
+          <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 11h5V3H3v8Zm0 6h5v-4H3v4Zm9 0h5V9h-5v8Zm0-14v4h5V3h-5Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" /></svg>
+          <span class="nav-text">Dashboard</span>
         </a>
-        <a routerLink="/panel/leads" routerLinkActive="active" class="nav-link" (click)="cerrarMenu()">
-          <svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 5h14M3 10h14M3 15h9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
-          Leads
+        <a routerLink="/panel/leads" routerLinkActive="active" class="nav-link" data-label="Leads" (click)="cerrarMenu()">
+          <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 5h14M3 10h14M3 15h9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
+          <span class="nav-text">Leads</span>
           @if (leads.pendientes() > 0) {
             <span class="badge" [attr.aria-label]="leads.pendientes() + ' leads nuevos'">{{ leads.pendientes() }}</span>
           }
         </a>
-        <a routerLink="/panel/companies" routerLinkActive="active" class="nav-link" (click)="cerrarMenu()">
-          <svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 17V5l6-2v14M9 17V8l8 2v7M2 17h16M5.5 7.5h1M5.5 10.5h1M5.5 13.5h1M12 12h2M12 14.5h2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
-          Clientes
+        <a routerLink="/panel/companies" routerLinkActive="active" class="nav-link" data-label="Clientes" (click)="cerrarMenu()">
+          <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 17V5l6-2v14M9 17V8l8 2v7M2 17h16M5.5 7.5h1M5.5 10.5h1M5.5 13.5h1M12 12h2M12 14.5h2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
+          <span class="nav-text">Clientes</span>
         </a>
-        <a routerLink="/panel/tickets" routerLinkActive="active" class="nav-link" (click)="cerrarMenu()">
-          <svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 4h14v10H8l-4 3v-3H3V4Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" /></svg>
-          Soporte
+        <a routerLink="/panel/tickets" routerLinkActive="active" class="nav-link" data-label="Soporte" (click)="cerrarMenu()">
+          <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 4h14v10H8l-4 3v-3H3V4Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" /></svg>
+          <span class="nav-text">Soporte</span>
           @if (tickets.pendientes() > 0) {
             <span class="badge" [attr.aria-label]="tickets.pendientes() + ' tickets sin responder'">{{ tickets.pendientes() }}</span>
           }
         </a>
-        <a routerLink="/panel/users" routerLinkActive="active" class="nav-link" (click)="cerrarMenu()">
-          <svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 10a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm-6 7c0-3 2.7-5 6-5s6 2 6 5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
-          Usuarios
+        <a routerLink="/panel/users" routerLinkActive="active" class="nav-link" data-label="Usuarios" (click)="cerrarMenu()">
+          <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 10a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm-6 7c0-3 2.7-5 6-5s6 2 6 5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
+          <span class="nav-text">Usuarios</span>
         </a>
       } @else {
-        <span class="nav-group">Mi empresa</span>
-        <a routerLink="/panel" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link" (click)="cerrarMenu()">
-          <svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 9.5 10 3l7 6.5V17h-5v-5H8v5H3V9.5Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" /></svg>
-          Inicio
+        <span class="nav-group"><span class="nav-group-text">Mi empresa</span></span>
+        <a routerLink="/panel" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link" data-label="Inicio" (click)="cerrarMenu()">
+          <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 9.5 10 3l7 6.5V17h-5v-5H8v5H3V9.5Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" /></svg>
+          <span class="nav-text">Inicio</span>
         </a>
-        <a routerLink="/panel/tickets" routerLinkActive="active" class="nav-link" (click)="cerrarMenu()">
-          <svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 4h14v10H8l-4 3v-3H3V4Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" /></svg>
-          Soporte
+        <a routerLink="/panel/tickets" routerLinkActive="active" class="nav-link" data-label="Soporte" (click)="cerrarMenu()">
+          <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 4h14v10H8l-4 3v-3H3V4Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" /></svg>
+          <span class="nav-text">Soporte</span>
         </a>
       }
 
-      <span class="nav-group">Cuenta</span>
-      <a routerLink="/panel/profile" routerLinkActive="active" class="nav-link" (click)="cerrarMenu()">
-        <svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M5 9V7a5 5 0 0 1 10 0v2M4 9h12v8H4V9Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" /></svg>
-        Mi perfil
+      <span class="nav-group"><span class="nav-group-text">Cuenta</span></span>
+      <a routerLink="/panel/profile" routerLinkActive="active" class="nav-link" data-label="Mi perfil" (click)="cerrarMenu()">
+        <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M5 9V7a5 5 0 0 1 10 0v2M4 9h12v8H4V9Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" /></svg>
+        <span class="nav-text">Mi perfil</span>
       </a>
-      <a routerLink="/" class="nav-link" (click)="cerrarMenu()">
-        <svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M8 4H4v12h12v-4M11 3h6v6M17 3l-8 8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
-        Ver sitio
+      <a href="/" target="_blank" rel="noopener" class="nav-link" data-label="Ver sitio (pestaña nueva)" (click)="cerrarMenu()">
+        <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M8 4H4v12h12v-4M11 3h6v6M17 3l-8 8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
+        <span class="nav-text">Ver sitio<span class="sr-only"> (se abre en una pestaña nueva)</span></span>
       </a>
     </nav>
 
@@ -68,7 +81,10 @@
           </div>
         </div>
       }
-      <button type="button" class="logout" (click)="salir()">Cerrar sesión</button>
+      <button type="button" class="logout" data-label="Cerrar sesión" (click)="salir()">
+        <svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M8 4H4v12h4M13 6l4 4-4 4M17 10H8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" /></svg>
+        <span class="nav-text">Cerrar sesión</span>
+      </button>
     </div>
   </aside>
 
