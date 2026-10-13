@@ -31,6 +31,14 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/gracias/gracias.component').then((m) => m.GraciasComponent),
   },
   {
+    path: 'noticias',
+    loadComponent: () => import('./pages/news/news.component').then((m) => m.NewsComponent),
+  },
+  {
+    path: 'noticias/:slug',
+    loadComponent: () => import('./pages/news-detail/news-detail.component').then((m) => m.NewsDetailComponent),
+  },
+  {
     path: 'panel',
     loadChildren: () => import('./panel/panel.routes').then((m) => m.PANEL_ROUTES),
   },
