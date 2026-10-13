@@ -17,6 +17,13 @@
   --line-2: #C4CED6;
   --danger: #B0524F;
 
+  --brass-light: #D8B77C;
+  --brass-50: #F7F0E3;
+  --teal-bright: #3D9389;
+  --teal-50: #E4F1EE;
+  --steel-50: #E8EEF4;
+  --danger-50: #F9ECEB;
+
   --font-display: 'Archivo', system-ui, sans-serif;
   --font-body: 'IBM Plex Sans', system-ui, sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
