@@ -1,0 +1,74 @@
+@switch (estado().tipo) {
+  @case ('cargando') {
+    <section class="container article-state"><p>Cargando noticia…</p></section>
+  }
+  @case ('no-existe') {
+    <section class="container article-state">
+      <h1>Esta noticia no existe</h1>
+      <p>Puede que la hayamos retirado o que el enlace esté incompleto.</p>
+      <a routerLink="/noticias" class="btn btn-primary">Ver todas las noticias</a>
+    </section>
+  }
+  @case ('error') {
+    <section class="container article-state">
+      <h1>No pudimos cargar la noticia</h1>
+      <p>Vuelve a intentarlo en unos minutos.</p>
+      <a routerLink="/noticias" class="btn btn-ghost">Ver todas las noticias</a>
+    </section>
+  }
+}
+
+@if (estado(); as actual) {
+  @if (actual.tipo === 'listo') {
+    <article class="article">
+      <header class="article-head">
+        <div class="container narrow">
+          <a routerLink="/noticias" class="back">← Todas las noticias</a>
+          <time class="article-date" [attr.datetime]="actual.detalle.noticia.publicada_en">{{ fechaNoticia(actual.detalle.noticia.publicada_en) }}</time>
+          <h1 class="article-title">{{ actual.detalle.noticia.titulo }}</h1>
+          <p class="article-summary">{{ actual.detalle.noticia.resumen }}</p>
+        </div>
+      </header>
+
+      <div class="container narrow">
+        <figure class="article-figure">
+          <img
+            [src]="actual.detalle.noticia.imagen.url"
+            [alt]="actual.detalle.noticia.titulo"
+            [attr.width]="actual.detalle.noticia.imagen.ancho"
+            [attr.height]="actual.detalle.noticia.imagen.alto"
+          />
+        </figure>
+
+        <app-news-content [contenido]="actual.detalle.noticia.contenido ?? ''" />
+
+        <app-news-share [url]="sitio + '/noticias/' + actual.detalle.noticia.slug" [titulo]="actual.detalle.noticia.titulo" />
+
+        <aside class="cta">
+          <div>
+            <h2>¿Quieres que tu negocio facture sin complicaciones?</h2>
+            <p>Te mostramos el sistema en una demo gratuita.</p>
+          </div>
+          <a routerLink="/contacto" class="btn btn-primary">Solicitar demo</a>
+        </aside>
+      </div>
+
+      @if (actual.detalle.relacionadas.length > 0) {
+        <section class="related">
+          <div class="container">
+            <h2 class="related-title">Sigue leyendo</h2>
+            <div class="related-grid">
+              @for (item of actual.detalle.relacionadas; track item.id) {
+                <a [routerLink]="['/noticias', item.slug]" class="related-card">
+                  <img [src]="item.imagen.url" [alt]="item.titulo" loading="lazy" [attr.width]="item.imagen.ancho" [attr.height]="item.imagen.alto" />
+                  <span class="related-date">{{ fechaNoticia(item.publicada_en) }}</span>
+                  <span class="related-name">{{ item.titulo }}</span>
+                </a>
+              }
+            </div>
+          </div>
+        </section>
+      }
+    </article>
+  }
+}
