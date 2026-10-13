@@ -22,6 +22,7 @@ import {
 } from '../../models/labels';
 import { ColumnChartComponent, ColumnPoint } from '../../components/column-chart/column-chart.component';
 import { BarListComponent } from '../../components/bar-list/bar-list.component';
+import { SessionService } from '../../core/session.service';
 
 function fechaLocal(fecha: Date): string {
   const mes = String(fecha.getMonth() + 1).padStart(2, '0');
@@ -102,6 +103,31 @@ export class DashboardComponent {
   protected readonly ticketsPorEstado = computed((): readonly FilaConteo[] =>
     (this.soporte()?.por_estado ?? []).map((fila) => ({ etiqueta: etiquetaEstadoTicket(fila.estado), total: fila.total })),
   );
+
+  private readonly sesion = inject(SessionService);
+
+  protected readonly saludo = ((): string => {
+    const hora = new Date().getHours();
+    return hora < 12 ? 'Buenos días' : hora < 19 ? 'Buenas tardes' : 'Buenas noches';
+  })();
+
+  protected readonly fechaLarga = new Intl.DateTimeFormat('es-PE', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  }).format(new Date());
+
+  protected readonly nombre = computed((): string => (this.sesion.usuario()?.nombre ?? '').split(' ')[0] ?? '');
+
+  protected readonly tendencia = computed((): 'sube' | 'baja' | 'igual' => {
+    const leads = this.leads();
+    if (!leads) {
+      return 'igual';
+    }
+    const { leads: actual, leads_periodo_anterior: anterior } = leads.indicadores;
+    return actual > anterior ? 'sube' : actual < anterior ? 'baja' : 'igual';
+  });
 
   constructor() {
     this.cargar();
