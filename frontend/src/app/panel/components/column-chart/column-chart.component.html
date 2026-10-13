@@ -1,0 +1,34 @@
+<div class="chart" (mouseleave)="activo.set(null)">
+  <svg [attr.viewBox]="'0 0 ' + ancho + ' ' + alto" role="img" [attr.aria-label]="'Gráfico de columnas de ' + unidad()">
+    @for (guia of guias(); track guia.y) {
+      <line [attr.x1]="izquierda" [attr.x2]="ancho" [attr.y1]="guia.y" [attr.y2]="guia.y" class="grid" />
+      <text [attr.x]="izquierda - 8" [attr.y]="guia.y + 4" class="axis" text-anchor="end">{{ guia.valor }}</text>
+    }
+
+    @for (barra of barras(); track barra.etiqueta; let i = $index) {
+      <path [attr.d]="ruta(barra)" class="bar" [class.bar-active]="activo() === i" />
+      @if (i % 2 === 0 || barras().length <= 6) {
+        <text [attr.x]="barra.centro" [attr.y]="base + 17" class="axis" text-anchor="middle">{{ barra.etiqueta }}</text>
+      }
+      <rect
+        [attr.x]="barra.centro - (ancho - izquierda) / barras().length / 2"
+        y="0"
+        [attr.width]="(ancho - izquierda) / barras().length"
+        [attr.height]="base"
+        class="hit"
+        tabindex="0"
+        [attr.aria-label]="barra.detalle + ': ' + barra.valor + ' ' + unidad()"
+        (mouseenter)="activo.set(i)"
+        (focus)="activo.set(i)"
+        (blur)="activo.set(null)"
+      />
+    }
+  </svg>
+
+  @if (seleccion(); as barra) {
+    <div class="tooltip" [style.left.%]="tooltipX(barra)">
+      <span class="tooltip-label">{{ barra.detalle }}</span>
+      <span class="tooltip-value">{{ barra.valor }} {{ unidad() }}</span>
+    </div>
+  }
+</div>
