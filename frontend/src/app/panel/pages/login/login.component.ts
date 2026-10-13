@@ -14,7 +14,7 @@ import { mensajeError } from '../../models/labels';
   imports: [ReactiveFormsModule, RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './login.component.html',
-  styleUrls: ['../../panel-shared.css', './login.component.css'],
+  styleUrl: './login.component.css',
 })
 export class LoginComponent {
   private readonly fb = inject(FormBuilder);
@@ -23,6 +23,9 @@ export class LoginComponent {
 
   protected readonly enviando = signal(false);
   protected readonly error = signal<string | null>(null);
+  protected readonly verPassword = signal(false);
+  protected readonly mayusculas = signal(false);
+  protected readonly anio = new Date().getFullYear();
 
   protected readonly form = this.fb.nonNullable.group({
     correo: ['', [Validators.required, Validators.email]],
@@ -54,6 +57,14 @@ export class LoginComponent {
         next: (usuario: Usuario) => this.router.navigate([usuario.debe_cambiar_password ? '/panel/profile' : '/panel']),
         error: (error: HttpErrorResponse) => this.error.set(mensajeError(error, 'No pudimos iniciar tu sesión.')),
       });
+  }
+
+  protected alternarPassword(): void {
+    this.verPassword.update((visible: boolean) => !visible);
+  }
+
+  protected revisarMayusculas(evento: KeyboardEvent): void {
+    this.mayusculas.set(evento.getModifierState('CapsLock'));
   }
 
   protected invalido(control: 'correo' | 'password'): boolean {
