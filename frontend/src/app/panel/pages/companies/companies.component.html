@@ -1,0 +1,146 @@
+<section class="page">
+  <header class="page-head">
+    <div>
+      <span class="eyebrow">Clientes · Empresas</span>
+      <h1 class="page-title">Clientes</h1>
+      <p class="page-lead">Empresas con productos contratados, sus suscripciones y sus usuarios.</p>
+    </div>
+    <button type="button" class="btn btn-primary btn-sm" (click)="alternarAlta()">
+      {{ mostrandoAlta() ? 'Cancelar' : 'Nueva empresa' }}
+    </button>
+  </header>
+
+  @if (mostrandoAlta()) {
+    <form class="card" [formGroup]="form" (ngSubmit)="crear()" novalidate>
+      <h2 class="card-title">Nueva empresa</h2>
+      <p class="card-sub">Después podrás agregar sus suscripciones y usuarios.</p>
+      <div class="form-grid">
+        <div class="field full">
+          <label for="razon">Razón social</label>
+          <input id="razon" type="text" formControlName="razon_social" />
+          @if (invalido('razon_social')) {
+            <span class="field-error">Indica la razón social.</span>
+          }
+        </div>
+        <div class="field">
+          <label for="ruc">RUC</label>
+          <input id="ruc" type="text" inputmode="numeric" maxlength="11" formControlName="ruc" />
+          @if (invalido('ruc')) {
+            <span class="field-error">11 dígitos, empieza con 10, 15, 16, 17 o 20.</span>
+          }
+        </div>
+        <div class="field">
+          <label for="rubro">Rubro</label>
+          <input id="rubro" type="text" formControlName="rubro" />
+        </div>
+        <div class="field full">
+          <label for="direccion">Dirección</label>
+          <input id="direccion" type="text" formControlName="direccion" />
+        </div>
+        <div class="field">
+          <label for="contacto">Contacto principal</label>
+          <input id="contacto" type="text" formControlName="contacto" />
+        </div>
+        <div class="field">
+          <label for="telefono">Teléfono</label>
+          <input id="telefono" type="tel" formControlName="telefono" />
+          @if (invalido('telefono')) {
+            <span class="field-error">Ingresa un teléfono válido.</span>
+          }
+        </div>
+        <div class="field full">
+          <label for="correo">Correo</label>
+          <input id="correo" type="email" formControlName="correo" />
+          @if (invalido('correo')) {
+            <span class="field-error">Ingresa un correo válido.</span>
+          }
+        </div>
+      </div>
+      @if (errorAlta(); as mensaje) {
+        <p class="alert alert-error spaced" role="alert">{{ mensaje }}</p>
+      }
+      <div class="form-actions spaced">
+        <button type="submit" class="btn btn-primary btn-sm" [disabled]="creando()">{{ creando() ? 'Guardando…' : 'Registrar empresa' }}</button>
+      </div>
+    </form>
+  }
+
+  <form class="card filters" (ngSubmit)="filtrar()">
+    <div class="field field-search">
+      <label for="buscar">Buscar</label>
+      <input id="buscar" type="search" name="buscar" [(ngModel)]="buscar" />
+      <span class="field-help">Razón social, RUC, contacto o correo</span>
+    </div>
+    <div class="field">
+      <label for="producto">Producto activo</label>
+      <select id="producto" name="producto" [(ngModel)]="productoId">
+        <option value="">Todos</option>
+        @for (producto of productos(); track producto.id) {
+          <option [value]="producto.id">{{ producto.nombre }}</option>
+        }
+      </select>
+    </div>
+    <div class="field">
+      <label for="renueva">Renueva en</label>
+      <select id="renueva" name="renueva" [(ngModel)]="renuevaEn">
+        <option value="">Cualquier fecha</option>
+        <option value="7">Próximos 7 días</option>
+        <option value="30">Próximos 30 días</option>
+        <option value="60">Próximos 60 días</option>
+      </select>
+    </div>
+    <div class="filter-actions">
+      <button type="submit" class="btn btn-primary btn-sm">Filtrar</button>
+    </div>
+  </form>
+
+  @if (error(); as mensaje) {
+    <p class="alert alert-error" role="alert">{{ mensaje }}</p>
+  }
+
+  @if (resultado(); as pagina) {
+    <div class="table-wrap" [class.loading]="cargando()">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Empresa</th>
+            <th>RUC</th>
+            <th>Suscripciones activas</th>
+            <th>Próxima renovación</th>
+            <th>Tickets abiertos</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (empresa of pagina.data; track empresa.id) {
+            <tr class="row" tabindex="0" (click)="abrir(empresa)" (keydown.enter)="abrir(empresa)">
+              <td>
+                <a [routerLink]="['/panel/companies', empresa.id]" class="link" (click)="$event.stopPropagation()">{{ empresa.razon_social }}</a>
+                <span class="sub">{{ empresa.contacto ?? empresa.correo ?? '—' }}</span>
+              </td>
+              <td class="mono">{{ empresa.ruc }}</td>
+              <td class="mono">{{ empresa.suscripciones_activas ?? 0 }}</td>
+              <td class="mono">{{ fechaCorta(empresa.proxima_renovacion) }}</td>
+              <td class="mono">{{ empresa.tickets_abiertos ?? 0 }}</td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="5" class="empty">No hay clientes con estos filtros.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    @if (pagina.meta.last_page > 1) {
+      <div class="pagination">
+        <span>{{ pagina.meta.from }}–{{ pagina.meta.to }} de {{ pagina.meta.total }} clientes</span>
+        <div class="pagination-actions">
+          <button type="button" class="btn btn-ghost btn-sm" [disabled]="pagina.meta.current_page <= 1" (click)="irA(pagina.meta.current_page - 1)">← Anterior</button>
+          <button type="button" class="btn btn-ghost btn-sm" [disabled]="pagina.meta.current_page >= pagina.meta.last_page" (click)="irA(pagina.meta.current_page + 1)">Siguiente →</button>
+        </div>
+      </div>
+    }
+  } @else if (cargando()) {
+    <p class="muted">Cargando clientes…</p>
+  }
+</section>
