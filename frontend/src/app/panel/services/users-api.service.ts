@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Paginado, Usuario, UsuarioCreado } from '../models/panel.models';
+import { Paginado, Rol, Usuario, UsuarioCreado } from '../models/panel.models';
 
 export interface CambioUsuario {
   readonly nombre?: string;
@@ -13,7 +13,7 @@ export interface CambioUsuario {
 export class UsersApiService {
   private readonly http = inject(HttpClient);
 
-  listar(buscar: string, pagina: number, rol: 'administrador' | '' = ''): Observable<Paginado<Usuario>> {
+  listar(buscar: string, pagina: number, rol: Rol | '' = ''): Observable<Paginado<Usuario>> {
     let parametros = new HttpParams().set('page', pagina);
 
     if (buscar.trim() !== '') {
