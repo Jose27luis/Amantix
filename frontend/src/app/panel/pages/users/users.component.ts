@@ -2,10 +2,11 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 import { DatePipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 import { UsersApiService } from '../../services/users-api.service';
 import { SessionService } from '../../core/session.service';
-import { Paginado, Usuario, UsuarioCreado } from '../../models/panel.models';
+import { Paginado, Rol, Usuario, UsuarioCreado } from '../../models/panel.models';
 import { mensajeError } from '../../models/labels';
 
 interface ClaveEntregada {
@@ -16,7 +17,7 @@ interface ClaveEntregada {
 @Component({
   selector: 'app-users',
   standalone: true,
-  imports: [ReactiveFormsModule, FormsModule, DatePipe],
+  imports: [ReactiveFormsModule, FormsModule, DatePipe, RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './users.component.html',
   styleUrls: ['../../panel-shared.css', './users.component.css'],
@@ -27,6 +28,7 @@ export class UsersComponent {
   protected readonly sesion = inject(SessionService);
 
   protected buscar = '';
+  protected rol: Rol | '' = '';
   private pagina = 1;
 
   protected readonly cargando = signal(true);
@@ -168,7 +170,7 @@ export class UsersComponent {
     this.cargando.set(true);
     this.error.set(null);
 
-    this.api.listar(this.buscar, this.pagina).subscribe({
+    this.api.listar(this.buscar, this.pagina, this.rol).subscribe({
       next: (resultado: Paginado<Usuario>) => {
         this.resultado.set(resultado);
         this.cargando.set(false);
