@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { Meta } from '@angular/platform-browser';
 import { SessionService } from '../core/session.service';
@@ -20,6 +20,14 @@ export class PanelLayoutComponent {
   protected readonly tickets = inject(TicketsApiService);
 
   protected readonly menuAbierto = signal(false);
+
+  protected readonly iniciales = computed((): string => {
+    const partes = (this.sesion.usuario()?.nombre ?? '').trim().split(/\s+/).filter((parte: string) => parte !== '');
+    return partes
+      .slice(0, 2)
+      .map((parte: string) => parte.charAt(0).toUpperCase())
+      .join('');
+  });
 
   constructor() {
     inject(Meta).updateTag({ name: 'robots', content: 'noindex, nofollow' });
