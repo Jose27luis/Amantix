@@ -1,0 +1,39 @@
+.filters .field {
+  flex: 1 1 170px;
+}
+
+.filters .field-search {
+  flex: 2 1 260px;
+}
+
+.filter-actions {
+  display: flex;
+  gap: 8px;
+  align-self: flex-start;
+  margin-top: 24px;
+}
+
+.spaced {
+  margin-top: 16px;
+}
+
+.table-wrap {
+  transition: opacity 0.2s ease;
+}
+
+.table-wrap.loading {
+  opacity: 0.6;
+}
+
+.row {
+  cursor: pointer;
+}
+
+.row:hover td {
+  background: var(--surface);
+}
+
+.row:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: -2px;
+}
