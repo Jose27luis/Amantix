@@ -1,0 +1,29 @@
+<section class="share" aria-label="Compartir esta noticia">
+  <p class="share-title">¿Le sirve a alguien que conoces?</p>
+  <ul class="share-list">
+    <li>
+      <a [href]="whatsapp()" target="_blank" rel="noopener" class="share-btn">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22c5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2Zm4.52 13.99c-.19.53-1.12 1.03-1.56 1.1-.43.06-.97.09-1.56-.1-.36-.11-.82-.26-1.41-.52-2.48-1.07-4.1-3.57-4.23-3.74-.12-.17-1.01-1.35-1.01-2.57s.63-1.82.86-2.07c.23-.25.49-.31.66-.31h.48c.15.01.36-.06.56.43.21.5.71 1.73.77 1.85.06.12.1.27.02.43-.08.17-.12.27-.25.41-.12.15-.26.33-.37.43-.12.13-.25.26-.11.51.15.25.64 1.06 1.38 1.72.94.84 1.74 1.1 1.99 1.23.25.12.4.1.54-.06.15-.16.62-.72.79-.97.17-.25.33-.21.56-.12.23.08 1.45.68 1.7.81.25.12.41.19.47.29.07.11.07.6-.12 1.13Z" /></svg>
+        WhatsApp
+      </a>
+    </li>
+    <li>
+      <a [href]="facebook()" target="_blank" rel="noopener" class="share-btn">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13.5 21v-7.5h2.5l.4-3h-2.9V8.6c0-.87.25-1.46 1.5-1.46H16.6V4.46A21 21 0 0 0 14.3 4.3c-2.28 0-3.8 1.39-3.8 3.94V10.5H8v3h2.5V21h3Z" /></svg>
+        Facebook
+      </a>
+    </li>
+    <li>
+      <a [href]="linkedin()" target="_blank" rel="noopener" class="share-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.94 8.5H3.56V20h3.38V8.5ZM5.25 3A1.97 1.97 0 1 0 5.3 7a1.97 1.97 0 0 0-.05-4ZM20.44 13.4c0-3.07-1.64-4.5-3.83-4.5-1.76 0-2.55.97-3 1.65V8.5h-3.37V20h3.37v-6.1c0-1.6.3-3.16 2.3-3.16 1.95 0 1.98 1.84 1.98 3.26V20h3.37l-.01-6.6Z" /></svg>
+        LinkedIn
+      </a>
+    </li>
+    <li>
+      <button type="button" class="share-btn" (click)="copiar()">
+        <svg width="16" height="16" viewBox="0 0 20 20" aria-hidden="true"><path d="M8.5 11.5a3.5 3.5 0 0 0 5 0l2.5-2.5a3.5 3.5 0 0 0-5-5L10 5m1.5 3.5a3.5 3.5 0 0 0-5 0L4 11a3.5 3.5 0 0 0 5 5l1-1" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" /></svg>
+        <span aria-live="polite">{{ copiado() ? 'Enlace copiado' : 'Copiar enlace' }}</span>
+      </button>
+    </li>
+  </ul>
+</section>
