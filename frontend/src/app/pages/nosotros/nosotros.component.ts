@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { SeoService } from '../../core/seo.service';
 
 interface Value {
   readonly title: string;
@@ -20,6 +21,15 @@ interface Fact {
   styleUrl: './nosotros.component.css',
 })
 export class NosotrosComponent {
+  constructor() {
+    inject(SeoService).aplicar({
+      titulo: 'Nosotros: casa de software de Puerto Maldonado',
+      descripcion:
+        'Amantix nació en Puerto Maldonado para crear sistemas que cuadren, cumplan con SUNAT y no fallen cuando hay dinero de por medio.',
+      ruta: '/nosotros',
+    });
+  }
+
   protected readonly values: readonly Value[] = [
     { title: 'Precisión', description: 'Si maneja dinero o impuestos, tiene que cuadrar siempre.' },
     { title: 'Seguridad', description: 'Aislamiento por empresa, cifrado y trazabilidad por defecto.' },
