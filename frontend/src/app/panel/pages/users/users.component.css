@@ -1,0 +1,79 @@
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 20px;
+  align-items: start;
+}
+
+.col-main {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.filters .field-search {
+  flex: 1 1 240px;
+}
+
+.new-user {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.secret {
+  justify-content: space-between;
+}
+
+.secret-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.secret-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.secret-actions,
+.actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.strong {
+  display: block;
+  font-weight: 600;
+}
+
+.you {
+  font-weight: 400;
+  color: var(--slate);
+}
+
+.sub {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.8rem;
+  color: var(--slate);
+}
+
+.edit {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 220px;
+}
+
+@media (max-width: 1000px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .new-user {
+    order: -1;
+  }
+}
