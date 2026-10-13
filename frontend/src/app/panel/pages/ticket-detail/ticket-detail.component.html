@@ -1,0 +1,171 @@
+<section class="page">
+  <a routerLink="/panel/tickets" class="back">← Volver a soporte</a>
+
+  @if (error(); as mensaje) {
+    <p class="alert alert-error" role="alert">{{ mensaje }}</p>
+  }
+
+  @if (ticket(); as datos) {
+    <header class="page-head">
+      <div>
+        <span class="eyebrow">{{ datos.codigo }} · {{ datos.producto?.nombre ?? 'Consulta general' }}</span>
+        <h1 class="page-title">{{ datos.asunto }}</h1>
+        <p class="page-lead">
+          @if (sesion.esAdministrador() && datos.empresa) {
+            <a [routerLink]="['/panel/companies', datos.empresa.id]" class="link">{{ datos.empresa.razon_social }}</a> ·
+          }
+          Abierto el {{ datos.creado | date: 'dd/MM/yyyy HH:mm' }}
+        </p>
+      </div>
+      <div class="chips">
+        <span [class]="'chip chip-' + datos.prioridad">Prioridad {{ etiquetaPrioridad(datos.prioridad) | lowercase }}</span>
+        <span [class]="'chip chip-' + datos.estado">{{ etiquetaEstado(datos.estado) }}</span>
+      </div>
+    </header>
+
+    <div class="layout">
+      <div class="col-main">
+        <ol class="thread">
+          @for (mensaje of mensajes(); track mensaje.id) {
+            <li class="msg" [class.msg-team]="mensaje.autor?.es_equipo" [class.msg-internal]="mensaje.interno">
+              <div class="msg-head">
+                <span class="msg-author">{{ mensaje.autor?.nombre ?? 'Usuario eliminado' }}</span>
+                @if (mensaje.autor?.es_equipo) {
+                  <span class="msg-tag">EQUIPO AMANTIX</span>
+                }
+                @if (mensaje.interno) {
+                  <span class="msg-tag msg-tag-internal">NOTA INTERNA</span>
+                }
+                <span class="msg-date">{{ mensaje.creado | date: 'dd/MM/yyyy HH:mm' }}</span>
+              </div>
+              <p class="msg-body">{{ mensaje.mensaje }}</p>
+              @if (mensaje.adjuntos.length > 0) {
+                <ul class="attachments">
+                  @for (adjunto of mensaje.adjuntos; track adjunto.id) {
+                    <li>
+                      <button type="button" class="attachment" (click)="descargar(adjunto)">
+                        <svg width="14" height="14" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3v10m0 0-4-4m4 4 4-4M4 16h12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                        {{ adjunto.nombre }}
+                        <span class="attachment-size">{{ formatoTamano(adjunto.tamano) }}</span>
+                      </button>
+                    </li>
+                  }
+                </ul>
+              }
+            </li>
+          }
+        </ol>
+
+        @if (puedeResponder()) {
+          <form class="card reply" (ngSubmit)="responder()">
+            <div class="field">
+              <label for="respuesta">{{ datos.estado === 'resuelto' && !sesion.esAdministrador() ? 'Responder y reabrir el ticket' : 'Tu respuesta' }}</label>
+              <textarea id="respuesta" name="respuesta" rows="5" maxlength="5000" [(ngModel)]="respuesta"></textarea>
+            </div>
+            <app-file-picker [(archivos)]="archivos" />
+            @if (sesion.esAdministrador()) {
+              <label class="check">
+                <input type="checkbox" name="interno" [(ngModel)]="interno" />
+                Nota interna: el cliente no la ve
+              </label>
+            }
+            @if (errorRespuesta(); as mensaje) {
+              <p class="alert alert-error" role="alert">{{ mensaje }}</p>
+            }
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary" [disabled]="enviando() || respuesta.trim() === ''">
+                {{ enviando() ? 'Enviando…' : interno ? 'Guardar nota' : 'Enviar respuesta' }}
+              </button>
+            </div>
+          </form>
+        } @else {
+          <p class="alert">
+            @if (datos.estado === 'cerrado') {
+              Este ticket está cerrado. Si necesitas más ayuda, abre uno nuevo.
+            } @else {
+              Pasaron más de 7 días desde que se resolvió. Abre un ticket nuevo si necesitas más ayuda.
+            }
+          </p>
+        }
+      </div>
+
+      <div class="col-side">
+        @if (sesion.esAdministrador()) {
+          <form class="card side-form" (ngSubmit)="guardarGestion()">
+            <h2 class="card-title">Gestión</h2>
+            <div class="field">
+              <label for="estado">Estado</label>
+              <select id="estado" name="estado" [(ngModel)]="estado">
+                @for (item of estados; track item.valor) {
+                  <option [value]="item.valor">{{ item.etiqueta }}</option>
+                }
+              </select>
+            </div>
+            <div class="field">
+              <label for="prioridad">Prioridad</label>
+              <select id="prioridad" name="prioridad" [(ngModel)]="prioridad">
+                @for (item of prioridades; track item.valor) {
+                  <option [value]="item.valor">{{ item.etiqueta }}</option>
+                }
+              </select>
+            </div>
+            <div class="field">
+              <label for="responsable">Responsable</label>
+              <select id="responsable" name="responsable" [(ngModel)]="asignadoA">
+                <option value="">Sin asignar</option>
+                @for (usuario of administradores(); track usuario.id) {
+                  <option [value]="usuario.id">{{ usuario.nombre }}</option>
+                }
+              </select>
+            </div>
+            @if (errorGestion(); as mensaje) {
+              <p class="alert alert-error" role="alert">{{ mensaje }}</p>
+            }
+            @if (mensajeGestion(); as mensaje) {
+              <p class="alert alert-ok" role="status">{{ mensaje }}</p>
+            }
+            <button type="submit" class="btn btn-primary" [disabled]="guardando()">{{ guardando() ? 'Guardando…' : 'Guardar cambios' }}</button>
+          </form>
+
+          <div class="card">
+            <h2 class="card-title">Historial</h2>
+            <ol class="timeline">
+              @for (registro of historial(); track registro.id) {
+                <li>
+                  <span class="timeline-title">{{ etiquetaAccion(registro.accion) }}</span>
+                  @if (describir(registro); as texto) {
+                    <span class="timeline-desc">{{ texto }}</span>
+                  }
+                  <span class="timeline-meta">{{ registro.autor ?? 'Sistema' }} · {{ registro.creado | date: 'dd/MM/yyyy HH:mm' }}</span>
+                </li>
+              }
+            </ol>
+          </div>
+        } @else {
+          <div class="card side-form">
+            <h2 class="card-title">Estado</h2>
+            <p class="muted small">
+              @switch (datos.estado) {
+                @case ('abierto') { Recibimos tu ticket. Te responderemos pronto. }
+                @case ('en_atencion') { Estamos revisando tu caso. }
+                @case ('esperando') { Te respondimos. Revisa el mensaje y contéstanos si hace falta. }
+                @case ('resuelto') { Lo marcamos como resuelto. Si el problema sigue, respóndenos dentro de los 7 días. }
+                @case ('cerrado') { Ticket cerrado. }
+              }
+            </p>
+            @if (datos.estado !== 'cerrado') {
+              @if (errorGestion(); as mensaje) {
+                <p class="alert alert-error" role="alert">{{ mensaje }}</p>
+              }
+              <button type="button" class="btn btn-ghost btn-sm" [disabled]="cerrando()" (click)="cerrar()">
+                {{ cerrando() ? 'Cerrando…' : 'Mi problema ya está resuelto, cerrar ticket' }}
+              </button>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  } @else if (cargando()) {
+    <p class="muted">Cargando ticket…</p>
+  }
+</section>
