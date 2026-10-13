@@ -2,6 +2,13 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { PRODUCTS } from '../../data/products';
 import { Product } from '../../models/product.model';
+import { SITIO_URL, SeoService } from '../../core/seo.service';
+
+const CATEGORIAS: Readonly<Record<Product['systemRef'], string>> = {
+  pro8: 'BusinessApplication',
+  mozo4: 'BusinessApplication',
+  agente: 'FinanceApplication',
+};
 
 @Component({
   selector: 'app-producto-detalle',
@@ -14,6 +21,7 @@ import { Product } from '../../models/product.model';
 export class ProductoDetalleComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly seo = inject(SeoService);
 
   protected readonly product: Product;
 
@@ -30,5 +38,35 @@ export class ProductoDetalleComponent {
       return;
     }
     this.product = match;
+    this.aplicarSeo(match);
+  }
+
+  private aplicarSeo(producto: Product): void {
+    this.seo.aplicar({
+      titulo: producto.name,
+      descripcion: producto.shortDescription,
+      ruta: `/productos/${producto.slug}`,
+      imagen: producto.image,
+      datosEstructurados: {
+        '@context': 'https://schema.org',
+        '@type': 'SoftwareApplication',
+        name: producto.name,
+        description: producto.description,
+        url: `${SITIO_URL}/productos/${producto.slug}`,
+        image: SITIO_URL + producto.image,
+        applicationCategory: CATEGORIAS[producto.systemRef],
+        operatingSystem: 'Web',
+        inLanguage: 'es-PE',
+        offers: {
+          '@type': 'AggregateOffer',
+          priceCurrency: 'PEN',
+          lowPrice: '80',
+          highPrice: '120',
+          offerCount: 3,
+          url: `${SITIO_URL}/planes`,
+        },
+        publisher: { '@id': `${SITIO_URL}/#organizacion` },
+      },
+    });
   }
 }
