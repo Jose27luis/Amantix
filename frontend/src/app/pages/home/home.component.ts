@@ -1,6 +1,7 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { PRODUCTS } from '../../data/products';
+import { SeoService } from '../../core/seo.service';
 
 interface Pillar {
   readonly code: string;
@@ -24,6 +25,15 @@ interface SecurityControl {
 })
 export class HomeComponent {
   protected readonly products = PRODUCTS;
+
+  constructor() {
+    inject(SeoService).aplicar({
+      titulo: 'Amantix — Software empresarial para facturar, operar y controlar',
+      descripcion:
+        'Casa de software peruana: facturación electrónica SUNAT, sistema para restaurantes y agente multibancario. Soporte cercano desde Puerto Maldonado.',
+      ruta: '/',
+    });
+  }
 
   protected readonly badges: readonly string[] = ['SUNAT', 'EN PRODUCCIÓN', 'HTTPS · SSL', 'MULTI-TENANT'];
 
