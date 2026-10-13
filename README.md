@@ -152,10 +152,10 @@ Hecho:
 - Sitio público, manual de marca y dominio amantix.pe.
 - API Laravel con login, roles y leads. El formulario de contacto guarda en la base.
 - Panel: login, dashboard de leads, leads con seguimiento, usuarios administradores y perfil.
+- Clientes, suscripciones, usuarios cliente, conversión de leads y soporte por tickets con adjuntos. El dashboard suma clientes, ingresos y soporte.
 
 Pendiente, en este orden:
 
-3. Clientes, suscripciones y soporte. Se suman los usuarios cliente y los indicadores de clientes, ingresos y tickets al dashboard.
 4. Contenido editable: productos, planes, preguntas frecuentes, casos y noticias. El sitio público lee de la API.
 5. Reportes.
 6. Sitio público: noticias, casos, preguntas frecuentes, política de privacidad, SEO y Open Graph.
@@ -777,7 +777,7 @@ Estados: nuevo, contactado, demo agendada, propuesta enviada, ganado, perdido. A
 #### Contenido
 
 - Productos: nombre, descripción corta y larga, funcionalidades, capturas, enlace a producción, orden y visibilidad.
-- Planes: producto, nombre, precio, periodo, lista de características, plan destacado.
+- Planes: nombre, precio, periodo, descripción, lista de características, plan destacado. Son comunes a los tres productos; cada suscripción indica el producto y el plan.
 - Preguntas frecuentes: producto, pregunta, respuesta, orden.
 - Casos de clientes: empresa, rubro, producto, cita, nombre y cargo de quien la dice, logo o foto, visibilidad.
 
@@ -823,11 +823,11 @@ erDiagram
     EMPRESAS ||--o{ USUARIOS : "tiene"
     EMPRESAS ||--o{ SUSCRIPCIONES : "contrata"
     EMPRESAS ||--o{ TICKETS : "abre"
-    PRODUCTOS ||--o{ PLANES : "tiene"
+    PRODUCTOS ||--o{ SUSCRIPCIONES : "se contrata en"
     PRODUCTOS ||--o{ PREGUNTAS : "tiene"
     PRODUCTOS ||--o{ CASOS : "aparece en"
     PRODUCTOS ||--o{ LEADS : "interesa a"
-    PLANES ||--o{ SUSCRIPCIONES : "se contrata en"
+    PLANES ||--o{ SUSCRIPCIONES : "define"
     LEADS ||--o{ NOTAS_LEAD : "tiene"
     LEADS |o--o| EMPRESAS : "se convierte en"
     TICKETS ||--o{ MENSAJES_TICKET : "tiene"
@@ -877,19 +877,23 @@ erDiagram
 
     PLANES {
         bigint id PK
-        bigint producto_id FK
         string nombre
         decimal precio
         string periodo "mensual|anual"
+        string descripcion
         json caracteristicas
         boolean destacado
+        int orden
+        boolean visible
     }
 
     SUSCRIPCIONES {
         bigint id PK
         bigint empresa_id FK
+        bigint producto_id FK
         bigint plan_id FK
         decimal precio
+        string periodo "mensual|anual"
         date fecha_alta
         date proxima_renovacion
         string estado "activa|suspendida|baja"
@@ -929,8 +933,10 @@ erDiagram
         string asunto
         string prioridad "baja|media|alta"
         string estado "abierto|en_atencion|esperando|resuelto|cerrado"
+        boolean pendiente_respuesta
         timestamp primera_respuesta
         timestamp resuelto_en
+        timestamp cerrado_en
     }
 
     MENSAJES_TICKET {
@@ -945,6 +951,7 @@ erDiagram
         bigint id PK
         bigint mensaje_ticket_id FK
         string nombre
+        string ruta
         string tipo
         int tamano
     }
