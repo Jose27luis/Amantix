@@ -34,6 +34,7 @@ class LeadResource extends JsonResource
                 'id' => $lead->asignado->id,
                 'nombre' => $lead->asignado->nombre,
             ],
+            'empresa_cliente_id' => $lead->empresa_id,
             'creado' => $lead->created_at?->toIso8601String(),
             'actualizado' => $lead->updated_at?->toIso8601String(),
         ];
