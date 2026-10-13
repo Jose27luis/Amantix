@@ -22,6 +22,7 @@ class UserAccountService
         $password = $this->generador->generar();
 
         $usuario = User::query()->create([
+            'empresa_id' => $datos['empresa_id'] ?? null,
             'nombre' => $datos['nombre'],
             'correo' => Str::lower(trim($datos['correo'])),
             'rol' => $datos['rol'],
