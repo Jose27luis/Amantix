@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\Role;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens;
 
@@ -15,6 +16,7 @@ class User extends Authenticatable
     protected $table = 'usuarios';
 
     protected $fillable = [
+        'empresa_id',
         'nombre',
         'correo',
         'password',
@@ -43,5 +45,10 @@ class User extends Authenticatable
     public function esAdministrador(): bool
     {
         return $this->rol === Role::Administrador;
+    }
+
+    public function empresa(): BelongsTo
+    {
+        return $this->belongsTo(Company::class, 'empresa_id');
     }
 }
