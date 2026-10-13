@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Allow: /api/news/images/
+Disallow: /panel
+Disallow: /api/
+Disallow: /gracias
+
+Sitemap: https://amantix.pe/sitemap.xml
