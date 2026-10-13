@@ -208,30 +208,44 @@
   flex: none;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  height: 36px;
-  margin-right: 8px;
-  padding: 0 10px;
-  border: 1px solid var(--line-2);
-  border-radius: 6px;
-  background: var(--cloud);
-  font-family: var(--font-body);
-  font-size: 0.8rem;
-  font-weight: 600;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin-right: 4px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
   color: var(--steel);
   cursor: pointer;
-  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+  transition: color 0.2s ease, background 0.2s ease;
 }
 
 .reveal:hover {
   color: var(--ink);
-  border-color: var(--steel);
+  background: rgba(15, 29, 46, 0.06);
 }
 
 .reveal[aria-pressed='true'] {
   color: var(--teal);
-  border-color: var(--teal);
-  background: rgba(47, 110, 104, 0.08);
+}
+
+.eye-pupil {
+  transform-origin: 10px 10px;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.eye-slash {
+  stroke-dasharray: 19;
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 0.25s ease;
+}
+
+.reveal[aria-pressed='true'] .eye-slash {
+  stroke-dashoffset: 19;
+}
+
+.reveal[aria-pressed='false'] .eye-pupil {
+  transform: scale(0.55);
 }
 
 .reveal:focus-visible {
@@ -325,6 +339,170 @@
   }
 }
 
+.render {
+  animation: acercar 1.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.visual-copy {
+  animation: subir 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both;
+}
+
+.visual-meta {
+  animation: subir 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.45s both;
+}
+
+.access-inner {
+  animation: subir 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
+}
+
+.card::before {
+  transform-origin: left center;
+  animation: trazar 0.9s cubic-bezier(0.65, 0, 0.35, 1) 0.45s both;
+}
+
+.intro > *,
+.form > * {
+  animation: subir 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.intro > :nth-child(1) {
+  animation-delay: 0.25s;
+}
+
+.intro > :nth-child(2) {
+  animation-delay: 0.33s;
+}
+
+.intro > :nth-child(3) {
+  animation-delay: 0.41s;
+}
+
+.form > :nth-child(1) {
+  animation-delay: 0.5s;
+}
+
+.form > :nth-child(2) {
+  animation-delay: 0.58s;
+}
+
+.form > :nth-child(3) {
+  animation-delay: 0.66s;
+}
+
+.form > :nth-child(4) {
+  animation-delay: 0.74s;
+}
+
+.brand-logo {
+  animation: girarLogo 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) 0.25s both;
+}
+
+.form > .error {
+  animation: deslizar 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: 0s;
+}
+
+.field-error,
+.field-note {
+  animation: deslizar 0.25s ease both;
+}
+
+.card.shake {
+  animation: sacudir 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+.submit::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, 0.45) 50%, transparent 70%);
+  transform: translateX(-120%);
+  pointer-events: none;
+}
+
+.submit:hover::after {
+  transform: translateX(120%);
+  transition: transform 0.7s ease;
+}
+
+.submit {
+  position: relative;
+  overflow: hidden;
+}
+
+@keyframes subir {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes acercar {
+  from {
+    opacity: 0;
+    transform: scale(1.08);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes trazar {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes girarLogo {
+  from {
+    opacity: 0;
+    transform: rotate(-45deg) scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes deslizar {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes sacudir {
+  10%,
+  90% {
+    transform: translateX(-2px);
+  }
+  20%,
+  80% {
+    transform: translateX(4px);
+  }
+  30%,
+  50%,
+  70% {
+    transform: translateX(-7px);
+  }
+  40%,
+  60% {
+    transform: translateX(7px);
+  }
+}
+
 .foot {
   display: flex;
   justify-content: space-between;
@@ -388,14 +566,36 @@
     animation-duration: 2.4s;
   }
 
+  .render,
+  .visual-copy,
+  .visual-meta,
+  .access-inner,
+  .card::before,
+  .intro > *,
+  .form > *,
+  .brand-logo,
+  .form > .error,
+  .field-error,
+  .field-note,
+  .card.shake {
+    animation: none;
+  }
+
   .control,
   .control-icon,
   .reveal,
-  .submit {
+  .eye-pupil,
+  .eye-slash,
+  .submit,
+  .submit:hover::after {
     transition: none;
   }
 
   .submit:hover {
     transform: none;
+  }
+
+  .submit::after {
+    display: none;
   }
 }
