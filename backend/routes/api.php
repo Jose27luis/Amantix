@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\LeadController;
 use App\Http\Controllers\Api\LeadNoteController;
 use App\Http\Controllers\Api\PublicLeadController;
@@ -21,6 +22,8 @@ Route::middleware(['auth:sanctum', 'active'])->group(function (): void {
     Route::put('auth/password', [AuthController::class, 'cambiarPassword'])->name('auth.password');
 
     Route::middleware('role:administrador')->prefix('admin')->group(function (): void {
+        Route::get('dashboard', [DashboardController::class, 'index']);
+
         Route::get('leads', [LeadController::class, 'index']);
         Route::get('leads/pending', [LeadController::class, 'pendientes']);
         Route::get('leads/{lead}', [LeadController::class, 'show']);
