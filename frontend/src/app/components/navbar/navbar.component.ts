@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
+import { SessionService } from '../../panel/core/session.service';
 
 @Component({
   selector: 'app-navbar',
@@ -10,7 +11,10 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
   styleUrl: './navbar.component.css',
 })
 export class NavbarComponent {
+  private readonly sesion = inject(SessionService);
+
   protected readonly menuOpen = signal(false);
+  protected readonly conSesion = computed(() => this.sesion.token() !== null);
 
   protected toggleMenu(): void {
     this.menuOpen.update((open) => !open);
