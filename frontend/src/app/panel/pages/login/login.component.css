@@ -204,7 +204,7 @@
   display: none;
 }
 
-.reveal {
+.eye-toggle {
   flex: none;
   display: inline-flex;
   align-items: center;
@@ -220,12 +220,12 @@
   transition: color 0.2s ease, background 0.2s ease;
 }
 
-.reveal:hover {
+.eye-toggle:hover {
   color: var(--ink);
   background: rgba(15, 29, 46, 0.06);
 }
 
-.reveal[aria-pressed='true'] {
+.eye-toggle[aria-pressed='true'] {
   color: var(--teal);
 }
 
@@ -240,15 +240,15 @@
   transition: stroke-dashoffset 0.25s ease;
 }
 
-.reveal[aria-pressed='true'] .eye-slash {
+.eye-toggle[aria-pressed='true'] .eye-slash {
   stroke-dashoffset: 19;
 }
 
-.reveal[aria-pressed='false'] .eye-pupil {
+.eye-toggle[aria-pressed='false'] .eye-pupil {
   transform: scale(0.55);
 }
 
-.reveal:focus-visible {
+.eye-toggle:focus-visible {
   outline: 2px solid var(--teal);
   outline-offset: 2px;
 }
@@ -583,7 +583,7 @@
 
   .control,
   .control-icon,
-  .reveal,
+  .eye-toggle,
   .eye-pupil,
   .eye-slash,
   .submit,
