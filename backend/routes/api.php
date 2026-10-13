@@ -11,8 +11,10 @@ use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\LeadController;
 use App\Http\Controllers\Api\LeadConversionController;
 use App\Http\Controllers\Api\LeadNoteController;
+use App\Http\Controllers\Api\NewsController;
 use App\Http\Controllers\Api\PlanController;
 use App\Http\Controllers\Api\PublicLeadController;
+use App\Http\Controllers\Api\PublicNewsController;
 use App\Http\Controllers\Api\PublicProductController;
 use App\Http\Controllers\Api\SubscriptionController;
 use App\Http\Controllers\Api\TicketController;
@@ -22,6 +24,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('products', [PublicProductController::class, 'index']);
 Route::get('plans', [PlanController::class, 'index']);
+Route::get('news', [PublicNewsController::class, 'index']);
+Route::get('news/images/{archivo}', [PublicNewsController::class, 'imagen']);
+Route::get('news/{slug}', [PublicNewsController::class, 'show']);
 Route::post('leads', [PublicLeadController::class, 'store'])->middleware('throttle:leads');
 
 Route::post('auth/login', [AuthController::class, 'login'])->middleware('throttle:login');
@@ -62,6 +67,12 @@ Route::middleware(['auth:sanctum', 'active'])->group(function (): void {
 
         Route::get('tickets/pending', [TicketController::class, 'pendientes']);
         Route::patch('tickets/{ticket}', [TicketController::class, 'update']);
+
+        Route::get('news', [NewsController::class, 'index']);
+        Route::post('news', [NewsController::class, 'store']);
+        Route::get('news/{news}', [NewsController::class, 'show']);
+        Route::post('news/{news}', [NewsController::class, 'update']);
+        Route::delete('news/{news}', [NewsController::class, 'destroy']);
 
         Route::get('users', [UserController::class, 'index']);
         Route::post('users', [UserController::class, 'store']);
