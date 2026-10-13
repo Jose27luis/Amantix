@@ -1,0 +1,94 @@
+.picker {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.add {
+  position: relative;
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 0 14px;
+  border: 1px dashed var(--line-2);
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--ink);
+  background: var(--cloud);
+  cursor: pointer;
+}
+
+.add:hover,
+.add:focus-within {
+  border-color: var(--teal);
+  color: var(--teal);
+}
+
+.add input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.hint {
+  font-size: 0.76rem;
+  color: var(--slate);
+}
+
+.files {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.files li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--cloud);
+  font-size: 0.85rem;
+}
+
+.name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.size {
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  color: var(--slate);
+}
+
+.remove {
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--slate);
+  cursor: pointer;
+}
+
+.remove:hover {
+  background: var(--surface);
+  color: var(--danger);
+}
+
+.warn {
+  font-size: 0.8rem;
+  color: var(--danger);
+}
