@@ -4,11 +4,20 @@ export type EstadoLead = 'nuevo' | 'contactado' | 'demo' | 'propuesta' | 'ganado
 
 export type OrigenLead = 'contacto' | 'demo' | 'cotizacion';
 
+export type EstadoSuscripcion = 'activa' | 'suspendida' | 'baja';
+
+export type Periodo = 'mensual' | 'anual';
+
+export type PrioridadTicket = 'baja' | 'media' | 'alta';
+
+export type EstadoTicket = 'abierto' | 'en_atencion' | 'esperando' | 'resuelto' | 'cerrado';
+
 export interface Usuario {
   readonly id: number;
   readonly nombre: string;
   readonly correo: string;
   readonly rol: Rol;
+  readonly empresa: { readonly id: number; readonly razon_social: string } | null;
   readonly activo: boolean;
   readonly debe_cambiar_password: boolean;
   readonly ultimo_ingreso: string | null;
@@ -40,6 +49,7 @@ export interface Lead {
   readonly motivo_perdida: string | null;
   readonly producto: ProductoResumen | null;
   readonly asignado: { readonly id: number; readonly nombre: string } | null;
+  readonly empresa_cliente_id: number | null;
   readonly creado: string;
   readonly actualizado: string;
 }
@@ -118,8 +128,177 @@ export interface MetricasLeads {
   readonly embudo: readonly { readonly estado: EstadoLead; readonly total: number }[];
 }
 
+export interface MetricasClientes {
+  readonly activos: number;
+  readonly suscripciones_activas: number;
+  readonly ingreso_mensual: number;
+  readonly altas: number;
+  readonly bajas: number;
+  readonly renovaciones_proximas: number;
+  readonly empresas: number;
+  readonly ingreso_por_producto: readonly { readonly producto: string; readonly monto: number }[];
+}
+
+export interface MetricasSoporte {
+  readonly abiertos: number;
+  readonly sin_responder: number;
+  readonly creados: number;
+  readonly primera_respuesta_minutos: number | null;
+  readonly por_estado: readonly { readonly estado: EstadoTicket; readonly total: number }[];
+}
+
 export interface Dashboard {
   readonly leads: MetricasLeads;
+  readonly clientes: MetricasClientes;
+  readonly soporte: MetricasSoporte;
+}
+
+export interface Plan {
+  readonly id: number;
+  readonly nombre: string;
+  readonly precio: number;
+  readonly periodo: Periodo;
+  readonly descripcion: string;
+  readonly caracteristicas: readonly string[];
+  readonly destacado: boolean;
+}
+
+export interface Empresa {
+  readonly id: number;
+  readonly razon_social: string;
+  readonly ruc: string;
+  readonly rubro: string | null;
+  readonly direccion: string | null;
+  readonly contacto: string | null;
+  readonly telefono: string | null;
+  readonly correo: string | null;
+  readonly suscripciones_activas: number | null;
+  readonly tickets_abiertos: number | null;
+  readonly proxima_renovacion: string | null;
+  readonly creado: string | null;
+}
+
+export interface DatosEmpresa {
+  readonly razon_social: string;
+  readonly ruc: string;
+  readonly rubro: string | null;
+  readonly direccion: string | null;
+  readonly contacto: string | null;
+  readonly telefono: string | null;
+  readonly correo: string | null;
+}
+
+export interface Suscripcion {
+  readonly id: number;
+  readonly empresa_id: number;
+  readonly producto: { readonly id: number; readonly nombre: string; readonly url_produccion: string } | null;
+  readonly plan: { readonly id: number; readonly nombre: string } | null;
+  readonly precio: number;
+  readonly periodo: Periodo;
+  readonly fecha_alta: string;
+  readonly proxima_renovacion: string;
+  readonly estado: EstadoSuscripcion;
+}
+
+export interface NuevaSuscripcion {
+  readonly producto_id: number;
+  readonly plan_id: number;
+  readonly precio: number;
+  readonly periodo: Periodo;
+  readonly fecha_alta: string;
+}
+
+export interface CambioSuscripcion {
+  readonly plan_id?: number;
+  readonly precio?: number;
+  readonly periodo?: Periodo;
+  readonly proxima_renovacion?: string;
+  readonly estado?: EstadoSuscripcion;
+}
+
+export interface Ticket {
+  readonly id: number;
+  readonly codigo: string;
+  readonly asunto: string;
+  readonly prioridad: PrioridadTicket;
+  readonly estado: EstadoTicket;
+  readonly pendiente_respuesta: boolean;
+  readonly puede_reabrirse: boolean;
+  readonly empresa: { readonly id: number; readonly razon_social: string } | null;
+  readonly producto: { readonly id: number; readonly nombre: string } | null;
+  readonly asignado: { readonly id: number; readonly nombre: string } | null;
+  readonly primera_respuesta: string | null;
+  readonly resuelto_en: string | null;
+  readonly creado: string;
+  readonly actualizado: string;
+}
+
+export interface DetalleEmpresa {
+  readonly empresa: Empresa;
+  readonly suscripciones: readonly Suscripcion[];
+  readonly usuarios: readonly Usuario[];
+  readonly tickets: readonly Ticket[];
+}
+
+export interface Adjunto {
+  readonly id: number;
+  readonly nombre: string;
+  readonly tipo: string;
+  readonly tamano: number;
+}
+
+export interface MensajeTicket {
+  readonly id: number;
+  readonly mensaje: string;
+  readonly interno: boolean;
+  readonly autor: { readonly nombre: string; readonly es_equipo: boolean } | null;
+  readonly adjuntos: readonly Adjunto[];
+  readonly creado: string;
+}
+
+export interface DetalleTicket {
+  readonly ticket: Ticket;
+  readonly mensajes: readonly MensajeTicket[];
+  readonly historial: readonly RegistroHistorial[];
+}
+
+export interface FiltrosTicket {
+  readonly buscar: string;
+  readonly estado: EstadoTicket | 'activos' | '';
+  readonly prioridad: PrioridadTicket | '';
+  readonly producto_id: string;
+  readonly empresa_id: string;
+  readonly sin_responder: boolean;
+  readonly page: number;
+}
+
+export interface CambioTicket {
+  readonly estado?: EstadoTicket;
+  readonly prioridad?: PrioridadTicket;
+  readonly asignado_a?: number | null;
+}
+
+export interface ResumenCliente {
+  readonly empresa: Empresa;
+  readonly suscripciones: readonly Suscripcion[];
+  readonly tickets_abiertos: number;
+  readonly tickets_recientes: readonly Ticket[];
+}
+
+export interface ConversionLead {
+  readonly razon_social: string;
+  readonly ruc: string;
+  readonly rubro: string | null;
+  readonly producto_id: number;
+  readonly plan_id: number;
+  readonly precio: number;
+  readonly fecha_alta: string;
+}
+
+export interface ResultadoConversion {
+  readonly empresa: Empresa;
+  readonly correo: string;
+  readonly password_temporal: string;
 }
 
 export interface UsuarioCreado {
