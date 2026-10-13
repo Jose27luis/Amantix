@@ -1,0 +1,13 @@
+.back {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--teal);
+  align-self: flex-start;
+}
+
+.ticket-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  max-width: 780px;
+}
