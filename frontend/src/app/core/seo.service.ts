@@ -4,6 +4,7 @@ import { Meta, Title } from '@angular/platform-browser';
 
 export const SITIO_URL = 'https://amantix.pe';
 export const SITIO_NOMBRE = 'Amantix';
+export const FACEBOOK_URL = 'https://www.facebook.com/Factix26';
 const IMAGEN_POR_DEFECTO = `${SITIO_URL}/amantix-marca.png`;
 
 export interface DatosSeo {
