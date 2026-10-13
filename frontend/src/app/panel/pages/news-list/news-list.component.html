@@ -1,0 +1,73 @@
+<section class="page">
+  <header class="page-head">
+    <div>
+      <span class="eyebrow">Noticias · Sitio y redes</span>
+      <h1 class="page-title">Noticias</h1>
+      <p class="page-lead">Lo que publiques aquí aparece en amantix.pe/noticias, sale en Google y se comparte en Facebook con su imagen.</p>
+    </div>
+    <a routerLink="/panel/news/new" class="btn btn-primary btn-sm">Nueva noticia</a>
+  </header>
+
+  <form class="card filters" (ngSubmit)="filtrar()">
+    <div class="field field-search">
+      <label for="buscar">Buscar por título</label>
+      <input id="buscar" type="search" name="buscar" [(ngModel)]="buscar" />
+    </div>
+    <div class="field">
+      <label for="estado">Estado</label>
+      <select id="estado" name="estado" [(ngModel)]="estado">
+        <option value="">Todas</option>
+        <option value="publicada">Publicadas</option>
+        <option value="borrador">Borradores</option>
+      </select>
+    </div>
+    <div class="filter-actions">
+      <button type="submit" class="btn btn-primary btn-sm">Filtrar</button>
+    </div>
+  </form>
+
+  @if (error(); as mensaje) {
+    <p class="alert alert-error" role="alert">{{ mensaje }}</p>
+  }
+
+  @if (resultado(); as pagina) {
+    @if (pagina.data.length === 0) {
+      <div class="card empty-card">
+        <h2 class="card-title">Todavía no hay noticias</h2>
+        <p class="card-sub">Pega aquí lo que publicas en Facebook: tendrá su propia página y aparecerá en Google.</p>
+        <a routerLink="/panel/news/new" class="btn btn-primary btn-sm">Escribir la primera</a>
+      </div>
+    } @else {
+      <div class="news-grid" [class.loading]="cargando()">
+        @for (noticia of pagina.data; track noticia.id) {
+          <article class="news-card" tabindex="0" (click)="abrir(noticia)" (keydown.enter)="abrir(noticia)">
+            <div class="news-media">
+              <img [src]="noticia.imagen.url" [alt]="noticia.titulo" loading="lazy" />
+              <span [class]="'chip news-state ' + (noticia.estado === 'publicada' ? 'chip-activa' : 'chip-media')">
+                {{ noticia.estado === 'publicada' ? 'Publicada' : 'Borrador' }}
+              </span>
+            </div>
+            <div class="news-body">
+              <span class="news-date">{{ noticia.publicada_en ? fechaNoticia(noticia.publicada_en) : 'Sin publicar' }}</span>
+              <h2 class="news-title">{{ noticia.titulo }}</h2>
+              <p class="news-summary">{{ noticia.resumen }}</p>
+              <span class="news-author">{{ noticia.autor ?? 'Equipo Amantix' }}</span>
+            </div>
+          </article>
+        }
+      </div>
+
+      @if (pagina.meta.last_page > 1) {
+        <div class="pagination">
+          <span>{{ pagina.meta.from }}–{{ pagina.meta.to }} de {{ pagina.meta.total }} noticias</span>
+          <div class="pagination-actions">
+            <button type="button" class="btn btn-ghost btn-sm" [disabled]="pagina.meta.current_page <= 1" (click)="irA(pagina.meta.current_page - 1)">← Anterior</button>
+            <button type="button" class="btn btn-ghost btn-sm" [disabled]="pagina.meta.current_page >= pagina.meta.last_page" (click)="irA(pagina.meta.current_page + 1)">Siguiente →</button>
+          </div>
+        </div>
+      }
+    }
+  } @else if (cargando()) {
+    <p class="muted">Cargando noticias…</p>
+  }
+</section>
