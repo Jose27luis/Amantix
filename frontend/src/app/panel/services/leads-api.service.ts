@@ -1,7 +1,16 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { Observable, map, tap } from 'rxjs';
-import { CambioLead, DetalleLead, FiltrosLead, Lead, NotaLead, Paginado } from '../models/panel.models';
+import {
+  CambioLead,
+  ConversionLead,
+  DetalleLead,
+  FiltrosLead,
+  Lead,
+  NotaLead,
+  Paginado,
+  ResultadoConversion,
+} from '../models/panel.models';
 
 @Injectable({ providedIn: 'root' })
 export class LeadsApiService {
@@ -29,6 +38,12 @@ export class LeadsApiService {
 
   actualizar(id: number, cambio: CambioLead): Observable<Lead> {
     return this.http.patch<Lead>(`/api/admin/leads/${id}`, cambio).pipe(tap(() => this.refrescarPendientes()));
+  }
+
+  convertir(id: number, datos: ConversionLead): Observable<ResultadoConversion> {
+    return this.http
+      .post<ResultadoConversion>(`/api/admin/leads/${id}/convert`, datos)
+      .pipe(tap(() => this.refrescarPendientes()));
   }
 
   agregarNota(id: number, nota: string): Observable<NotaLead> {
