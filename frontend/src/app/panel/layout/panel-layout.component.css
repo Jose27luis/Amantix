@@ -1,17 +1,20 @@
 .shell {
   display: grid;
-  grid-template-columns: 256px 1fr;
+  grid-template-columns: 256px minmax(0, 1fr);
   min-height: 100vh;
   background:
     radial-gradient(1200px 500px at 85% -10%, rgba(61, 147, 137, 0.1), transparent 60%),
     radial-gradient(900px 420px at 10% 110%, rgba(216, 183, 124, 0.12), transparent 60%),
     var(--mist);
+  transition: grid-template-columns 0.42s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .sidebar {
   position: sticky;
   top: 0;
+  z-index: 15;
   height: 100vh;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 22px;
@@ -21,23 +24,67 @@
     radial-gradient(240px 260px at 100% 100%, rgba(61, 147, 137, 0.25), transparent 70%),
     linear-gradient(180deg, #0f1d2e 0%, #142a42 100%);
   color: var(--cloud);
-  overflow-y: auto;
   box-shadow: 4px 0 24px rgba(15, 29, 46, 0.18);
+}
+
+.collapse {
+  position: absolute;
+  top: 30px;
+  right: -14px;
+  z-index: 3;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--mist);
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--brass-light), var(--brass));
+  color: var(--ink);
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(15, 29, 46, 0.3);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.collapse svg {
+  transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.collapse:hover {
+  transform: scale(1.12);
+  box-shadow: 0 6px 16px rgba(176, 137, 79, 0.55);
+}
+
+.collapse:focus-visible {
+  outline: 2px solid var(--teal-light);
+  outline-offset: 2px;
 }
 
 .brand {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 4px 8px;
+  padding: 4px 9px;
+  min-width: 0;
 }
 
 .brand-logo {
+  flex: none;
   display: block;
   padding: 3px;
   border-radius: 8px;
   background: var(--mist);
   box-shadow: 0 0 0 2px rgba(216, 183, 124, 0.45);
+}
+
+.brand-text {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  transition: opacity 0.25s ease, max-width 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+  max-width: 180px;
 }
 
 .brand-name {
@@ -63,40 +110,78 @@
   flex-direction: column;
   gap: 3px;
   flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  margin: 0 -14px;
+  padding: 0 14px;
 }
 
 .nav-group {
+  position: relative;
+  display: block;
   font-family: var(--font-mono);
   font-size: 0.66rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--brass-light);
-  opacity: 0.8;
   padding: 16px 12px 6px;
+  white-space: nowrap;
 }
 
-.nav-link {
+.nav-group-text {
+  display: inline-block;
+  opacity: 0.8;
+  transition: opacity 0.25s ease;
+}
+
+.nav-group::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 12px;
+  width: 24px;
+  height: 1px;
+  margin-left: -12px;
+  background: rgba(216, 183, 124, 0.45);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.nav-link,
+.logout {
   position: relative;
   display: flex;
   align-items: center;
-  gap: 11px;
+  gap: 12px;
   min-height: 44px;
-  padding: 0 12px;
-  border-radius: 8px;
+  padding: 0 18px;
+  border-radius: 10px;
   font-size: 0.92rem;
   color: rgba(255, 255, 255, 0.78);
-  transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+  white-space: nowrap;
+  transition: background 0.2s ease, color 0.2s ease, gap 0.42s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.nav-link svg {
+.nav-link svg,
+.logout svg {
   flex: none;
-  transition: color 0.2s ease;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.nav-text {
+  overflow: hidden;
+  max-width: 170px;
+  transition: opacity 0.22s ease, max-width 0.42s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .nav-link:hover {
   background: rgba(255, 255, 255, 0.07);
   color: var(--cloud);
-  transform: translateX(2px);
+}
+
+.nav-link:hover svg {
+  transform: scale(1.08);
 }
 
 .nav-link.active {
@@ -123,7 +208,8 @@
 
 .nav-link:focus-visible,
 .logout:focus-visible,
-.burger:focus-visible {
+.burger:focus-visible,
+.brand:focus-visible {
   outline: 2px solid var(--teal-light);
   outline-offset: 2px;
 }
@@ -144,6 +230,7 @@
   color: var(--ink);
   box-shadow: 0 0 0 3px rgba(216, 183, 124, 0.2);
   animation: latido 2.4s ease-in-out infinite;
+  transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @keyframes latido {
@@ -160,7 +247,7 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding: 14px 10px 4px;
+  padding: 14px 0 4px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -169,6 +256,7 @@
   align-items: center;
   gap: 10px;
   min-width: 0;
+  padding: 0 9px;
 }
 
 .avatar {
@@ -192,6 +280,9 @@
   flex-direction: column;
   gap: 1px;
   min-width: 0;
+  max-width: 170px;
+  overflow: hidden;
+  transition: opacity 0.22s ease, max-width 0.42s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .who-name {
@@ -211,21 +302,27 @@
 }
 
 .logout {
+  width: 100%;
   font-family: var(--font-body);
-  font-size: 0.85rem;
   font-weight: 600;
   color: var(--cloud);
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 8px;
-  min-height: 40px;
   cursor: pointer;
-  transition: background 0.2s ease, border-color 0.2s ease;
 }
 
 .logout:hover {
   background: rgba(176, 82, 79, 0.25);
   border-color: rgba(176, 82, 79, 0.6);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }
 
 .main {
@@ -248,9 +345,87 @@
   display: none;
 }
 
+@media (min-width: 961px) {
+  .shell-collapsed {
+    grid-template-columns: 84px minmax(0, 1fr);
+  }
+
+  .shell-collapsed .collapse svg {
+    transform: rotate(180deg);
+  }
+
+  .shell-collapsed .brand-text,
+  .shell-collapsed .nav-text,
+  .shell-collapsed .who-text {
+    opacity: 0;
+    max-width: 0;
+  }
+
+  .shell-collapsed .nav-link,
+  .shell-collapsed .logout {
+    gap: 0;
+  }
+
+  .shell-collapsed .nav-group-text {
+    opacity: 0;
+  }
+
+  .shell-collapsed .nav-group::after {
+    opacity: 1;
+  }
+
+  .shell-collapsed .nav {
+    overflow: visible;
+  }
+
+  .shell-collapsed .badge {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    font-size: 0.64rem;
+  }
+
+  .shell-collapsed .nav-link::after,
+  .shell-collapsed .logout::after {
+    content: attr(data-label);
+    position: absolute;
+    left: calc(100% + 16px);
+    top: 50%;
+    z-index: 20;
+    padding: 7px 12px;
+    border-radius: 8px;
+    background: var(--ink);
+    border: 1px solid rgba(216, 183, 124, 0.35);
+    color: var(--cloud);
+    font-size: 0.82rem;
+    font-weight: 600;
+    white-space: nowrap;
+    box-shadow: 0 8px 20px rgba(15, 29, 46, 0.35);
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(-6px, -50%);
+    transition: opacity 0.18s ease, transform 0.18s ease;
+  }
+
+  .shell-collapsed .nav-link:hover::after,
+  .shell-collapsed .nav-link:focus-visible::after,
+  .shell-collapsed .logout:hover::after,
+  .shell-collapsed .logout:focus-visible::after {
+    opacity: 1;
+    transform: translate(0, -50%);
+  }
+}
+
 @media (max-width: 960px) {
   .shell {
     grid-template-columns: 1fr;
+  }
+
+  .collapse {
+    display: none;
   }
 
   .sidebar {
@@ -259,20 +434,28 @@
     width: 272px;
     z-index: 30;
     transform: translateX(-100%);
-    transition: transform 0.25s ease;
+    transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .shell-open .sidebar {
     transform: none;
   }
 
-  .shell-open .scrim {
+  .scrim {
     display: block;
     position: fixed;
     inset: 0;
     z-index: 20;
     border: 0;
     background: rgba(15, 29, 46, 0.45);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.32s ease;
+  }
+
+  .shell-open .scrim {
+    opacity: 1;
+    pointer-events: auto;
   }
 
   .topbar {
@@ -314,15 +497,21 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .shell,
   .sidebar,
+  .scrim,
+  .collapse,
+  .collapse svg,
+  .brand-text,
+  .nav-text,
+  .who-text,
+  .nav-group-text,
+  .nav-group::after,
   .nav-link,
   .nav-link svg,
-  .logout {
+  .logout,
+  .badge {
     transition: none;
-  }
-
-  .nav-link:hover {
-    transform: none;
   }
 
   .badge {
