@@ -31,6 +31,10 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/gracias/gracias.component').then((m) => m.GraciasComponent),
   },
   {
+    path: 'panel',
+    loadChildren: () => import('./panel/panel.routes').then((m) => m.PANEL_ROUTES),
+  },
+  {
     path: '**',
     redirectTo: '',
   },
