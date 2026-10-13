@@ -23,6 +23,10 @@ class UserResource extends JsonResource
             'nombre' => $usuario->nombre,
             'correo' => $usuario->correo,
             'rol' => $usuario->rol->value,
+            'empresa' => $usuario->empresa === null ? null : [
+                'id' => $usuario->empresa->id,
+                'razon_social' => $usuario->empresa->razon_social,
+            ],
             'activo' => $usuario->activo,
             'debe_cambiar_password' => $usuario->debe_cambiar_password,
             'ultimo_ingreso' => $usuario->ultimo_ingreso?->toIso8601String(),
