@@ -58,7 +58,7 @@ export class ProfileComponent {
           this.form.reset();
           this.listo.set(true);
           if (obligatorio) {
-            this.router.navigate([this.sesion.esAdministrador() ? '/panel' : '/panel/profile']);
+            this.router.navigate(['/panel']);
           }
         },
         error: (error: HttpErrorResponse) => this.error.set(mensajeError(error, 'No pudimos cambiar tu contraseña.')),
