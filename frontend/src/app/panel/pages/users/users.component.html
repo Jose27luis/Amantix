@@ -3,7 +3,7 @@
     <div>
       <span class="eyebrow">Usuarios · Accesos</span>
       <h1 class="page-title">Usuarios</h1>
-      <p class="page-lead">Administradores del panel. Los usuarios cliente se crean desde cada empresa cliente.</p>
+      <p class="page-lead">Accesos al panel. Los administradores se crean aquí; los usuarios cliente, desde la ficha de cada empresa.</p>
     </div>
   </header>
 
@@ -27,6 +27,14 @@
         <div class="field field-search">
           <label for="buscar">Buscar</label>
           <input id="buscar" type="search" name="buscar" [(ngModel)]="buscar" />
+        </div>
+        <div class="field">
+          <label for="rol">Rol</label>
+          <select id="rol" name="rol" [(ngModel)]="rol">
+            <option value="">Todos</option>
+            <option value="administrador">Administradores</option>
+            <option value="cliente">Clientes</option>
+          </select>
         </div>
         <button type="submit" class="btn btn-ghost btn-sm">Buscar</button>
       </form>
@@ -67,6 +75,13 @@
                     } @else {
                       <span class="strong">{{ usuario.nombre }}@if (esYo(usuario)) {<span class="you"> · Tú</span>}</span>
                       <span class="sub">{{ usuario.correo }}</span>
+                      <span class="sub">
+                        @if (usuario.empresa; as empresa) {
+                          Cliente · <a [routerLink]="['/panel/companies', empresa.id]" class="link">{{ empresa.razon_social }}</a>
+                        } @else {
+                          Administrador
+                        }
+                      </span>
                     }
                   </td>
                   <td>
