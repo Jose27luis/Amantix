@@ -1,0 +1,140 @@
+<section class="page">
+  <header class="page-head">
+    <div>
+      <span class="eyebrow">Usuarios · Accesos</span>
+      <h1 class="page-title">Usuarios</h1>
+      <p class="page-lead">Administradores del panel. Los usuarios cliente se crean desde cada empresa cliente.</p>
+    </div>
+  </header>
+
+  @if (clave(); as entregada) {
+    <div class="secret" role="status">
+      <div class="secret-text">
+        <span class="secret-label">Contraseña temporal de {{ entregada.correo }}</span>
+        <code>{{ entregada.password }}</code>
+        <span class="field-help">Se muestra una sola vez. El usuario la cambiará en su primer ingreso.</span>
+      </div>
+      <div class="secret-actions">
+        <button type="button" class="btn btn-ghost btn-sm" (click)="copiar(entregada.password)">{{ copiado() ? 'Copiada' : 'Copiar' }}</button>
+        <button type="button" class="btn btn-ghost btn-sm" (click)="cerrarClave()">Listo</button>
+      </div>
+    </div>
+  }
+
+  <div class="layout">
+    <div class="col-main">
+      <form class="filters" (ngSubmit)="filtrar()">
+        <div class="field field-search">
+          <label for="buscar">Buscar</label>
+          <input id="buscar" type="search" name="buscar" [(ngModel)]="buscar" />
+        </div>
+        <button type="submit" class="btn btn-ghost btn-sm">Buscar</button>
+      </form>
+
+      @if (error(); as mensaje) {
+        <p class="alert alert-error" role="alert">{{ mensaje }}</p>
+      }
+      @if (errorFila(); as mensaje) {
+        <p class="alert alert-error" role="alert">{{ mensaje }}</p>
+      }
+
+      @if (resultado(); as pagina) {
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Usuario</th>
+                <th>Estado</th>
+                <th>Último ingreso</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (usuario of pagina.data; track usuario.id) {
+                <tr>
+                  <td>
+                    @if (editando() === usuario.id) {
+                      <div class="edit">
+                        <div class="field">
+                          <label [for]="'nombre-' + usuario.id">Nombre</label>
+                          <input [id]="'nombre-' + usuario.id" type="text" [(ngModel)]="editNombre" />
+                        </div>
+                        <div class="field">
+                          <label [for]="'correo-' + usuario.id">Correo</label>
+                          <input [id]="'correo-' + usuario.id" type="email" [(ngModel)]="editCorreo" />
+                        </div>
+                      </div>
+                    } @else {
+                      <span class="strong">{{ usuario.nombre }}@if (esYo(usuario)) {<span class="you"> · Tú</span>}</span>
+                      <span class="sub">{{ usuario.correo }}</span>
+                    }
+                  </td>
+                  <td>
+                    <span [class]="usuario.activo ? 'chip chip-ganado' : 'chip chip-perdido'">{{ usuario.activo ? 'Activo' : 'Desactivado' }}</span>
+                    @if (usuario.debe_cambiar_password) {
+                      <span class="sub">Contraseña temporal</span>
+                    }
+                  </td>
+                  <td class="mono">{{ usuario.ultimo_ingreso ? (usuario.ultimo_ingreso | date: 'dd/MM/yyyy HH:mm') : 'Nunca' }}</td>
+                  <td>
+                    <div class="actions">
+                      @if (editando() === usuario.id) {
+                        <button type="button" class="btn btn-primary btn-sm" [disabled]="ocupado() === usuario.id" (click)="guardarEdicion(usuario)">Guardar</button>
+                        <button type="button" class="btn btn-ghost btn-sm" (click)="cancelarEdicion()">Cancelar</button>
+                      } @else {
+                        <button type="button" class="btn btn-ghost btn-sm" (click)="empezarEdicion(usuario)">Editar</button>
+                        @if (!esYo(usuario)) {
+                          <button type="button" class="btn btn-ghost btn-sm" [disabled]="ocupado() === usuario.id" (click)="restablecer(usuario)">Restablecer contraseña</button>
+                          <button type="button" class="btn btn-ghost btn-sm" [disabled]="ocupado() === usuario.id" (click)="alternarActivo(usuario)">{{ usuario.activo ? 'Desactivar' : 'Activar' }}</button>
+                        }
+                      }
+                    </div>
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="4" class="empty">No hay usuarios con esa búsqueda.</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        @if (pagina.meta.last_page > 1) {
+          <div class="pagination">
+            <span>{{ pagina.meta.from }}–{{ pagina.meta.to }} de {{ pagina.meta.total }} usuarios</span>
+            <div class="pagination-actions">
+              <button type="button" class="btn btn-ghost btn-sm" [disabled]="pagina.meta.current_page <= 1" (click)="irA(pagina.meta.current_page - 1)">← Anterior</button>
+              <button type="button" class="btn btn-ghost btn-sm" [disabled]="pagina.meta.current_page >= pagina.meta.last_page" (click)="irA(pagina.meta.current_page + 1)">Siguiente →</button>
+            </div>
+          </div>
+        }
+      } @else if (cargando()) {
+        <p class="muted">Cargando usuarios…</p>
+      }
+    </div>
+
+    <form class="card new-user" [formGroup]="form" (ngSubmit)="crear()" novalidate>
+      <h2 class="card-title">Nuevo administrador</h2>
+      <p class="card-sub">Recibirá una contraseña temporal que debe cambiar al ingresar.</p>
+      <div class="field">
+        <label for="nuevo-nombre">Nombre</label>
+        <input id="nuevo-nombre" type="text" formControlName="nombre" autocomplete="off" />
+        @if (form.controls.nombre.invalid && form.controls.nombre.touched) {
+          <span class="field-error">Indica el nombre.</span>
+        }
+      </div>
+      <div class="field">
+        <label for="nuevo-correo">Correo</label>
+        <input id="nuevo-correo" type="email" formControlName="correo" autocomplete="off" />
+        @if (form.controls.correo.invalid && form.controls.correo.touched) {
+          <span class="field-error">Ingresa un correo válido.</span>
+        }
+      </div>
+      @if (errorCrear(); as mensaje) {
+        <p class="alert alert-error" role="alert">{{ mensaje }}</p>
+      }
+      <button type="submit" class="btn btn-primary" [disabled]="creando()">{{ creando() ? 'Creando…' : 'Crear administrador' }}</button>
+    </form>
+  </div>
+</section>
