@@ -1,6 +1,10 @@
-<app-navbar />
-<main>
+@if (esPanel()) {
   <router-outlet />
-</main>
-<app-footer />
-<app-whatsapp-button />
+} @else {
+  <app-navbar />
+  <main>
+    <router-outlet />
+  </main>
+  <app-footer />
+  <app-whatsapp-button />
+}
