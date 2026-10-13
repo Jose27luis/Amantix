@@ -1,12 +1,28 @@
 <div class="chart" (mouseleave)="activo.set(null)">
   <svg [attr.viewBox]="'0 0 ' + ancho + ' ' + alto" role="img" [attr.aria-label]="'Gráfico de columnas de ' + unidad()">
+    <defs>
+      <linearGradient [attr.id]="gradiente + '-base'" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3D9389" />
+        <stop offset="100%" stop-color="#2A3F54" />
+      </linearGradient>
+      <linearGradient [attr.id]="gradiente + '-activa'" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#E9CD97" />
+        <stop offset="100%" stop-color="#B0894F" />
+      </linearGradient>
+    </defs>
     @for (guia of guias(); track guia.y) {
       <line [attr.x1]="izquierda" [attr.x2]="ancho" [attr.y1]="guia.y" [attr.y2]="guia.y" class="grid" />
       <text [attr.x]="izquierda - 8" [attr.y]="guia.y + 4" class="axis" text-anchor="end">{{ guia.valor }}</text>
     }
 
     @for (barra of barras(); track barra.etiqueta; let i = $index) {
-      <path [attr.d]="ruta(barra)" class="bar" [class.bar-active]="activo() === i" />
+      <path
+        [attr.d]="ruta(barra)"
+        class="bar"
+        [class.bar-active]="activo() === i"
+        [attr.fill]="'url(#' + gradiente + (activo() === i ? '-activa' : '-base') + ')'"
+        [style.animation-delay.ms]="i * 40"
+      />
       @if (i % 2 === 0 || barras().length <= 6) {
         <text [attr.x]="barra.centro" [attr.y]="base + 17" class="axis" text-anchor="middle">{{ barra.etiqueta }}</text>
       }
