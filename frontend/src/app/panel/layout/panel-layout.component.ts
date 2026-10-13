@@ -3,6 +3,7 @@ import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/rou
 import { Meta } from '@angular/platform-browser';
 import { SessionService } from '../core/session.service';
 import { LeadsApiService } from '../services/leads-api.service';
+import { TicketsApiService } from '../services/tickets-api.service';
 
 @Component({
   selector: 'app-panel-layout',
@@ -16,6 +17,7 @@ export class PanelLayoutComponent {
   private readonly router = inject(Router);
   protected readonly sesion = inject(SessionService);
   protected readonly leads = inject(LeadsApiService);
+  protected readonly tickets = inject(TicketsApiService);
 
   protected readonly menuAbierto = signal(false);
 
@@ -24,6 +26,7 @@ export class PanelLayoutComponent {
 
     if (this.sesion.esAdministrador()) {
       this.leads.refrescarPendientes();
+      this.tickets.refrescarPendientes();
     }
   }
 
