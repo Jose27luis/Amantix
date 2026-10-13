@@ -1,4 +1,4 @@
-<ul class="list">
+<ul class="list" [class]="'list tono-' + tono()">
   @for (barra of barras(); track barra.etiqueta) {
     <li class="row" [attr.title]="barra.etiqueta + ': ' + formato()(barra.total) + ' (' + barra.participacion + ' %)'">
       <div class="row-head">
