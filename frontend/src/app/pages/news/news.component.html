@@ -1,0 +1,68 @@
+<section class="news-head">
+  <div class="container">
+    <span class="eyebrow">Noticias · Amantix</span>
+    <h1 class="news-title">Noticias y novedades</h1>
+    <p class="news-lead">Cambios de SUNAT, facturación electrónica y novedades de nuestros sistemas, explicados para tu negocio.</p>
+  </div>
+</section>
+
+<section class="news-list">
+  <div class="container">
+    @switch (estado().tipo) {
+      @case ('cargando') {
+        <p class="state">Cargando noticias…</p>
+      }
+      @case ('error') {
+        <p class="state">No pudimos cargar las noticias. Vuelve a intentarlo en unos minutos.</p>
+      }
+    }
+
+    @if (estado(); as actual) {
+      @if (actual.tipo === 'listo') {
+        @if (actual.pagina.data.length === 0) {
+          <div class="empty">
+            <h2>Pronto publicaremos novedades</h2>
+            <p>Mientras tanto, conoce nuestros sistemas o escríbenos para una demo.</p>
+            <a routerLink="/productos" class="btn btn-primary">Ver productos</a>
+          </div>
+        } @else {
+          <div class="grid">
+            @for (noticia of actual.pagina.data; track noticia.id; let primero = $first) {
+              <article class="card-news" [class.card-feature]="primero && actual.pagina.meta.current_page === 1">
+                <a [routerLink]="['/noticias', noticia.slug]" class="card-link">
+                  <div class="card-media">
+                    <img
+                      [src]="noticia.imagen.url"
+                      [alt]="noticia.titulo"
+                      [attr.width]="noticia.imagen.ancho"
+                      [attr.height]="noticia.imagen.alto"
+                      [attr.loading]="primero ? 'eager' : 'lazy'"
+                    />
+                  </div>
+                  <div class="card-body">
+                    <time class="card-date" [attr.datetime]="noticia.publicada_en">{{ fechaNoticia(noticia.publicada_en) }}</time>
+                    <h2 class="card-title">{{ noticia.titulo }}</h2>
+                    <p class="card-summary">{{ noticia.resumen }}</p>
+                    <span class="card-more">Leer noticia</span>
+                  </div>
+                </a>
+              </article>
+            }
+          </div>
+
+          @if (actual.pagina.meta.last_page > 1) {
+            <nav class="pager" aria-label="Páginas de noticias">
+              @if (actual.pagina.meta.current_page > 1) {
+                <a [routerLink]="['/noticias']" [queryParams]="actual.pagina.meta.current_page - 1 > 1 ? { pagina: actual.pagina.meta.current_page - 1 } : {}" class="btn btn-ghost" rel="prev">Más recientes</a>
+              }
+              <span class="pager-info">Página {{ actual.pagina.meta.current_page }} de {{ actual.pagina.meta.last_page }}</span>
+              @if (actual.pagina.meta.current_page < actual.pagina.meta.last_page) {
+                <a [routerLink]="['/noticias']" [queryParams]="{ pagina: actual.pagina.meta.current_page + 1 }" class="btn btn-ghost" rel="next">Anteriores</a>
+              }
+            </nav>
+          }
+        }
+      }
+    }
+  </div>
+</section>
