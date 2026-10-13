@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { SeoService } from '../../core/seo.service';
 
 type BillingPeriod = 'mensual' | 'anual';
 
@@ -21,6 +22,15 @@ interface Plan {
 })
 export class PlanesComponent {
   protected readonly period = signal<BillingPeriod>('mensual');
+
+  constructor() {
+    inject(SeoService).aplicar({
+      titulo: 'Planes y precios desde S/ 80 al mes',
+      descripcion:
+        'Planes Esencial, Negocio y Corporativo para facturación electrónica SUNAT, restaurantes y agentes multibancarios. Desde S/ 80 al mes con soporte por WhatsApp.',
+      ruta: '/planes',
+    });
+  }
 
   protected readonly plans: readonly Plan[] = [
     {
