@@ -1,0 +1,43 @@
+<ng-template #linea let-segmentos>
+  @for (segmento of segmentos; track $index) {
+    @switch (segmento.tipo) {
+      @case ('negrita') {
+        <strong>{{ segmento.valor }}</strong>
+      }
+      @case ('enlace') {
+        <a [href]="segmento.href" target="_blank" rel="noopener nofollow">{{ segmento.valor }}</a>
+      }
+      @default {
+        {{ segmento.valor }}
+      }
+    }
+  }
+</ng-template>
+
+<div class="cuerpo">
+  @for (bloque of bloques(); track $index) {
+    @switch (bloque.tipo) {
+      @case ('subtitulo') {
+        <h2 class="subtitulo"><ng-container *ngTemplateOutlet="linea; context: { $implicit: bloque.segmentos }" /></h2>
+      }
+      @case ('lista') {
+        @if (bloque.ordenada) {
+          <ol class="lista lista-numerada">
+            @for (item of bloque.items; track $index) {
+              <li><ng-container *ngTemplateOutlet="linea; context: { $implicit: item }" /></li>
+            }
+          </ol>
+        } @else {
+          <ul class="lista">
+            @for (item of bloque.items; track $index) {
+              <li><ng-container *ngTemplateOutlet="linea; context: { $implicit: item }" /></li>
+            }
+          </ul>
+        }
+      }
+      @default {
+        <p><ng-container *ngTemplateOutlet="linea; context: { $implicit: bloque.segmentos }" /></p>
+      }
+    }
+  }
+</div>
