@@ -1,0 +1,143 @@
+<section class="page">
+  <a routerLink="/panel/leads" class="back">← Volver a leads</a>
+
+  @if (error(); as mensaje) {
+    <p class="alert alert-error" role="alert">{{ mensaje }}</p>
+  }
+
+  @if (lead(); as datos) {
+    <header class="page-head">
+      <div>
+        <span class="eyebrow">{{ datos.codigo }} · {{ etiquetaOrigen(datos.origen) }}</span>
+        <h1 class="page-title">{{ datos.nombre }}</h1>
+        <p class="page-lead">{{ datos.empresa ?? 'Sin empresa' }} · Recibido el {{ datos.creado | date: 'dd/MM/yyyy HH:mm' }}</p>
+      </div>
+      <span [class]="'chip chip-' + datos.estado">{{ etiquetaEstado(datos.estado) }}</span>
+    </header>
+
+    <div class="layout">
+      <div class="col-main">
+        <div class="card">
+          <h2 class="card-title">Datos de contacto</h2>
+          <dl class="facts">
+            <div>
+              <dt>Correo</dt>
+              <dd><a [href]="'mailto:' + datos.correo" class="link">{{ datos.correo }}</a></dd>
+            </div>
+            <div>
+              <dt>Teléfono</dt>
+              <dd class="mono">{{ datos.telefono ?? '—' }}</dd>
+            </div>
+            <div>
+              <dt>Producto</dt>
+              <dd>{{ datos.producto?.nombre ?? 'Sin definir' }}</dd>
+            </div>
+            <div>
+              <dt>Responsable</dt>
+              <dd>{{ datos.asignado?.nombre ?? 'Sin asignar' }}</dd>
+            </div>
+          </dl>
+          <div class="contact-actions">
+            @if (whatsapp(); as enlace) {
+              <a [href]="enlace" target="_blank" rel="noopener" class="btn btn-primary btn-sm">Escribir por WhatsApp ↗</a>
+            }
+            <a [href]="'mailto:' + datos.correo" class="btn btn-ghost btn-sm">Enviar correo</a>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 class="card-title">Mensaje</h2>
+          <p class="message">{{ datos.mensaje }}</p>
+        </div>
+
+        <div class="card">
+          <h2 class="card-title">Notas internas</h2>
+          <p class="card-sub">Solo las ve el equipo de Amantix.</p>
+          <form class="note-form" (ngSubmit)="agregarNota()">
+            <div class="field">
+              <label for="nota">Nueva nota</label>
+              <textarea id="nota" name="nota" rows="3" maxlength="3000" [(ngModel)]="nota"></textarea>
+            </div>
+            @if (errorNota(); as mensaje) {
+              <p class="alert alert-error" role="alert">{{ mensaje }}</p>
+            }
+            <button type="submit" class="btn btn-primary btn-sm" [disabled]="enviandoNota() || nota.trim() === ''">
+              {{ enviandoNota() ? 'Guardando…' : 'Agregar nota' }}
+            </button>
+          </form>
+
+          <ul class="notes">
+            @for (item of notas(); track item.id) {
+              <li class="note">
+                <span class="note-meta">{{ item.autor ?? 'Usuario eliminado' }} · {{ item.creado | date: 'dd/MM/yyyy HH:mm' }}</span>
+                <p>{{ item.nota }}</p>
+              </li>
+            } @empty {
+              <li class="muted">Todavía no hay notas.</li>
+            }
+          </ul>
+        </div>
+      </div>
+
+      <div class="col-side">
+        <form class="card side-form" (ngSubmit)="guardar()">
+          <h2 class="card-title">Seguimiento</h2>
+          <div class="field">
+            <label for="estado">Estado</label>
+            <select id="estado" name="estado" [(ngModel)]="estado">
+              @for (item of estados; track item.valor) {
+                <option [value]="item.valor">{{ item.etiqueta }}</option>
+              }
+            </select>
+          </div>
+
+          @if (estado === 'perdido') {
+            <div class="field">
+              <label for="motivo">Motivo de la pérdida</label>
+              <input id="motivo" type="text" name="motivo" maxlength="255" [(ngModel)]="motivo" />
+              <span class="field-help">Obligatorio al marcar como perdido.</span>
+            </div>
+          }
+
+          <div class="field">
+            <label for="responsable">Responsable</label>
+            <select id="responsable" name="responsable" [(ngModel)]="asignadoA">
+              <option value="">Sin asignar</option>
+              @for (usuario of administradores(); track usuario.id) {
+                <option [value]="usuario.id">{{ usuario.nombre }}</option>
+              }
+            </select>
+          </div>
+
+          @if (errorGuardado(); as mensaje) {
+            <p class="alert alert-error" role="alert">{{ mensaje }}</p>
+          }
+          @if (mensajeGuardado(); as mensaje) {
+            <p class="alert alert-ok" role="status">{{ mensaje }}</p>
+          }
+
+          <button type="submit" class="btn btn-primary" [disabled]="guardando() || (estado === 'perdido' && motivo.trim() === '')">
+            {{ guardando() ? 'Guardando…' : 'Guardar cambios' }}
+          </button>
+        </form>
+
+        <div class="card">
+          <h2 class="card-title">Historial</h2>
+          <ol class="timeline">
+            @for (registro of historial(); track registro.id) {
+              <li>
+                <span class="timeline-title">{{ titulo(registro) }}</span>
+                @if (registro.accion !== 'lead_recibido') {
+                  <span class="timeline-desc">{{ describir(registro) }}</span>
+                }
+                <span class="timeline-meta">{{ registro.autor ?? 'Sitio web' }} · {{ registro.creado | date: 'dd/MM/yyyy HH:mm' }}</span>
+              </li>
+            }
+          </ol>
+        </div>
+      </div>
+    </div>
+  } @else if (cargando()) {
+    <p class="muted">Cargando lead…</p>
+  }
+</section>
