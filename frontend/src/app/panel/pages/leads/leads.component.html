@@ -1,0 +1,110 @@
+<section class="page">
+  <header class="page-head">
+    <div>
+      <span class="eyebrow">Leads · Seguimiento</span>
+      <h1 class="page-title">Leads</h1>
+      <p class="page-lead">Solicitudes que llegan desde el sitio. Abre una para cambiar su estado o dejar notas.</p>
+    </div>
+  </header>
+
+  <form class="card filters" (ngSubmit)="filtrar()">
+    <div class="field field-search">
+      <label for="buscar">Buscar</label>
+      <input id="buscar" type="search" name="buscar" [(ngModel)]="buscar" />
+      <span class="field-help">Nombre, empresa, correo, teléfono o código</span>
+    </div>
+    <div class="field">
+      <label for="estado">Estado</label>
+      <select id="estado" name="estado" [(ngModel)]="estado">
+        <option value="">Todos</option>
+        @for (item of estados; track item.valor) {
+          <option [value]="item.valor">{{ item.etiqueta }}</option>
+        }
+      </select>
+    </div>
+    <div class="field">
+      <label for="producto">Producto</label>
+      <select id="producto" name="producto" [(ngModel)]="productoId">
+        <option value="">Todos</option>
+        @for (producto of productos(); track producto.id) {
+          <option [value]="producto.id">{{ producto.nombre }}</option>
+        }
+      </select>
+    </div>
+    <div class="field">
+      <label for="origen">Origen</label>
+      <select id="origen" name="origen" [(ngModel)]="origen">
+        <option value="">Todos</option>
+        @for (item of origenes; track item.valor) {
+          <option [value]="item.valor">{{ item.etiqueta }}</option>
+        }
+      </select>
+    </div>
+    <div class="field">
+      <label for="desde">Desde</label>
+      <input id="desde" type="date" name="desde" [(ngModel)]="desde" />
+    </div>
+    <div class="field">
+      <label for="hasta">Hasta</label>
+      <input id="hasta" type="date" name="hasta" [(ngModel)]="hasta" />
+    </div>
+    <div class="filter-actions">
+      <button type="submit" class="btn btn-primary btn-sm">Filtrar</button>
+      <button type="button" class="btn btn-ghost btn-sm" (click)="limpiar()">Limpiar</button>
+    </div>
+  </form>
+
+  @if (error(); as mensaje) {
+    <p class="alert alert-error" role="alert">{{ mensaje }}</p>
+  }
+
+  @if (resultado(); as pagina) {
+    <div class="table-wrap" [class.loading]="cargando()">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Código</th>
+            <th>Recibido</th>
+            <th>Contacto</th>
+            <th>Producto</th>
+            <th>Origen</th>
+            <th>Estado</th>
+            <th>Responsable</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (lead of pagina.data; track lead.id) {
+            <tr class="row" tabindex="0" (click)="abrir(lead)" (keydown.enter)="abrir(lead)">
+              <td class="mono"><a [routerLink]="['/panel/leads', lead.id]" (click)="$event.stopPropagation()">{{ lead.codigo }}</a></td>
+              <td class="mono">{{ lead.creado | date: 'dd/MM/yyyy HH:mm' }}</td>
+              <td>
+                <span class="strong">{{ lead.nombre }}</span>
+                <span class="sub">{{ lead.empresa ?? lead.correo }}</span>
+              </td>
+              <td>{{ lead.producto?.nombre ?? 'Sin definir' }}</td>
+              <td>{{ etiquetaOrigen(lead.origen) }}</td>
+              <td><span [class]="'chip chip-' + lead.estado">{{ etiquetaEstado(lead.estado) }}</span></td>
+              <td>{{ lead.asignado?.nombre ?? '—' }}</td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="7" class="empty">No hay leads con estos filtros.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    @if (pagina.meta.total > 0) {
+      <div class="pagination">
+        <span>{{ pagina.meta.from }}–{{ pagina.meta.to }} de {{ pagina.meta.total }} leads</span>
+        <div class="pagination-actions">
+          <button type="button" class="btn btn-ghost btn-sm" [disabled]="pagina.meta.current_page <= 1 || cargando()" (click)="irA(pagina.meta.current_page - 1)">← Anterior</button>
+          <button type="button" class="btn btn-ghost btn-sm" [disabled]="pagina.meta.current_page >= pagina.meta.last_page || cargando()" (click)="irA(pagina.meta.current_page + 1)">Siguiente →</button>
+        </div>
+      </div>
+    }
+  } @else if (cargando()) {
+    <p class="muted">Cargando leads…</p>
+  }
+</section>
