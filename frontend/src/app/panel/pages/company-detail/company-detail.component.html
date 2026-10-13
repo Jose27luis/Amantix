@@ -1,0 +1,276 @@
+<section class="page">
+  <a routerLink="/panel/companies" class="back">← Volver a clientes</a>
+
+  @if (error(); as mensaje) {
+    <p class="alert alert-error" role="alert">{{ mensaje }}</p>
+  }
+
+  @if (clave(); as entregada) {
+    <div class="secret" role="status">
+      <div class="secret-text">
+        <span class="secret-label">Contraseña temporal de {{ entregada.correo }}</span>
+        <code>{{ entregada.password }}</code>
+        <span class="field-help">Se muestra una sola vez. Envíala al cliente junto con el enlace amantix.pe/panel.</span>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn btn-ghost btn-sm" (click)="copiar(entregada.password)">{{ copiado() ? 'Copiada' : 'Copiar' }}</button>
+        <button type="button" class="btn btn-ghost btn-sm" (click)="cerrarClave()">Listo</button>
+      </div>
+    </div>
+  }
+
+  @if (detalle(); as datos) {
+    <header class="page-head">
+      <div>
+        <span class="eyebrow">RUC · {{ datos.empresa.ruc }}</span>
+        <h1 class="page-title">{{ datos.empresa.razon_social }}</h1>
+        <p class="page-lead">{{ datos.empresa.rubro ?? 'Rubro sin registrar' }} · Cliente desde {{ datos.empresa.creado | date: 'dd/MM/yyyy' }}</p>
+      </div>
+    </header>
+
+    <div class="card">
+      <div class="section-head">
+        <h2 class="card-title">Datos de la empresa</h2>
+        @if (!editandoDatos()) {
+          <button type="button" class="btn btn-ghost btn-sm" (click)="empezarEdicion(datos.empresa)">Editar</button>
+        }
+      </div>
+
+      @if (editandoDatos()) {
+        <form [formGroup]="datosForm" (ngSubmit)="guardarDatos(datos.empresa)" novalidate>
+          <div class="form-grid">
+            <div class="field full">
+              <label for="razon">Razón social</label>
+              <input id="razon" type="text" formControlName="razon_social" />
+              @if (campoInvalido('razon_social')) {
+                <span class="field-error">Indica la razón social.</span>
+              }
+            </div>
+            <div class="field">
+              <label for="ruc">RUC</label>
+              <input id="ruc" type="text" inputmode="numeric" maxlength="11" formControlName="ruc" />
+              @if (campoInvalido('ruc')) {
+                <span class="field-error">11 dígitos, empieza con 10, 15, 16, 17 o 20.</span>
+              }
+            </div>
+            <div class="field">
+              <label for="rubro">Rubro</label>
+              <input id="rubro" type="text" formControlName="rubro" />
+            </div>
+            <div class="field full">
+              <label for="direccion">Dirección</label>
+              <input id="direccion" type="text" formControlName="direccion" />
+            </div>
+            <div class="field">
+              <label for="contacto">Contacto principal</label>
+              <input id="contacto" type="text" formControlName="contacto" />
+            </div>
+            <div class="field">
+              <label for="telefono">Teléfono</label>
+              <input id="telefono" type="tel" formControlName="telefono" />
+              @if (campoInvalido('telefono')) {
+                <span class="field-error">Ingresa un teléfono válido.</span>
+              }
+            </div>
+            <div class="field full">
+              <label for="correo">Correo</label>
+              <input id="correo" type="email" formControlName="correo" />
+              @if (campoInvalido('correo')) {
+                <span class="field-error">Ingresa un correo válido.</span>
+              }
+            </div>
+          </div>
+          @if (errorDatos(); as mensaje) {
+            <p class="alert alert-error spaced" role="alert">{{ mensaje }}</p>
+          }
+          <div class="form-actions spaced">
+            <button type="submit" class="btn btn-primary btn-sm" [disabled]="guardandoDatos()">{{ guardandoDatos() ? 'Guardando…' : 'Guardar' }}</button>
+            <button type="button" class="btn btn-ghost btn-sm" (click)="editandoDatos.set(false)">Cancelar</button>
+          </div>
+        </form>
+      } @else {
+        <dl class="facts">
+          <div><dt>Contacto</dt><dd>{{ datos.empresa.contacto ?? '—' }}</dd></div>
+          <div><dt>Teléfono</dt><dd class="mono">{{ datos.empresa.telefono ?? '—' }}</dd></div>
+          <div><dt>Correo</dt><dd>{{ datos.empresa.correo ?? '—' }}</dd></div>
+          <div><dt>Dirección</dt><dd>{{ datos.empresa.direccion ?? '—' }}</dd></div>
+        </dl>
+      }
+    </div>
+
+    <div class="card">
+      <div class="section-head">
+        <h2 class="card-title">Suscripciones</h2>
+        <button type="button" class="btn btn-ghost btn-sm" (click)="alternarSuscripcion()">{{ mostrandoSuscripcion() ? 'Cancelar' : 'Agregar suscripción' }}</button>
+      </div>
+
+      @if (mostrandoSuscripcion()) {
+        <form class="inset" [formGroup]="suscripcionForm" (ngSubmit)="agregarSuscripcion(datos.empresa)" novalidate>
+          <div class="form-grid">
+            <div class="field">
+              <label for="sus-producto">Producto</label>
+              <select id="sus-producto" formControlName="producto_id">
+                <option value="" disabled>Elige un producto</option>
+                @for (producto of productos(); track producto.id) {
+                  <option [value]="producto.id">{{ producto.nombre }}</option>
+                }
+              </select>
+            </div>
+            <div class="field">
+              <label for="sus-plan">Plan</label>
+              <select id="sus-plan" formControlName="plan_id" (change)="elegirPlan()">
+                <option value="" disabled>Elige un plan</option>
+                @for (plan of planes(); track plan.id) {
+                  <option [value]="plan.id">{{ plan.nombre }} · {{ formatoSoles(plan.precio) }}</option>
+                }
+              </select>
+            </div>
+            <div class="field">
+              <label for="sus-precio">Precio (S/)</label>
+              <input id="sus-precio" type="number" min="0" step="0.01" formControlName="precio" />
+            </div>
+            <div class="field">
+              <label for="sus-periodo">Periodo</label>
+              <select id="sus-periodo" formControlName="periodo">
+                <option value="mensual">Mensual</option>
+                <option value="anual">Anual</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="sus-alta">Fecha de alta</label>
+              <input id="sus-alta" type="date" formControlName="fecha_alta" />
+              <span class="field-help">La primera renovación se calcula con el periodo.</span>
+            </div>
+          </div>
+          <div class="form-actions spaced">
+            <button type="submit" class="btn btn-primary btn-sm" [disabled]="guardandoSuscripcion()">{{ guardandoSuscripcion() ? 'Guardando…' : 'Agregar' }}</button>
+          </div>
+        </form>
+      }
+
+      @if (errorSuscripcion(); as mensaje) {
+        <p class="alert alert-error spaced" role="alert">{{ mensaje }}</p>
+      }
+
+      <div class="table-wrap spaced">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Producto</th>
+              <th>Plan</th>
+              <th>Precio</th>
+              <th>Alta</th>
+              <th>Renovación</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (suscripcion of datos.suscripciones; track suscripcion.id) {
+              <tr>
+                <td>{{ suscripcion.producto?.nombre ?? '—' }}</td>
+                <td>{{ suscripcion.plan?.nombre ?? '—' }}</td>
+                <td class="mono">{{ formatoSoles(suscripcion.precio) }}<span class="sub">{{ suscripcion.periodo === 'anual' ? 'al año' : 'al mes' }}</span></td>
+                <td class="mono">{{ fechaCorta(suscripcion.fecha_alta) }}</td>
+                <td class="mono">
+                  @if (renovando() === suscripcion.id) {
+                    <div class="inline-edit">
+                      <input type="date" [(ngModel)]="nuevaRenovacion" aria-label="Nueva fecha de renovación" />
+                      <button type="button" class="btn btn-primary btn-sm" [disabled]="ocupadoSuscripcion() === suscripcion.id" (click)="guardarRenovacion(suscripcion)">Guardar</button>
+                      <button type="button" class="btn btn-ghost btn-sm" (click)="renovando.set(null)">Cancelar</button>
+                    </div>
+                  } @else {
+                    {{ fechaCorta(suscripcion.proxima_renovacion) }}
+                    @if (suscripcion.estado === 'activa') {
+                      <button type="button" class="text-btn" (click)="empezarRenovacion(suscripcion)">Registrar renovación</button>
+                    }
+                  }
+                </td>
+                <td>
+                  <select
+                    class="compact"
+                    [ngModel]="suscripcion.estado"
+                    (ngModelChange)="cambiarEstado(suscripcion, $event)"
+                    [disabled]="ocupadoSuscripcion() === suscripcion.id"
+                    [attr.aria-label]="'Estado de ' + (suscripcion.producto?.nombre ?? 'la suscripción')"
+                  >
+                    @for (item of estadosSuscripcion; track item.valor) {
+                      <option [value]="item.valor">{{ item.etiqueta }}</option>
+                    }
+                  </select>
+                </td>
+              </tr>
+            } @empty {
+              <tr><td colspan="6" class="empty">Esta empresa todavía no tiene suscripciones.</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="section-head">
+          <h2 class="card-title">Usuarios del panel</h2>
+          <button type="button" class="btn btn-ghost btn-sm" (click)="alternarUsuario()">{{ mostrandoUsuario() ? 'Cancelar' : 'Nuevo usuario' }}</button>
+        </div>
+
+        @if (mostrandoUsuario()) {
+          <form class="inset" [formGroup]="usuarioForm" (ngSubmit)="crearUsuario(datos.empresa)" novalidate>
+            <div class="field">
+              <label for="usu-nombre">Nombre</label>
+              <input id="usu-nombre" type="text" formControlName="nombre" autocomplete="off" />
+            </div>
+            <div class="field">
+              <label for="usu-correo">Correo</label>
+              <input id="usu-correo" type="email" formControlName="correo" autocomplete="off" />
+            </div>
+            <button type="submit" class="btn btn-primary btn-sm" [disabled]="guardandoUsuario()">{{ guardandoUsuario() ? 'Creando…' : 'Crear usuario' }}</button>
+          </form>
+        }
+
+        @if (errorUsuario(); as mensaje) {
+          <p class="alert alert-error spaced" role="alert">{{ mensaje }}</p>
+        }
+
+        <ul class="people">
+          @for (usuario of datos.usuarios; track usuario.id) {
+            <li>
+              <div>
+                <span class="strong">{{ usuario.nombre }}</span>
+                <span class="sub">{{ usuario.correo }} · {{ usuario.activo ? 'Activo' : 'Desactivado' }}{{ usuario.debe_cambiar_password ? ' · Contraseña temporal' : '' }}</span>
+              </div>
+              <div class="form-actions">
+                <button type="button" class="btn btn-ghost btn-sm" [disabled]="ocupadoUsuario() === usuario.id" (click)="restablecer(usuario)">Restablecer</button>
+                <button type="button" class="btn btn-ghost btn-sm" [disabled]="ocupadoUsuario() === usuario.id" (click)="alternarActivo(usuario)">{{ usuario.activo ? 'Desactivar' : 'Activar' }}</button>
+              </div>
+            </li>
+          } @empty {
+            <li class="muted">Sin usuarios. Crea uno para que el cliente pueda abrir tickets.</li>
+          }
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="section-head">
+          <h2 class="card-title">Tickets recientes</h2>
+          <a [routerLink]="['/panel/tickets']" [queryParams]="{ empresa_id: datos.empresa.id }" class="link">Ver todos →</a>
+        </div>
+        <ul class="people">
+          @for (ticket of datos.tickets; track ticket.id) {
+            <li>
+              <div>
+                <a [routerLink]="['/panel/tickets', ticket.id]" class="link">{{ ticket.asunto }}</a>
+                <span class="sub">{{ ticket.codigo }} · {{ etiquetaPrioridad(ticket.prioridad) }} · {{ ticket.actualizado | date: 'dd/MM/yyyy HH:mm' }}</span>
+              </div>
+              <span [class]="'chip chip-' + ticket.estado">{{ etiquetaEstadoTicket(ticket.estado) }}</span>
+            </li>
+          } @empty {
+            <li class="muted">Sin tickets.</li>
+          }
+        </ul>
+      </div>
+    </div>
+  } @else if (cargando()) {
+    <p class="muted">Cargando empresa…</p>
+  }
+</section>
