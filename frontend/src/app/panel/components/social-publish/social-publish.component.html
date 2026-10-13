@@ -1,0 +1,35 @@
+<section class="social" aria-labelledby="social-titulo">
+  <div class="social-head">
+    <span class="social-icon" aria-hidden="true">
+      <svg width="20" height="20" viewBox="0 0 20 20"><path d="M14 7a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM6 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM14 18a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM8.2 11.2l3.6 2.1M11.8 5.7 8.2 7.8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
+    </span>
+    <div>
+      <h2 id="social-titulo" class="social-title">Publícala en redes</h2>
+      <p class="social-lead">
+        Cada botón copia el título, el texto y el enlace de la noticia y abre la red. Pega con Ctrl+V y publica: la imagen
+        aparece sola gracias al enlace.
+      </p>
+    </div>
+  </div>
+
+  <div class="social-actions">
+    <a [href]="enlaceFacebook()" target="_blank" rel="noopener" class="red red-facebook" (click)="copiar('facebook')">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13.5 21v-7.5h2.5l.4-3h-2.9V8.6c0-.87.25-1.46 1.5-1.46H16.6V4.46A21 21 0 0 0 14.3 4.3c-2.28 0-3.8 1.39-3.8 3.94V10.5H8v3h2.5V21h3Z" /></svg>
+      Publicar en Facebook
+    </a>
+    <a [href]="enlaceLinkedin()" target="_blank" rel="noopener" class="red red-linkedin" (click)="copiar('linkedin')">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.94 8.5H3.56V20h3.38V8.5ZM5.25 3A1.97 1.97 0 1 0 5.3 7a1.97 1.97 0 0 0-.05-4ZM20.44 13.4c0-3.07-1.64-4.5-3.83-4.5-1.76 0-2.55.97-3 1.65V8.5h-3.37V20h3.37v-6.1c0-1.6.3-3.16 2.3-3.16 1.95 0 1.98 1.84 1.98 3.26V20h3.37l-.01-6.6Z" /></svg>
+      Publicar en LinkedIn
+    </a>
+    <button type="button" class="red red-copy" (click)="copiar(null)">
+      <svg width="16" height="16" viewBox="0 0 20 20" aria-hidden="true"><path d="M7 7h9v10H7V7Zm-3 6V3h9" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" /></svg>
+      Copiar texto
+    </button>
+  </div>
+
+  <p class="social-note" aria-live="polite">{{ aviso() ?? '' }}</p>
+
+  @if (recortaLinkedin()) {
+    <p class="social-hint">LinkedIn admite 3000 caracteres: allí se copia hasta el último párrafo que entra, siempre con el enlace.</p>
+  }
+</section>
