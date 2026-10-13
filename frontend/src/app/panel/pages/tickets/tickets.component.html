@@ -1,0 +1,127 @@
+<section class="page">
+  <header class="page-head">
+    <div>
+      <span class="eyebrow">Soporte · Tickets</span>
+      <h1 class="page-title">Soporte</h1>
+      <p class="page-lead">
+        @if (sesion.esAdministrador()) {
+          Tickets de los clientes. Primero aparecen los que esperan respuesta del equipo.
+        } @else {
+          Tus consultas al equipo de Amantix. Te respondemos dentro del ticket.
+        }
+      </p>
+    </div>
+    @if (!sesion.esAdministrador()) {
+      <a routerLink="/panel/tickets/new" class="btn btn-primary btn-sm">Nuevo ticket</a>
+    }
+  </header>
+
+  <form class="card filters" (ngSubmit)="filtrar()">
+    <div class="field field-search">
+      <label for="buscar">Buscar</label>
+      <input id="buscar" type="search" name="buscar" [(ngModel)]="buscar" />
+      <span class="field-help">{{ sesion.esAdministrador() ? 'Asunto, código, empresa o RUC' : 'Asunto o código' }}</span>
+    </div>
+    <div class="field">
+      <label for="estado">Estado</label>
+      <select id="estado" name="estado" [(ngModel)]="estado">
+        <option value="activos">Abiertos</option>
+        <option value="">Todos</option>
+        @for (item of estados; track item.valor) {
+          <option [value]="item.valor">{{ item.etiqueta }}</option>
+        }
+      </select>
+    </div>
+    <div class="field">
+      <label for="prioridad">Prioridad</label>
+      <select id="prioridad" name="prioridad" [(ngModel)]="prioridad">
+        <option value="">Todas</option>
+        @for (item of prioridades; track item.valor) {
+          <option [value]="item.valor">{{ item.etiqueta }}</option>
+        }
+      </select>
+    </div>
+    <div class="field">
+      <label for="producto">Producto</label>
+      <select id="producto" name="producto" [(ngModel)]="productoId">
+        <option value="">Todos</option>
+        @for (producto of productos(); track producto.id) {
+          <option [value]="producto.id">{{ producto.nombre }}</option>
+        }
+      </select>
+    </div>
+    @if (sesion.esAdministrador()) {
+      <label class="check">
+        <input type="checkbox" name="sinResponder" [(ngModel)]="sinResponder" />
+        Solo sin responder
+      </label>
+    }
+    <div class="filter-actions">
+      <button type="submit" class="btn btn-primary btn-sm">Filtrar</button>
+    </div>
+  </form>
+
+  @if (empresaId !== '') {
+    <p class="muted">Mostrando los tickets de una sola empresa. <a routerLink="/panel/tickets" class="link">Ver todos</a></p>
+  }
+
+  @if (error(); as mensaje) {
+    <p class="alert alert-error" role="alert">{{ mensaje }}</p>
+  }
+
+  @if (resultado(); as pagina) {
+    <div class="table-wrap" [class.loading]="cargando()">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Ticket</th>
+            @if (sesion.esAdministrador()) {
+              <th>Empresa</th>
+            }
+            <th>Producto</th>
+            <th>Prioridad</th>
+            <th>Estado</th>
+            <th>Actualizado</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (ticket of pagina.data; track ticket.id) {
+            <tr class="row" tabindex="0" (click)="abrir(ticket)" (keydown.enter)="abrir(ticket)">
+              <td>
+                <a [routerLink]="['/panel/tickets', ticket.id]" class="link" (click)="$event.stopPropagation()">
+                  @if (sesion.esAdministrador() && ticket.pendiente_respuesta && ticket.estado !== 'resuelto' && ticket.estado !== 'cerrado') {
+                    <span class="dot-alert" role="img" aria-label="Sin responder"></span>
+                  }{{ ticket.asunto }}
+                </a>
+                <span class="sub mono">{{ ticket.codigo }}</span>
+              </td>
+              @if (sesion.esAdministrador()) {
+                <td>{{ ticket.empresa?.razon_social ?? '—' }}</td>
+              }
+              <td>{{ ticket.producto?.nombre ?? 'General' }}</td>
+              <td><span [class]="'chip chip-' + ticket.prioridad">{{ etiquetaPrioridad(ticket.prioridad) }}</span></td>
+              <td><span [class]="'chip chip-' + ticket.estado">{{ etiquetaEstado(ticket.estado) }}</span></td>
+              <td class="mono">{{ ticket.actualizado | date: 'dd/MM/yyyy HH:mm' }}</td>
+            </tr>
+          } @empty {
+            <tr>
+              <td [attr.colspan]="sesion.esAdministrador() ? 6 : 5" class="empty">No hay tickets con estos filtros.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    @if (pagina.meta.last_page > 1) {
+      <div class="pagination">
+        <span>{{ pagina.meta.from }}–{{ pagina.meta.to }} de {{ pagina.meta.total }} tickets</span>
+        <div class="pagination-actions">
+          <button type="button" class="btn btn-ghost btn-sm" [disabled]="pagina.meta.current_page <= 1" (click)="irA(pagina.meta.current_page - 1)">← Anterior</button>
+          <button type="button" class="btn btn-ghost btn-sm" [disabled]="pagina.meta.current_page >= pagina.meta.last_page" (click)="irA(pagina.meta.current_page + 1)">Siguiente →</button>
+        </div>
+      </div>
+    }
+  } @else if (cargando()) {
+    <p class="muted">Cargando tickets…</p>
+  }
+</section>
