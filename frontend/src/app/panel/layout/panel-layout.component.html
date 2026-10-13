@@ -61,8 +61,11 @@
     <div class="sidebar-foot">
       @if (sesion.usuario(); as usuario) {
         <div class="who">
-          <span class="who-name">{{ usuario.nombre }}</span>
-          <span class="who-role">{{ usuario.rol === 'administrador' ? 'ADMINISTRADOR' : 'CLIENTE' }}</span>
+          <span class="avatar" aria-hidden="true">{{ iniciales() }}</span>
+          <div class="who-text">
+            <span class="who-name">{{ usuario.nombre }}</span>
+            <span class="who-role">{{ usuario.rol === 'administrador' ? 'Administrador' : (usuario.empresa?.razon_social ?? 'Cliente') }}</span>
+          </div>
         </div>
       }
       <button type="button" class="logout" (click)="salir()">Cerrar sesión</button>
