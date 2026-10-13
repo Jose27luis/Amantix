@@ -1,0 +1,72 @@
+.chart {
+  position: relative;
+}
+
+svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.grid {
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
+.axis {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  fill: var(--slate);
+}
+
+.bar {
+  fill: var(--steel);
+  transition: fill 0.15s ease;
+}
+
+.bar-active {
+  fill: var(--ink);
+}
+
+.hit {
+  fill: transparent;
+  cursor: default;
+}
+
+.hit:focus-visible {
+  outline: none;
+  stroke: var(--teal);
+  stroke-width: 2;
+}
+
+.tooltip {
+  position: absolute;
+  top: 0;
+  transform: translate(-50%, -8px);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: var(--ink);
+  color: var(--cloud);
+  font-size: 0.78rem;
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: 0 4px 14px rgba(15, 29, 46, 0.2);
+}
+
+.tooltip-label {
+  color: var(--slate-2);
+}
+
+.tooltip-value {
+  font-family: var(--font-mono);
+  font-weight: 600;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bar {
+    transition: none;
+  }
+}
