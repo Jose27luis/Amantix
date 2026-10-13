@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, map, shareReplay } from 'rxjs';
-import { Dashboard, ListaSimple, ProductoResumen } from '../models/panel.models';
+import { Dashboard, ListaSimple, Plan, ProductoResumen } from '../models/panel.models';
 
 export interface FiltrosDashboard {
   readonly desde: string;
@@ -19,6 +19,11 @@ export class CatalogApiService {
       map((respuesta: ListaSimple<ProductoResumen>) => respuesta.data),
       shareReplay(1),
     );
+
+  readonly planes$: Observable<readonly Plan[]> = this.http.get<ListaSimple<Plan>>('/api/plans').pipe(
+    map((respuesta: ListaSimple<Plan>) => respuesta.data),
+    shareReplay(1),
+  );
 
   dashboard(filtros: FiltrosDashboard): Observable<Dashboard> {
     let parametros = new HttpParams();
