@@ -1,0 +1,155 @@
+.back {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--teal);
+  align-self: flex-start;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 20px;
+  align-items: start;
+}
+
+.col-main,
+.col-side {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin: 16px 0 0;
+}
+
+.facts dt {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--slate);
+  margin-bottom: 4px;
+}
+
+.facts dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.mono {
+  font-family: var(--font-mono);
+}
+
+.link {
+  color: var(--teal);
+  font-weight: 600;
+}
+
+.contact-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.message {
+  margin: 12px 0 0;
+  white-space: pre-line;
+  line-height: 1.7;
+}
+
+.note-form,
+.side-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.note-form .btn {
+  align-self: flex-start;
+}
+
+.notes {
+  list-style: none;
+  margin: 20px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.note {
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface);
+}
+
+.note p {
+  margin: 6px 0 0;
+  white-space: pre-line;
+}
+
+.note-meta {
+  font-size: 0.78rem;
+  color: var(--slate);
+}
+
+.timeline {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0 0 0 14px;
+  border-left: 1px solid var(--line-2);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.timeline li {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.timeline li::before {
+  content: '';
+  position: absolute;
+  left: -19px;
+  top: 6px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--cloud);
+  border: 2px solid var(--steel);
+}
+
+.timeline-title {
+  font-weight: 600;
+  font-size: 0.88rem;
+}
+
+.timeline-desc {
+  font-size: 0.85rem;
+}
+
+.timeline-meta {
+  font-size: 0.76rem;
+  color: var(--slate);
+}
+
+@media (max-width: 1000px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 520px) {
+  .facts {
+    grid-template-columns: 1fr;
+  }
+}
