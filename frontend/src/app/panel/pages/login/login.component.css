@@ -1,63 +1,358 @@
 .login {
   min-height: 100vh;
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(420px, 1fr);
+  background: var(--cloud);
+}
+
+.visual {
+  position: relative;
+  overflow: hidden;
+  background: #e9ecef;
+  border-right: 1px solid var(--line);
+}
+
+.render {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 58% 50%;
+}
+
+.visual-copy {
+  position: absolute;
+  left: clamp(32px, 5vw, 64px);
+  right: clamp(32px, 5vw, 64px);
+  top: clamp(40px, 9vh, 88px);
+  max-width: 400px;
+}
+
+.visual-line {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 2.4vw, 2.25rem);
+  font-weight: 800;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.visual-meta {
+  margin: 14px 0 0;
+  padding-top: 14px;
+  border-top: 2px solid var(--brass);
+  max-width: 340px;
+  font-size: 0.9rem;
+  color: var(--steel);
+}
+
+.access {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 32px 16px;
-  background:
-    linear-gradient(135deg, rgba(176, 137, 79, 0.05) 25%, transparent 25%) 0 0 / 28px 28px,
-    linear-gradient(225deg, rgba(176, 137, 79, 0.05) 25%, transparent 25%) 0 0 / 28px 28px,
-    var(--ink);
+  padding: 48px clamp(24px, 5vw, 72px);
 }
 
-.login-card {
+.access-inner {
   width: 100%;
-  max-width: 420px;
+  max-width: 400px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 36px 32px;
-  background: var(--cloud);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
 }
 
 .brand {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 18px;
+  align-self: flex-start;
+  border-radius: 6px;
 }
 
 .brand-name {
   font-family: var(--font-display);
   font-weight: 800;
-  font-size: 1.3rem;
+  font-size: 1.25rem;
   letter-spacing: -0.02em;
+  color: var(--ink);
 }
 
-.eyebrow {
+.intro {
+  margin: 48px 0 32px;
+}
+
+.title {
+  font-size: 2rem;
+  line-height: 1.1;
+}
+
+.lead {
+  margin: 10px 0 0;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--slate);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.field label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.control {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 48px;
+  border: 1px solid var(--line-2);
+  border-radius: 6px;
+  background: var(--cloud);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.control:hover {
+  border-color: var(--slate-2);
+}
+
+.control:focus-within {
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgba(47, 110, 104, 0.16);
+}
+
+.control-invalid,
+.control-invalid:hover {
+  border-color: var(--danger);
+}
+
+.control-icon {
+  flex: none;
+  margin-left: 14px;
+  color: var(--slate-2);
+}
+
+.control:focus-within .control-icon {
   color: var(--teal);
 }
 
-.login-title {
-  font-size: 1.6rem;
-  margin-bottom: 14px;
+.control input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0 14px 0 10px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--ink);
 }
 
-.login-form {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+.control input:focus {
+  outline: none;
 }
 
-.login-form .btn {
-  min-height: 46px;
-}
-
-.login-note {
-  margin: 14px 0 0;
-  font-size: 0.8rem;
+.reveal {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin-right: 2px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
   color: var(--slate);
+  cursor: pointer;
+}
+
+.reveal:hover {
+  color: var(--ink);
+}
+
+.reveal:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: -2px;
+}
+
+.field-error {
+  font-size: 0.82rem;
+  color: var(--danger);
+}
+
+.field-note {
+  font-size: 0.82rem;
+  color: var(--steel);
+}
+
+.error {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border-left: 3px solid var(--danger);
+  border-radius: 0 6px 6px 0;
+  background: #f8eeee;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: #8a3b39;
+}
+
+.error svg {
+  flex: none;
+  margin-top: 1px;
+  color: var(--danger);
+}
+
+.submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  height: 48px;
+  margin-top: 4px;
+  border: 0;
+  border-radius: 6px;
+  background: var(--brass);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--ink);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.submit:hover {
+  background: var(--brass-dark);
+}
+
+.submit:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 3px;
+}
+
+.submit:disabled {
+  cursor: progress;
+  opacity: 0.85;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(15, 29, 46, 0.25);
+  border-top-color: var(--ink);
+  border-radius: 50%;
+  animation: girar 0.8s linear infinite;
+}
+
+@keyframes girar {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.help {
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+}
+
+.help p {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: var(--slate);
+}
+
+.help a {
+  font-weight: 600;
+  color: var(--teal);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 56px;
+  font-size: 0.78rem;
+  color: var(--slate);
+}
+
+.secure {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  color: var(--teal);
+}
+
+.brand:focus-visible,
+.help a:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 3px;
+}
+
+@media (max-width: 900px) {
+  .login {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+  }
+
+  .visual {
+    height: 200px;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .render {
+    object-position: 62% 40%;
+  }
+
+  .visual-copy {
+    display: none;
+  }
+
+  .access {
+    align-items: flex-start;
+    padding: 32px 16px 40px;
+  }
+
+  .intro {
+    margin: 32px 0 24px;
+  }
+
+  .title {
+    font-size: 1.65rem;
+  }
+
+  .foot {
+    margin-top: 40px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation-duration: 2.4s;
+  }
+
+  .control,
+  .submit {
+    transition: none;
+  }
 }
