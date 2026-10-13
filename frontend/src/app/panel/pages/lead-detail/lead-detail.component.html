@@ -80,6 +80,85 @@
       </div>
 
       <div class="col-side">
+        @if (conversion(); as resultado) {
+          <div class="secret secret-col" role="status">
+            <span class="secret-label">Acceso del cliente {{ resultado.correo }}</span>
+            <code>{{ resultado.password_temporal }}</code>
+            <span class="field-help">Contraseña temporal. Se muestra una sola vez. Envíala con el enlace amantix.pe/panel.</span>
+            <div class="form-actions">
+              <button type="button" class="btn btn-ghost btn-sm" (click)="copiar(resultado.password_temporal)">{{ copiado() ? 'Copiada' : 'Copiar' }}</button>
+              <a [routerLink]="['/panel/companies', resultado.empresa.id]" class="btn btn-ghost btn-sm">Ver empresa →</a>
+            </div>
+          </div>
+        }
+
+        @if (datos.empresa_cliente_id) {
+          @if (!conversion()) {
+            <div class="card">
+              <h2 class="card-title">Ya es cliente</h2>
+              <p class="card-sub">Este lead se convirtió en empresa cliente.</p>
+              <a [routerLink]="['/panel/companies', datos.empresa_cliente_id]" class="link">Ver empresa →</a>
+            </div>
+          }
+        } @else if (mostrandoConversion()) {
+          <form class="card side-form" (ngSubmit)="convertir()">
+            <h2 class="card-title">Convertir en cliente</h2>
+            <p class="card-sub">Crea la empresa, su suscripción y el usuario cliente con el correo del lead.</p>
+            <div class="field">
+              <label for="conv-razon">Razón social</label>
+              <input id="conv-razon" type="text" name="razon" maxlength="200" [(ngModel)]="razonSocial" />
+            </div>
+            <div class="field">
+              <label for="conv-ruc">RUC</label>
+              <input id="conv-ruc" type="text" name="ruc" inputmode="numeric" maxlength="11" [(ngModel)]="ruc" />
+              <span class="field-help">Si el RUC ya está registrado, se usa esa empresa.</span>
+            </div>
+            <div class="field">
+              <label for="conv-rubro">Rubro</label>
+              <input id="conv-rubro" type="text" name="rubro" maxlength="120" [(ngModel)]="rubro" />
+            </div>
+            <div class="field">
+              <label for="conv-producto">Producto</label>
+              <select id="conv-producto" name="producto" [(ngModel)]="productoConversion">
+                <option value="" disabled>Elige un producto</option>
+                @for (producto of productos(); track producto.id) {
+                  <option [value]="producto.id">{{ producto.nombre }}</option>
+                }
+              </select>
+            </div>
+            <div class="field">
+              <label for="conv-plan">Plan</label>
+              <select id="conv-plan" name="plan" [ngModel]="planConversion" (ngModelChange)="planConversion = $event; elegirPlan()">
+                <option value="" disabled>Elige un plan</option>
+                @for (plan of planes(); track plan.id) {
+                  <option [value]="plan.id">{{ plan.nombre }} · {{ formatoSoles(plan.precio) }}</option>
+                }
+              </select>
+            </div>
+            <div class="field">
+              <label for="conv-precio">Precio mensual (S/)</label>
+              <input id="conv-precio" type="number" name="precio" min="0" step="0.01" [(ngModel)]="precioConversion" />
+            </div>
+            <div class="field">
+              <label for="conv-alta">Fecha de alta</label>
+              <input id="conv-alta" type="date" name="alta" [(ngModel)]="fechaAlta" />
+            </div>
+            @if (errorConversion(); as mensaje) {
+              <p class="alert alert-error" role="alert">{{ mensaje }}</p>
+            }
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary btn-sm" [disabled]="convirtiendo()">{{ convirtiendo() ? 'Convirtiendo…' : 'Convertir' }}</button>
+              <button type="button" class="btn btn-ghost btn-sm" (click)="mostrandoConversion.set(false)">Cancelar</button>
+            </div>
+          </form>
+        } @else {
+          <div class="card">
+            <h2 class="card-title">¿Cerraste la venta?</h2>
+            <p class="card-sub">Registra la empresa y dale acceso al panel de soporte.</p>
+            <button type="button" class="btn btn-primary btn-sm" (click)="abrirConversion(datos)">Convertir en cliente</button>
+          </div>
+        }
+
         <form class="card side-form" (ngSubmit)="guardar()">
           <h2 class="card-title">Seguimiento</h2>
           <div class="field">
