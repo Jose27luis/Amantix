@@ -3,9 +3,11 @@ import { DatePipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
 import { LeadsApiService } from '../../services/leads-api.service';
 import { UsersApiService } from '../../services/users-api.service';
+import { CatalogApiService } from '../../services/catalog-api.service';
 import {
   CambioLead,
   DetalleLead,
@@ -13,7 +15,10 @@ import {
   Lead,
   NotaLead,
   Paginado,
+  Plan,
+  ProductoResumen,
   RegistroHistorial,
+  ResultadoConversion,
   Usuario,
 } from '../../models/panel.models';
 import {
@@ -22,6 +27,8 @@ import {
   etiquetaAccion,
   etiquetaEstado,
   etiquetaOrigen,
+  fechaHoy,
+  formatoSoles,
   mensajeError,
 } from '../../models/labels';
 
@@ -62,6 +69,81 @@ export class LeadDetailComponent implements OnInit {
   protected readonly errorNota = signal<string | null>(null);
 
   protected readonly whatsapp = computed(() => enlaceWhatsapp(this.lead()?.telefono ?? null));
+
+  private readonly catalogo = inject(CatalogApiService);
+  protected readonly productos = toSignal(this.catalogo.productos$, { initialValue: [] as readonly ProductoResumen[] });
+  protected readonly planes = toSignal(this.catalogo.planes$, { initialValue: [] as readonly Plan[] });
+  protected readonly formatoSoles = formatoSoles;
+
+  protected readonly convirtiendo = signal(false);
+  protected readonly mostrandoConversion = signal(false);
+  protected readonly errorConversion = signal<string | null>(null);
+  protected readonly conversion = signal<ResultadoConversion | null>(null);
+  protected readonly copiado = signal(false);
+
+  protected razonSocial = '';
+  protected ruc = '';
+  protected rubro = '';
+  protected productoConversion = '';
+  protected planConversion = '';
+  protected precioConversion = 0;
+  protected fechaAlta = fechaHoy();
+
+  protected abrirConversion(lead: Lead): void {
+    this.razonSocial = lead.empresa ?? lead.nombre;
+    this.productoConversion = lead.producto ? String(lead.producto.id) : '';
+    this.errorConversion.set(null);
+    this.mostrandoConversion.set(true);
+  }
+
+  protected elegirPlan(): void {
+    const plan = this.planes().find((item: Plan) => String(item.id) === this.planConversion);
+    if (plan) {
+      this.precioConversion = plan.precio;
+    }
+  }
+
+  protected convertir(): void {
+    const actual = this.lead();
+    if (!actual || this.convirtiendo()) {
+      return;
+    }
+
+    if (this.razonSocial.trim() === '' || !/^(10|15|16|17|20)\d{9}$/.test(this.ruc.trim()) || this.productoConversion === '' || this.planConversion === '') {
+      this.errorConversion.set('Completa razón social, un RUC válido de 11 dígitos, producto y plan.');
+      return;
+    }
+
+    this.convirtiendo.set(true);
+    this.errorConversion.set(null);
+
+    this.api
+      .convertir(actual.id, {
+        razon_social: this.razonSocial.trim(),
+        ruc: this.ruc.trim(),
+        rubro: this.rubro.trim() === '' ? null : this.rubro.trim(),
+        producto_id: Number(this.productoConversion),
+        plan_id: Number(this.planConversion),
+        precio: Number(this.precioConversion),
+        fecha_alta: this.fechaAlta,
+      })
+      .pipe(finalize(() => this.convirtiendo.set(false)))
+      .subscribe({
+        next: (resultado: ResultadoConversion) => {
+          this.conversion.set(resultado);
+          this.mostrandoConversion.set(false);
+          this.cargar();
+        },
+        error: (error: HttpErrorResponse) => this.errorConversion.set(mensajeError(error, 'No pudimos convertir el lead.')),
+      });
+  }
+
+  protected copiar(texto: string): void {
+    navigator.clipboard.writeText(texto).then(
+      () => this.copiado.set(true),
+      () => this.copiado.set(false),
+    );
+  }
 
   ngOnInit(): void {
     this.cargar();
