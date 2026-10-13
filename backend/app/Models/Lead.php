@@ -18,6 +18,7 @@ class Lead extends Model
         'codigo',
         'producto_id',
         'asignado_a',
+        'empresa_id',
         'nombre',
         'empresa',
         'correo',
@@ -49,6 +50,11 @@ class Lead extends Model
     public function asignado(): BelongsTo
     {
         return $this->belongsTo(User::class, 'asignado_a');
+    }
+
+    public function empresaCliente(): BelongsTo
+    {
+        return $this->belongsTo(Company::class, 'empresa_id');
     }
 
     public function notas(): HasMany
