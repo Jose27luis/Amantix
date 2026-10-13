@@ -1,7 +1,8 @@
 import { afterNextRender, ChangeDetectionStrategy, Component, inject, PLATFORM_ID } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
+import { isPlatformBrowser, Location } from '@angular/common';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
-import { filter } from 'rxjs/operators';
+import { filter, map } from 'rxjs/operators';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { FooterComponent } from './components/footer/footer.component';
 import { WhatsappButtonComponent } from './components/whatsapp-button/whatsapp-button.component';
@@ -19,6 +20,14 @@ export class AppComponent {
   private readonly router = inject(Router);
   private observer: IntersectionObserver | null = null;
   private readonly observed = new WeakSet<Element>();
+
+  protected readonly esPanel = toSignal(
+    this.router.events.pipe(
+      filter((event): event is NavigationEnd => event instanceof NavigationEnd),
+      map((event: NavigationEnd) => event.urlAfterRedirects.startsWith('/panel')),
+    ),
+    { initialValue: inject(Location).path().startsWith('/panel') },
+  );
 
   constructor() {
     if (!isPlatformBrowser(this.platformId)) {
