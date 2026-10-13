@@ -1,0 +1,60 @@
+<section class="page">
+  <a routerLink="/panel/tickets" class="back">← Volver a soporte</a>
+
+  <header class="page-head">
+    <div>
+      <span class="eyebrow">Soporte · Nuevo ticket</span>
+      <h1 class="page-title">¿En qué te ayudamos?</h1>
+      <p class="page-lead">Cuéntanos qué pasa y, si puedes, adjunta una captura. Te respondemos dentro del ticket.</p>
+    </div>
+  </header>
+
+  <form class="card ticket-form" [formGroup]="form" (ngSubmit)="enviar()" novalidate>
+    <div class="form-grid">
+      <div class="field">
+        <label for="producto">Producto</label>
+        <select id="producto" formControlName="producto_id">
+          <option value="">Consulta general</option>
+          @for (producto of productos(); track producto.id) {
+            <option [value]="producto.id">{{ producto.nombre }}</option>
+          }
+        </select>
+      </div>
+      <div class="field">
+        <label for="prioridad">Prioridad</label>
+        <select id="prioridad" formControlName="prioridad">
+          @for (item of prioridades; track item.valor) {
+            <option [value]="item.valor">{{ item.etiqueta }}</option>
+          }
+        </select>
+        <span class="field-help">Alta: el sistema no te deja facturar u operar.</span>
+      </div>
+      <div class="field full">
+        <label for="asunto">Asunto</label>
+        <input id="asunto" type="text" maxlength="160" formControlName="asunto" />
+        @if (invalido('asunto')) {
+          <span class="field-error">Escribe un asunto de al menos 4 caracteres.</span>
+        }
+      </div>
+      <div class="field full">
+        <label for="mensaje">Detalle</label>
+        <textarea id="mensaje" rows="7" maxlength="5000" formControlName="mensaje"></textarea>
+        <span class="field-help">Qué intentabas hacer, qué pasó y desde cuándo.</span>
+        @if (invalido('mensaje')) {
+          <span class="field-error">Cuéntanos qué pasa.</span>
+        }
+      </div>
+      <div class="full">
+        <app-file-picker [(archivos)]="archivos" />
+      </div>
+    </div>
+
+    @if (error(); as mensaje) {
+      <p class="alert alert-error" role="alert">{{ mensaje }}</p>
+    }
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary" [disabled]="enviando()">{{ enviando() ? 'Enviando…' : 'Enviar ticket' }}</button>
+    </div>
+  </form>
+</section>
