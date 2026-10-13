@@ -16,6 +16,7 @@ interface FilaBarra extends FilaConteo {
 export class BarListComponent {
   readonly filas = input.required<readonly FilaConteo[]>();
   readonly formato = input<(valor: number) => string>((valor: number) => String(valor));
+  readonly tono = input<'brass' | 'teal' | 'steel'>('steel');
 
   protected readonly barras = computed((): readonly FilaBarra[] => {
     const filas = this.filas();
