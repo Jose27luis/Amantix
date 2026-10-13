@@ -1,9 +1,9 @@
 <ul class="list">
   @for (barra of barras(); track barra.etiqueta) {
-    <li class="row" [attr.title]="barra.etiqueta + ': ' + barra.total + ' (' + barra.participacion + ' %)'">
+    <li class="row" [attr.title]="barra.etiqueta + ': ' + formato()(barra.total) + ' (' + barra.participacion + ' %)'">
       <div class="row-head">
         <span class="label">{{ barra.etiqueta }}</span>
-        <span class="value">{{ barra.total }}<span class="share">{{ barra.participacion }} %</span></span>
+        <span class="value">{{ formato()(barra.total) }}<span class="share">{{ barra.participacion }} %</span></span>
       </div>
       <div class="track" aria-hidden="true">
         <div class="fill" [style.width.%]="barra.porcentaje"></div>
