@@ -1,0 +1,67 @@
+<section class="page">
+  <header class="page-head">
+    <div>
+      <span class="eyebrow">Cuenta · Seguridad</span>
+      <h1 class="page-title">Mi perfil</h1>
+    </div>
+  </header>
+
+  @if (sesion.usuario(); as usuario) {
+    @if (usuario.debe_cambiar_password) {
+      <p class="alert alert-error" role="alert">Estás usando una contraseña temporal. Cámbiala para continuar.</p>
+    }
+
+    <div class="layout">
+      <div class="card">
+        <h2 class="card-title">Tus datos</h2>
+        <dl class="facts">
+          <div>
+            <dt>Nombre</dt>
+            <dd>{{ usuario.nombre }}</dd>
+          </div>
+          <div>
+            <dt>Correo</dt>
+            <dd>{{ usuario.correo }}</dd>
+          </div>
+          <div>
+            <dt>Rol</dt>
+            <dd>{{ usuario.rol === 'administrador' ? 'Administrador' : 'Cliente' }}</dd>
+          </div>
+        </dl>
+      </div>
+
+      <form class="card pass-form" [formGroup]="form" (ngSubmit)="cambiar()" novalidate>
+        <h2 class="card-title">Cambiar contraseña</h2>
+        <div class="field">
+          <label for="actual">Contraseña actual</label>
+          <input id="actual" type="password" formControlName="actual" autocomplete="current-password" />
+          @if (form.controls.actual.invalid && form.controls.actual.touched) {
+            <span class="field-error">Ingresa tu contraseña actual.</span>
+          }
+        </div>
+        <div class="field">
+          <label for="nueva">Nueva contraseña</label>
+          <input id="nueva" type="password" formControlName="password" autocomplete="new-password" />
+          <span class="field-help">Mínimo 8 caracteres.</span>
+          @if (form.controls.password.invalid && form.controls.password.touched) {
+            <span class="field-error">Debe tener al menos 8 caracteres.</span>
+          }
+        </div>
+        <div class="field">
+          <label for="confirmacion">Repite la nueva contraseña</label>
+          <input id="confirmacion" type="password" formControlName="confirmacion" autocomplete="new-password" />
+          @if (form.hasError('distinta') && form.controls.confirmacion.touched) {
+            <span class="field-error">Las contraseñas no coinciden.</span>
+          }
+        </div>
+        @if (error(); as mensaje) {
+          <p class="alert alert-error" role="alert">{{ mensaje }}</p>
+        }
+        @if (listo()) {
+          <p class="alert alert-ok" role="status">Contraseña actualizada.</p>
+        }
+        <button type="submit" class="btn btn-primary" [disabled]="enviando()">{{ enviando() ? 'Guardando…' : 'Cambiar contraseña' }}</button>
+      </form>
+    </div>
+  }
+</section>
