@@ -1,0 +1,26 @@
+<div class="picker">
+  @if (archivos().length < maximo) {
+    <label class="add">
+      <input type="file" accept="image/jpeg,image/png,image/webp,application/pdf" multiple (change)="elegir($event)" />
+      <svg width="16" height="16" viewBox="0 0 20 20" aria-hidden="true"><path d="m14 9-5.5 5.5a3 3 0 0 1-4.2-4.2L10 4.5a2 2 0 0 1 2.8 2.8L7.2 13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
+      Adjuntar archivo
+    </label>
+  }
+  <span class="hint">Hasta {{ maximo }} archivos · JPG, PNG, WEBP o PDF · 5 MB cada uno</span>
+
+  @if (archivos().length > 0) {
+    <ul class="files">
+      @for (archivo of archivos(); track archivo.name + $index; let i = $index) {
+        <li>
+          <span class="name">{{ archivo.name }}</span>
+          <span class="size">{{ formatoTamano(archivo.size) }}</span>
+          <button type="button" class="remove" (click)="quitar(i)" [attr.aria-label]="'Quitar ' + archivo.name">✕</button>
+        </li>
+      }
+    </ul>
+  }
+
+  @if (aviso(); as mensaje) {
+    <span class="warn" role="alert">{{ mensaje }}</span>
+  }
+</div>
