@@ -147,13 +147,15 @@ Cada lead guarda nombre, empresa, correo, teléfono, producto de interés, mensa
 
 ## 9. Próximos pasos
 
-Hecho: sitio público, manual de marca y dominio amantix.pe.
+Hecho:
+
+- Sitio público, manual de marca y dominio amantix.pe.
+- API Laravel con login, roles y leads. El formulario de contacto guarda en la base.
+- Panel: login, dashboard de leads, leads con seguimiento, usuarios administradores y perfil.
 
 Pendiente, en este orden:
 
-1. API Laravel con login, roles y leads. El formulario de contacto pasa a guardar en la base.
-2. Panel: dashboard, leads y usuarios.
-3. Clientes, suscripciones y soporte.
+3. Clientes, suscripciones y soporte. Se suman los usuarios cliente y los indicadores de clientes, ingresos y tickets al dashboard.
 4. Contenido editable: productos, planes, preguntas frecuentes, casos y noticias. El sitio público lee de la API.
 5. Reportes.
 6. Sitio público: noticias, casos, preguntas frecuentes, política de privacidad, SEO y Open Graph.
