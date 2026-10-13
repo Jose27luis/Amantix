@@ -1,0 +1,6 @@
+/
+/contacto
+/gracias
+/nosotros
+/planes
+/productos
