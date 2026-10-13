@@ -20,12 +20,22 @@ svg {
 }
 
 .bar {
-  fill: var(--steel);
-  transition: fill 0.15s ease;
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  animation: levantar 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .bar-active {
-  fill: var(--ink);
+  filter: drop-shadow(0 4px 8px rgba(176, 137, 79, 0.45));
+}
+
+@keyframes levantar {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
 }
 
 .hit {
@@ -67,6 +77,6 @@ svg {
 
 @media (prefers-reduced-motion: reduce) {
   .bar {
-    transition: none;
+    animation: none;
   }
 }
