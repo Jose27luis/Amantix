@@ -9,7 +9,7 @@
 
   <section class="access">
     <div class="access-inner">
-      <div class="card">
+      <div class="card" [class.shake]="agitar()" (animationend)="terminarSacudida($event)">
         <header class="intro">
           <a routerLink="/" class="brand" aria-label="Ir al sitio de Amantix">
             <img src="/amantix-logo.png" alt="" width="64" height="64" class="brand-logo" />
@@ -65,18 +65,11 @@
                 [attr.aria-pressed]="verPassword()"
                 [attr.aria-label]="verPassword() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
               >
-                @if (verPassword()) {
-                  <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
-                    <path d="M3 3l14 14M8.6 8.7a2 2 0 0 0 2.7 2.7M6.2 6.3C4.4 7.4 3 9 2 10c1.8 2.5 4.6 5 8 5 1.4 0 2.7-.4 3.8-1.1M9 5.1c.3 0 .7-.1 1-.1 3.4 0 6.2 2.5 8 5-.5.7-1.1 1.4-1.8 2.1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-                  </svg>
-                  <span class="reveal-text">Ocultar</span>
-                } @else {
-                  <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
-                    <path d="M2 10c1.8-2.5 4.6-5 8-5s6.2 2.5 8 5c-1.8 2.5-4.6 5-8 5s-6.2-2.5-8-5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
-                    <circle cx="10" cy="10" r="2.4" fill="currentColor" />
-                  </svg>
-                  <span class="reveal-text">Mostrar</span>
-                }
+                <svg class="eye" width="22" height="22" viewBox="0 0 20 20" aria-hidden="true">
+                  <path d="M2 10c1.8-2.5 4.6-5 8-5s6.2 2.5 8 5c-1.8 2.5-4.6 5-8 5s-6.2-2.5-8-5Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" />
+                  <circle class="eye-pupil" cx="10" cy="10" r="2.4" fill="currentColor" />
+                  <path class="eye-slash" d="M3.5 3.5l13 13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                </svg>
               </button>
             </div>
             @if (mayusculas()) {
