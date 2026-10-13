@@ -153,12 +153,13 @@ Hecho:
 - API Laravel con login, roles y leads. El formulario de contacto guarda en la base.
 - Panel: login, dashboard de leads, leads con seguimiento, usuarios administradores y perfil.
 - Clientes, suscripciones, usuarios cliente, conversión de leads y soporte por tickets con adjuntos. El dashboard suma clientes, ingresos y soporte.
+- Noticias con publicación en redes (sección 12.7) y SEO del sitio (sección 13).
 
 Pendiente, en este orden:
 
-4. Contenido editable: productos, planes, preguntas frecuentes, casos y noticias. El sitio público lee de la API.
+4. Contenido editable: productos, planes, preguntas frecuentes y casos. El sitio público lee de la API.
 5. Reportes.
-6. Sitio público: noticias, casos, preguntas frecuentes, política de privacidad, SEO y Open Graph.
+6. Sitio público: casos, preguntas frecuentes y política de privacidad.
 
 ---
 
@@ -785,9 +786,9 @@ Los cambios se ven en el sitio público sin volver a compilar.
 
 #### Noticias
 
-- Título, resumen, imagen de portada, contenido con formato básico (títulos, listas, negritas, enlaces, imágenes).
+- Título, texto, imagen y un resumen opcional para Google y redes.
 - Estados: borrador y publicada, con fecha de publicación.
-- Las publicadas aparecen en el sitio público y en el panel del cliente.
+- Las publicadas aparecen en el sitio público y en el menú del panel del cliente. Detalle en la sección 12.7.
 
 #### Reportes
 
@@ -982,8 +983,10 @@ erDiagram
         string slug
         string titulo
         string resumen
-        string portada
         longtext contenido
+        string imagen
+        int imagen_ancho
+        int imagen_alto
         string estado "borrador|publicada"
         timestamp publicada_en
     }
@@ -1033,4 +1036,66 @@ sequenceDiagram
     C->>P: Confirma o reabre dentro de 7 días
     P->>P: Pasa a cerrado a los 7 días sin respuesta
 ```
+
+### 12.7. Noticias y redes
+
+Amantix publica en Facebook texto con una imagen. Las noticias del panel llevan ese mismo contenido al sitio, con dirección propia, para que salga en Google y no dependa de la red social.
+
+Cómo se publica:
+
+1. Panel → Noticias → Nueva noticia.
+2. Título, texto e imagen. El texto se pega tal como se escribió para Facebook.
+3. Borrador o Publicada. Vista previa muestra cómo quedará.
+4. Al guardar una publicada aparece el bloque Publícala en redes.
+
+| Lo que trae el texto | Cómo se muestra |
+|---|---|
+| Cada renglón | Un párrafo |
+| Renglón que empieza con guion, viñeta o emoji | Lista con rombo latón |
+| Renglón que empieza con 1. o 1) | Lista numerada |
+| Renglón corto que termina en : o ? | Subtítulo |
+| `**texto**` | Negrita |
+| Dirección web | Enlace |
+
+Reglas:
+
+- La dirección sale del título (`/noticias/cambios-sunat-2026`) y se congela la primera vez que se publica, para no romper enlaces compartidos.
+- Borrador no existe para el visitante: su dirección da 404 y no entra al sitemap.
+- La imagen se prepara en el navegador antes de subirla: se endereza, se reduce a 1920 px y se guarda como JPEG. Así se quitan los datos de ubicación de las fotos de celular.
+- El servidor revisa los primeros bytes del archivo y acepta solo JPG, PNG o WEBP de hasta 8 MB y mínimo 200 × 200 px.
+- Si no se escribe resumen, se arma con el inicio del texto, sin viñetas ni enlaces.
+- Cada noticia tiene vista previa para Facebook, WhatsApp y LinkedIn (Open Graph) y datos `NewsArticle` para Google.
+- Al final de cada noticia hay botones para compartir y tres noticias recientes.
+
+Publicar en redes:
+
+| Botón | Qué hace |
+|---|---|
+| Publicar en Facebook | Copia título, texto y enlace, y abre Facebook con el enlace. Se pega con Ctrl+V y se publica; la imagen sale sola. |
+| Publicar en LinkedIn | Igual, recortando el texto a 3000 caracteres en el último párrafo que entra. |
+| Copiar texto | Solo copia, para pegar en cualquier red. |
+
+No hay conexión directa por API con Meta ni LinkedIn: exige una página de empresa con la app verificada por Meta y reconectar LinkedIn cada 60 días. Así se publica desde la propia cuenta, sin permisos.
+
+---
+
+## 13. Buscadores (SEO)
+
+| Pieza | Qué hace |
+|---|---|
+| Título y descripción por página | Lo que Google muestra en sus resultados |
+| Dirección canónica | Una sola dirección por página, sin barra final |
+| Open Graph y Twitter | Vista previa con imagen al compartir en Facebook, WhatsApp, LinkedIn y X |
+| Datos estructurados | `Organization` y `WebSite` en todo el sitio, `SoftwareApplication` con precios en cada producto, `ItemList` en productos, `CollectionPage` en noticias y `NewsArticle` en cada noticia |
+| `sitemap.xml` | Páginas, productos y noticias publicadas, generado al momento |
+| `robots.txt` | Bloquea el panel, la API y la página de gracias; deja pasar las imágenes de noticias |
+| Renderizado en servidor | Google recibe el HTML completo de cada página, noticias incluidas |
+| Caché | Las páginas se revalidan en cada visita; imágenes, scripts y estilos se guardan un año |
+
+Pendiente del lado de Amantix:
+
+1. Verificar amantix.pe en Google Search Console con un registro TXT en Cloudflare y enviar el sitemap.
+2. Hacer lo mismo en Bing Webmaster Tools, que puede importar desde Search Console.
+3. Crear el perfil de empresa en Google con la dirección de Puerto Maldonado.
+4. Para campañas pagadas: cuenta de Google Ads y propiedad de Google Analytics 4 para medir las solicitudes de demo.
 
