@@ -37,7 +37,7 @@
 .nav-links {
   display: flex;
   align-items: center;
-  gap: 34px;
+  gap: clamp(18px, 2.2vw, 32px);
 }
 
 .nav-link {
