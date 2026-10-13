@@ -4,8 +4,22 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { CatalogApiService, FiltrosDashboard } from '../../services/catalog-api.service';
-import { Dashboard, FilaConteo, MetricasLeads, ProductoResumen } from '../../models/panel.models';
-import { etiquetaEstado, etiquetaOrigen, mensajeError } from '../../models/labels';
+import {
+  Dashboard,
+  FilaConteo,
+  MetricasClientes,
+  MetricasLeads,
+  MetricasSoporte,
+  ProductoResumen,
+} from '../../models/panel.models';
+import {
+  etiquetaEstado,
+  etiquetaEstadoTicket,
+  etiquetaOrigen,
+  formatoMinutos,
+  formatoSoles,
+  mensajeError,
+} from '../../models/labels';
 import { ColumnChartComponent, ColumnPoint } from '../../components/column-chart/column-chart.component';
 import { BarListComponent } from '../../components/bar-list/bar-list.component';
 
@@ -74,6 +88,19 @@ export class DashboardComponent {
 
   protected readonly embudo = computed((): readonly FilaConteo[] =>
     (this.leads()?.embudo ?? []).map((fila) => ({ etiqueta: etiquetaEstado(fila.estado), total: fila.total })),
+  );
+
+  protected readonly clientes = computed((): MetricasClientes | null => this.datos()?.clientes ?? null);
+  protected readonly soporte = computed((): MetricasSoporte | null => this.datos()?.soporte ?? null);
+  protected readonly formatoSoles = formatoSoles;
+  protected readonly formatoMinutos = formatoMinutos;
+
+  protected readonly ingresoPorProducto = computed((): readonly FilaConteo[] =>
+    (this.clientes()?.ingreso_por_producto ?? []).map((fila) => ({ etiqueta: fila.producto, total: fila.monto })),
+  );
+
+  protected readonly ticketsPorEstado = computed((): readonly FilaConteo[] =>
+    (this.soporte()?.por_estado ?? []).map((fila) => ({ etiqueta: etiquetaEstadoTicket(fila.estado), total: fila.total })),
   );
 
   constructor() {
