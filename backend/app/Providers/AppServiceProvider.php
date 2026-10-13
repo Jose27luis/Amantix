@@ -23,5 +23,7 @@ class AppServiceProvider extends ServiceProvider
         ]);
 
         RateLimiter::for('login', static fn (Request $request): Limit => Limit::perMinute(10)->by((string) $request->ip()));
+
+        RateLimiter::for('tickets', static fn (Request $request): Limit => Limit::perMinute(20)->by((string) ($request->user()?->getAuthIdentifier() ?? $request->ip())));
     }
 }
