@@ -6,6 +6,7 @@ import { finalize } from 'rxjs';
 import { LeadService, UNDECIDED_PRODUCT } from '../../services/lead.service';
 import { ApiValidationError, Lead } from '../../models/lead.model';
 import { PRODUCTS } from '../../data/products';
+import { SeoService } from '../../core/seo.service';
 
 interface ProductOption {
   readonly value: string;
@@ -24,6 +25,15 @@ export class ContactoComponent {
   private readonly fb = inject(FormBuilder);
   private readonly leadService = inject(LeadService);
   private readonly router = inject(Router);
+
+  constructor() {
+    inject(SeoService).aplicar({
+      titulo: 'Contacto y demo gratuita',
+      descripcion:
+        'Solicita una demo de Facturador Amantix, Restaurant Sumaqta o Agente Amantix. Te respondemos el mismo día por WhatsApp o correo.',
+      ruta: '/contacto',
+    });
+  }
 
   protected readonly productOptions: readonly ProductOption[] = [
     ...PRODUCTS.map((product): ProductOption => ({ value: product.slug, label: product.name })),
