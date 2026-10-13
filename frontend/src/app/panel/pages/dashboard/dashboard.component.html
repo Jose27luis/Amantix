@@ -1,8 +1,8 @@
 <section class="page">
   <header class="page-head">
     <div>
-      <span class="eyebrow">Dashboard · Leads</span>
-      <h1 class="page-title">Así va la captación</h1>
+      <span class="eyebrow">Dashboard · Amantix</span>
+      <h1 class="page-title">Así va el negocio</h1>
     </div>
 
     <form class="filters" (ngSubmit)="cargar()">
@@ -31,7 +31,73 @@
     <p class="alert alert-error" role="alert">{{ mensaje }}</p>
   }
 
+  @if (clientes(); as cli) {
+    <h2 class="group-title">Clientes e ingresos</h2>
+    <div class="kpis" [class.loading]="cargando()">
+      <a routerLink="/panel/companies" class="kpi kpi-link">
+        <span class="kpi-label">Clientes activos</span>
+        <span class="kpi-value">{{ cli.activos }}</span>
+        <span class="kpi-note">{{ cli.suscripciones_activas }} suscripciones activas · Ver →</span>
+      </a>
+      <div class="kpi">
+        <span class="kpi-label">Ingreso mensual recurrente</span>
+        <span class="kpi-value kpi-money">{{ formatoSoles(cli.ingreso_mensual) }}</span>
+        <span class="kpi-note">Suscripciones activas, anuales prorrateadas</span>
+      </div>
+      <div class="kpi">
+        <span class="kpi-label">Altas y bajas</span>
+        <span class="kpi-value">{{ cli.altas }} / {{ cli.bajas }}</span>
+        <span class="kpi-note">Suscripciones en el periodo</span>
+      </div>
+      <a routerLink="/panel/companies" [queryParams]="{ renueva_en: 30 }" class="kpi kpi-link">
+        <span class="kpi-label">Renuevan en 30 días</span>
+        <span class="kpi-value">{{ cli.renovaciones_proximas }}</span>
+        <span class="kpi-note">Suscripciones por cobrar · Ver →</span>
+      </a>
+    </div>
+  }
+
+  @if (soporte(); as sop) {
+    <h2 class="group-title">Soporte</h2>
+    <div class="kpis" [class.loading]="cargando()">
+      <a routerLink="/panel/tickets" class="kpi kpi-link">
+        <span class="kpi-label">Tickets abiertos</span>
+        <span class="kpi-value">{{ sop.abiertos }}</span>
+        <span class="kpi-note">Abiertos, en atención o esperando · Ver →</span>
+      </a>
+      <a routerLink="/panel/tickets" [queryParams]="{ sin_responder: 1 }" class="kpi kpi-link">
+        <span class="kpi-label">Sin responder</span>
+        <span class="kpi-value">{{ sop.sin_responder }}</span>
+        <span class="kpi-note">Esperan respuesta del equipo · Ver →</span>
+      </a>
+      <div class="kpi">
+        <span class="kpi-label">Tickets nuevos</span>
+        <span class="kpi-value">{{ sop.creados }}</span>
+        <span class="kpi-note">En el periodo</span>
+      </div>
+      <div class="kpi">
+        <span class="kpi-label">Primera respuesta</span>
+        <span class="kpi-value kpi-money">{{ formatoMinutos(sop.primera_respuesta_minutos) }}</span>
+        <span class="kpi-note">Promedio de los tickets del periodo</span>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <h2 class="card-title">Ingreso mensual por producto</h2>
+        <p class="card-sub">Suscripciones activas</p>
+        <app-bar-list [filas]="ingresoPorProducto()" [formato]="formatoSoles" />
+      </div>
+      <div class="card">
+        <h2 class="card-title">Tickets por estado</h2>
+        <p class="card-sub">Todos los tickets</p>
+        <app-bar-list [filas]="ticketsPorEstado()" />
+      </div>
+    </div>
+  }
+
   @if (leads(); as datos) {
+    <h2 class="group-title">Leads</h2>
     <div class="kpis" [class.loading]="cargando()">
       <div class="kpi">
         <span class="kpi-label">Leads del periodo</span>
