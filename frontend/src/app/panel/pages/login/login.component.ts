@@ -25,6 +25,7 @@ export class LoginComponent {
   protected readonly error = signal<string | null>(null);
   protected readonly verPassword = signal(false);
   protected readonly mayusculas = signal(false);
+  protected readonly agitar = signal(false);
   protected readonly anio = new Date().getFullYear();
 
   protected readonly form = this.fb.nonNullable.group({
@@ -39,6 +40,7 @@ export class LoginComponent {
   protected ingresar(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
+      this.agitar.set(true);
       return;
     }
 
@@ -55,8 +57,17 @@ export class LoginComponent {
       .pipe(finalize(() => this.enviando.set(false)))
       .subscribe({
         next: (usuario: Usuario) => this.router.navigate([usuario.debe_cambiar_password ? '/panel/profile' : '/panel']),
-        error: (error: HttpErrorResponse) => this.error.set(mensajeError(error, 'No pudimos iniciar tu sesión.')),
+        error: (error: HttpErrorResponse) => {
+          this.error.set(mensajeError(error, 'No pudimos iniciar tu sesión.'));
+          this.agitar.set(true);
+        },
       });
+  }
+
+  protected terminarSacudida(evento: AnimationEvent): void {
+    if (evento.animationName.includes('sacudir')) {
+      this.agitar.set(false);
+    }
   }
 
   protected alternarPassword(): void {
