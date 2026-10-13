@@ -1,20 +1,33 @@
-<section class="page">
-  <header class="page-head">
-    <div>
-      <span class="eyebrow">Dashboard · Amantix</span>
-      <h1 class="page-title">Así va el negocio</h1>
+<section class="page dash">
+  <header class="hero">
+    <img src="/amantix-logo.png" alt="" class="hero-mark" width="512" height="512" aria-hidden="true" />
+    <div class="hero-copy">
+      <p class="hero-date">{{ fechaLarga }}</p>
+      <h1 class="hero-title">{{ saludo }}{{ nombre() ? ', ' + nombre() : '' }}</h1>
+      @if (leads() && soporte()) {
+        <p class="hero-lead">
+          Tienes <strong>{{ leads()?.indicadores?.sin_atender ?? 0 }}</strong> leads sin atender y
+          <strong>{{ soporte()?.sin_responder ?? 0 }}</strong> tickets esperando respuesta.
+        </p>
+        <div class="hero-actions">
+          <a routerLink="/panel/leads" [queryParams]="{ estado: 'nuevo' }" class="hero-chip chip-brass">Atender leads</a>
+          <a routerLink="/panel/tickets" [queryParams]="{ sin_responder: 1 }" class="hero-chip chip-teal">Responder tickets</a>
+        </div>
+      } @else {
+        <p class="hero-lead">Cargando el resumen del negocio…</p>
+      }
     </div>
 
-    <form class="filters" (ngSubmit)="cargar()">
-      <div class="field">
+    <form class="hero-filters" (ngSubmit)="cargar()">
+      <div class="hf-field">
         <label for="desde">Desde</label>
         <input id="desde" type="date" name="desde" [(ngModel)]="desde" [max]="hasta" />
       </div>
-      <div class="field">
+      <div class="hf-field">
         <label for="hasta">Hasta</label>
         <input id="hasta" type="date" name="hasta" [(ngModel)]="hasta" [min]="desde" />
       </div>
-      <div class="field">
+      <div class="hf-field">
         <label for="producto">Producto</label>
         <select id="producto" name="producto" [(ngModel)]="productoId">
           <option value="">Todos</option>
@@ -23,7 +36,7 @@
           }
         </select>
       </div>
-      <button type="submit" class="btn btn-primary btn-sm" [disabled]="cargando()">Aplicar</button>
+      <button type="submit" class="hf-apply" [disabled]="cargando()">{{ cargando() ? 'Cargando…' : 'Aplicar' }}</button>
     </form>
   </header>
 
@@ -31,117 +44,170 @@
     <p class="alert alert-error" role="alert">{{ mensaje }}</p>
   }
 
-  @if (clientes(); as cli) {
-    <h2 class="group-title">Clientes e ingresos</h2>
-    <div class="kpis" [class.loading]="cargando()">
-      <a routerLink="/panel/companies" class="kpi kpi-link">
+  <div class="kpi-grid" [class.loading]="cargando()">
+    @if (clientes(); as cli) {
+      <div class="kpi kpi-feature">
+        <span class="kpi-icon">
+          <svg width="22" height="22" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 14l4-4 3 3 7-7M12 6h5v5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
+        </span>
+        <span class="kpi-label">Ingreso mensual recurrente</span>
+        <span class="kpi-value">{{ formatoSoles(cli.ingreso_mensual) }}</span>
+        <span class="kpi-note">{{ cli.suscripciones_activas }} suscripciones activas · anuales prorrateadas</span>
+      </div>
+
+      <a routerLink="/panel/companies" class="kpi tone-teal">
+        <span class="kpi-icon">
+          <svg width="22" height="22" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 17V5l6-2v14M9 17V8l8 2v7M2 17h16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" /></svg>
+        </span>
         <span class="kpi-label">Clientes activos</span>
         <span class="kpi-value">{{ cli.activos }}</span>
-        <span class="kpi-note">{{ cli.suscripciones_activas }} suscripciones activas · Ver →</span>
+        <span class="kpi-note">{{ cli.empresas }} empresas registradas</span>
       </a>
-      <div class="kpi">
-        <span class="kpi-label">Ingreso mensual recurrente</span>
-        <span class="kpi-value kpi-money">{{ formatoSoles(cli.ingreso_mensual) }}</span>
-        <span class="kpi-note">Suscripciones activas, anuales prorrateadas</span>
+
+      <div class="kpi tone-steel">
+        <span class="kpi-icon">
+          <svg width="22" height="22" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 4v12M4 10h12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></svg>
+        </span>
+        <span class="kpi-label">Altas / bajas</span>
+        <span class="kpi-value">{{ cli.altas }}<span class="kpi-sep">/</span>{{ cli.bajas }}</span>
+        <span class="kpi-note">Suscripciones del periodo</span>
       </div>
-      <div class="kpi">
-        <span class="kpi-label">Altas y bajas</span>
-        <span class="kpi-value">{{ cli.altas }} / {{ cli.bajas }}</span>
-        <span class="kpi-note">Suscripciones en el periodo</span>
-      </div>
-      <a routerLink="/panel/companies" [queryParams]="{ renueva_en: 30 }" class="kpi kpi-link">
+
+      <a routerLink="/panel/companies" [queryParams]="{ renueva_en: 30 }" class="kpi tone-brass">
+        <span class="kpi-icon">
+          <svg width="22" height="22" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 5h14v12H3V5Zm0 4h14M7 3v4M13 3v4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" /></svg>
+        </span>
         <span class="kpi-label">Renuevan en 30 días</span>
         <span class="kpi-value">{{ cli.renovaciones_proximas }}</span>
-        <span class="kpi-note">Suscripciones por cobrar · Ver →</span>
+        <span class="kpi-note">Suscripciones por cobrar</span>
       </a>
-    </div>
-  }
+    }
 
-  @if (soporte(); as sop) {
-    <h2 class="group-title">Soporte</h2>
-    <div class="kpis" [class.loading]="cargando()">
-      <a routerLink="/panel/tickets" class="kpi kpi-link">
-        <span class="kpi-label">Tickets abiertos</span>
-        <span class="kpi-value">{{ sop.abiertos }}</span>
-        <span class="kpi-note">Abiertos, en atención o esperando · Ver →</span>
-      </a>
-      <a routerLink="/panel/tickets" [queryParams]="{ sin_responder: 1 }" class="kpi kpi-link">
-        <span class="kpi-label">Sin responder</span>
-        <span class="kpi-value">{{ sop.sin_responder }}</span>
-        <span class="kpi-note">Esperan respuesta del equipo · Ver →</span>
-      </a>
-      <div class="kpi">
-        <span class="kpi-label">Tickets nuevos</span>
-        <span class="kpi-value">{{ sop.creados }}</span>
-        <span class="kpi-note">En el periodo</span>
-      </div>
-      <div class="kpi">
-        <span class="kpi-label">Primera respuesta</span>
-        <span class="kpi-value kpi-money">{{ formatoMinutos(sop.primera_respuesta_minutos) }}</span>
-        <span class="kpi-note">Promedio de los tickets del periodo</span>
-      </div>
-    </div>
-
-    <div class="grid-2">
-      <div class="card">
-        <h2 class="card-title">Ingreso mensual por producto</h2>
-        <p class="card-sub">Suscripciones activas</p>
-        <app-bar-list [filas]="ingresoPorProducto()" [formato]="formatoSoles" />
-      </div>
-      <div class="card">
-        <h2 class="card-title">Tickets por estado</h2>
-        <p class="card-sub">Todos los tickets</p>
-        <app-bar-list [filas]="ticketsPorEstado()" />
-      </div>
-    </div>
-  }
-
-  @if (leads(); as datos) {
-    <h2 class="group-title">Leads</h2>
-    <div class="kpis" [class.loading]="cargando()">
-      <div class="kpi">
+    @if (leads(); as datos) {
+      <div class="kpi tone-brass">
+        <span class="kpi-icon">
+          <svg width="22" height="22" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 4h14l-5 6v5l-4 2v-7L3 4Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" /></svg>
+        </span>
         <span class="kpi-label">Leads del periodo</span>
-        <span class="kpi-value">{{ datos.indicadores.leads }}</span>
+        <span class="kpi-value">
+          {{ datos.indicadores.leads }}
+          <span class="trend" [class.trend-up]="tendencia() === 'sube'" [class.trend-down]="tendencia() === 'baja'">
+            {{ tendencia() === 'sube' ? '▲' : tendencia() === 'baja' ? '▼' : '=' }}
+          </span>
+        </span>
         <span class="kpi-note">{{ variacion() }}</span>
       </div>
-      <div class="kpi">
+
+      <div class="kpi tone-teal">
+        <span class="kpi-icon">
+          <svg width="22" height="22" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10.5 8 14l8-8" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" /></svg>
+        </span>
         <span class="kpi-label">Conversión</span>
-        <span class="kpi-value">{{ datos.indicadores.conversion }} %</span>
+        <span class="kpi-value">{{ datos.indicadores.conversion }}<span class="kpi-unit">%</span></span>
+        <span class="meter" aria-hidden="true"><span class="meter-fill" [style.width.%]="datos.indicadores.conversion"></span></span>
         <span class="kpi-note">{{ datos.indicadores.ganados }} ganados de {{ datos.indicadores.leads }}</span>
       </div>
-      <div class="kpi">
-        <span class="kpi-label">Perdidos</span>
-        <span class="kpi-value">{{ datos.indicadores.perdidos }}</span>
-        <span class="kpi-note">En el periodo</span>
-      </div>
-      <a routerLink="/panel/leads" [queryParams]="{ estado: 'nuevo' }" class="kpi kpi-link">
-        <span class="kpi-label">Sin atender</span>
+
+      <a routerLink="/panel/leads" [queryParams]="{ estado: 'nuevo' }" class="kpi tone-brass">
+        <span class="kpi-icon">
+          <svg width="22" height="22" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3a7 7 0 1 0 0 14 7 7 0 0 0 0-14Zm0 3v4l3 2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" /></svg>
+        </span>
+        <span class="kpi-label">Leads sin atender</span>
         <span class="kpi-value">{{ datos.indicadores.sin_atender }}</span>
-        <span class="kpi-note">Leads en estado nuevo · Ver →</span>
+        <span class="kpi-note">En estado nuevo · {{ datos.indicadores.perdidos }} perdidos en el periodo</span>
       </a>
-    </div>
+    }
 
-    <div class="card">
-      <h2 class="card-title">Leads por semana</h2>
-      <p class="card-sub">Últimas 12 semanas hasta {{ datos.periodo.hasta.split('-').reverse().join('/') }}</p>
-      <app-column-chart [puntos]="semanas()" />
-    </div>
+    @if (soporte(); as sop) {
+      <a routerLink="/panel/tickets" [queryParams]="{ sin_responder: 1 }" class="kpi" [class.tone-danger]="sop.sin_responder > 0" [class.tone-teal]="sop.sin_responder === 0">
+        <span class="kpi-icon">
+          <svg width="22" height="22" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 4h14v10H8l-4 3v-3H3V4Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" /></svg>
+        </span>
+        <span class="kpi-label">Tickets sin responder</span>
+        <span class="kpi-value">{{ sop.sin_responder }}</span>
+        <span class="kpi-note">{{ sop.abiertos }} abiertos en total</span>
+      </a>
 
-    <div class="grid-3">
-      <div class="card">
-        <h2 class="card-title">Por producto</h2>
-        <p class="card-sub">Leads del periodo</p>
-        <app-bar-list [filas]="porProducto()" />
+      <div class="kpi tone-steel">
+        <span class="kpi-icon">
+          <svg width="22" height="22" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3a7 7 0 1 0 0 14 7 7 0 0 0 0-14Zm-3 7.5 2 2 4-4.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" /></svg>
+        </span>
+        <span class="kpi-label">Primera respuesta</span>
+        <span class="kpi-value kpi-time">{{ formatoMinutos(sop.primera_respuesta_minutos) }}</span>
+        <span class="kpi-note">{{ sop.creados }} tickets nuevos en el periodo</span>
       </div>
-      <div class="card">
-        <h2 class="card-title">Embudo</h2>
-        <p class="card-sub">Estado actual de los leads del periodo</p>
-        <app-bar-list [filas]="embudo()" />
+    }
+  </div>
+
+  @if (leads(); as datos) {
+    <div class="chart-grid">
+      <div class="card card-wide">
+        <div class="card-head">
+          <div>
+            <h2 class="card-title">Leads por semana</h2>
+            <p class="card-sub">Últimas 12 semanas hasta {{ datos.periodo.hasta.split('-').reverse().join('/') }}</p>
+          </div>
+          <span class="pill pill-brass">{{ datos.indicadores.leads }} en el periodo</span>
+        </div>
+        <app-column-chart [puntos]="semanas()" />
       </div>
+
       <div class="card">
-        <h2 class="card-title">Por origen</h2>
-        <p class="card-sub">Formulario por el que llegaron</p>
-        <app-bar-list [filas]="porOrigen()" />
+        <div class="card-head">
+          <div>
+            <h2 class="card-title">Embudo</h2>
+            <p class="card-sub">Estado de los leads del periodo</p>
+          </div>
+        </div>
+        <app-bar-list [filas]="embudo()" tono="brass" />
+      </div>
+
+      @if (clientes(); as cli) {
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <h2 class="card-title">Ingreso mensual por producto</h2>
+              <p class="card-sub">Suscripciones activas</p>
+            </div>
+          </div>
+          @if (ingresoPorProducto().length > 0) {
+            <app-bar-list [filas]="ingresoPorProducto()" [formato]="formatoSoles" tono="teal" />
+          } @else {
+            <p class="empty-note">Aún no hay suscripciones activas.</p>
+          }
+        </div>
+      }
+
+      @if (soporte(); as sop) {
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <h2 class="card-title">Tickets por estado</h2>
+              <p class="card-sub">Todos los tickets</p>
+            </div>
+          </div>
+          <app-bar-list [filas]="ticketsPorEstado()" tono="steel" />
+        </div>
+      }
+
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <h2 class="card-title">Leads por producto</h2>
+            <p class="card-sub">Leads del periodo</p>
+          </div>
+        </div>
+        <app-bar-list [filas]="porProducto()" tono="teal" />
+      </div>
+
+      <div class="card card-tail">
+        <div class="card-head">
+          <div>
+            <h2 class="card-title">Leads por origen</h2>
+            <p class="card-sub">Formulario por el que llegaron</p>
+          </div>
+        </div>
+        <app-bar-list [filas]="porOrigen()" tono="brass" />
       </div>
     </div>
   } @else if (cargando()) {
