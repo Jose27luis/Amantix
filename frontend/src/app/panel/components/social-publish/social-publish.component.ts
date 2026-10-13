@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, input, signal } from '@angular/core';
-import { SITIO_URL } from '../../../core/seo.service';
+import { FACEBOOK_URL, SITIO_URL } from '../../../core/seo.service';
 
 type Red = 'facebook' | 'linkedin';
 
@@ -41,7 +41,7 @@ export class SocialPublishComponent {
   protected readonly aviso = signal<string | null>(null);
 
   protected readonly url = computed(() => `${SITIO_URL}/noticias/${this.slug()}`);
-  protected readonly enlaceFacebook = computed(() => `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(this.url())}`);
+  protected readonly enlaceFacebook = FACEBOOK_URL;
   protected readonly enlaceLinkedin = computed(() => `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(this.url())}`);
   protected readonly recortaLinkedin = computed(() => this.texto('linkedin').length < this.texto('facebook').length);
 
@@ -52,7 +52,7 @@ export class SocialPublishComponent {
           red === null
             ? 'Texto copiado.'
             : red === 'facebook'
-              ? 'Texto copiado. En Facebook, pégalo con Ctrl+V en la publicación; la vista previa con la imagen se arma sola con el enlace.'
+              ? 'Texto copiado. En la página de Facebook pulsa «Escribe algo», pega con Ctrl+V y publica; la vista previa con la imagen se arma sola con el enlace.'
               : 'Texto copiado. Pégalo con Ctrl+V en la ventana de LinkedIn.',
         );
         setTimeout(() => this.aviso.set(null), 9000);
