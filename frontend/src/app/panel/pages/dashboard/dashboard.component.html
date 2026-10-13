@@ -1,0 +1,84 @@
+<section class="page">
+  <header class="page-head">
+    <div>
+      <span class="eyebrow">Dashboard · Leads</span>
+      <h1 class="page-title">Así va la captación</h1>
+    </div>
+
+    <form class="filters" (ngSubmit)="cargar()">
+      <div class="field">
+        <label for="desde">Desde</label>
+        <input id="desde" type="date" name="desde" [(ngModel)]="desde" [max]="hasta" />
+      </div>
+      <div class="field">
+        <label for="hasta">Hasta</label>
+        <input id="hasta" type="date" name="hasta" [(ngModel)]="hasta" [min]="desde" />
+      </div>
+      <div class="field">
+        <label for="producto">Producto</label>
+        <select id="producto" name="producto" [(ngModel)]="productoId">
+          <option value="">Todos</option>
+          @for (producto of productos(); track producto.id) {
+            <option [value]="producto.id">{{ producto.nombre }}</option>
+          }
+        </select>
+      </div>
+      <button type="submit" class="btn btn-primary btn-sm" [disabled]="cargando()">Aplicar</button>
+    </form>
+  </header>
+
+  @if (error(); as mensaje) {
+    <p class="alert alert-error" role="alert">{{ mensaje }}</p>
+  }
+
+  @if (leads(); as datos) {
+    <div class="kpis" [class.loading]="cargando()">
+      <div class="kpi">
+        <span class="kpi-label">Leads del periodo</span>
+        <span class="kpi-value">{{ datos.indicadores.leads }}</span>
+        <span class="kpi-note">{{ variacion() }}</span>
+      </div>
+      <div class="kpi">
+        <span class="kpi-label">Conversión</span>
+        <span class="kpi-value">{{ datos.indicadores.conversion }} %</span>
+        <span class="kpi-note">{{ datos.indicadores.ganados }} ganados de {{ datos.indicadores.leads }}</span>
+      </div>
+      <div class="kpi">
+        <span class="kpi-label">Perdidos</span>
+        <span class="kpi-value">{{ datos.indicadores.perdidos }}</span>
+        <span class="kpi-note">En el periodo</span>
+      </div>
+      <a routerLink="/panel/leads" [queryParams]="{ estado: 'nuevo' }" class="kpi kpi-link">
+        <span class="kpi-label">Sin atender</span>
+        <span class="kpi-value">{{ datos.indicadores.sin_atender }}</span>
+        <span class="kpi-note">Leads en estado nuevo · Ver →</span>
+      </a>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">Leads por semana</h2>
+      <p class="card-sub">Últimas 12 semanas hasta {{ datos.periodo.hasta.split('-').reverse().join('/') }}</p>
+      <app-column-chart [puntos]="semanas()" />
+    </div>
+
+    <div class="grid-3">
+      <div class="card">
+        <h2 class="card-title">Por producto</h2>
+        <p class="card-sub">Leads del periodo</p>
+        <app-bar-list [filas]="porProducto()" />
+      </div>
+      <div class="card">
+        <h2 class="card-title">Embudo</h2>
+        <p class="card-sub">Estado actual de los leads del periodo</p>
+        <app-bar-list [filas]="embudo()" />
+      </div>
+      <div class="card">
+        <h2 class="card-title">Por origen</h2>
+        <p class="card-sub">Formulario por el que llegaron</p>
+        <app-bar-list [filas]="porOrigen()" />
+      </div>
+    </div>
+  } @else if (cargando()) {
+    <p class="muted">Cargando indicadores…</p>
+  }
+</section>
