@@ -1,0 +1,79 @@
+.cuerpo {
+  font-size: 1.08rem;
+  line-height: 1.8;
+  color: var(--ink);
+}
+
+.cuerpo p {
+  margin: 0 0 1.1em;
+}
+
+.subtitulo {
+  margin: 1.6em 0 0.6em;
+  font-size: 1.35rem;
+  line-height: 1.25;
+}
+
+.lista {
+  margin: 0 0 1.2em;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55em;
+}
+
+.lista li {
+  position: relative;
+  padding-left: 28px;
+}
+
+.lista li::before {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 0.62em;
+  width: 9px;
+  height: 9px;
+  transform: rotate(45deg);
+  background: linear-gradient(135deg, var(--brass-light), var(--brass));
+  border-radius: 2px;
+}
+
+.lista-numerada {
+  counter-reset: paso;
+}
+
+.lista-numerada li {
+  counter-increment: paso;
+  padding-left: 36px;
+}
+
+.lista-numerada li::before {
+  content: counter(paso);
+  left: 0;
+  top: 0.15em;
+  width: 24px;
+  height: 24px;
+  transform: none;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.cuerpo a {
+  color: var(--teal);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  overflow-wrap: anywhere;
+}
+
+.cuerpo strong {
+  font-weight: 700;
+}
