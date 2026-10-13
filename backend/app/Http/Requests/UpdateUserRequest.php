@@ -20,7 +20,7 @@ class UpdateUserRequest extends FormRequest
         return [
             'nombre' => ['sometimes', 'string', 'min:2', 'max:120'],
             'correo' => ['sometimes', 'email', 'max:160', Rule::unique('usuarios', 'correo')->ignore($id)],
-            'rol' => ['sometimes', Rule::enum(Role::class)],
+            'rol' => ['sometimes', Rule::in([Role::Administrador->value])],
             'activo' => ['sometimes', 'boolean'],
         ];
     }
