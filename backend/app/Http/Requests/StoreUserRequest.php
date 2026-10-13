@@ -15,7 +15,7 @@ class StoreUserRequest extends FormRequest
         return [
             'nombre' => ['required', 'string', 'min:2', 'max:120'],
             'correo' => ['required', 'email', 'max:160', Rule::unique('usuarios', 'correo')],
-            'rol' => ['required', Rule::enum(Role::class)],
+            'rol' => ['required', Rule::in([Role::Administrador->value])],
         ];
     }
 }
