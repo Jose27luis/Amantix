@@ -19,6 +19,8 @@ const MARGEN_IZQ = 32;
 const MARGEN_INF = 26;
 const MARGEN_SUP = 12;
 
+let instancias = 0;
+
 @Component({
   selector: 'app-column-chart',
   standalone: true,
@@ -30,6 +32,7 @@ export class ColumnChartComponent {
   readonly puntos = input.required<readonly ColumnPoint[]>();
   readonly unidad = input('leads');
 
+  protected readonly gradiente = `columnas-${++instancias}`;
   protected readonly ancho = ANCHO;
   protected readonly alto = ALTO;
   protected readonly base = ALTO - MARGEN_INF;
