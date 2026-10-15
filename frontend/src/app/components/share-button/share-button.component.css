@@ -1,0 +1,49 @@
+.share {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--line-2);
+  border-radius: 999px;
+  background: var(--cloud);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--ink);
+  cursor: pointer;
+  transition: transform 0.2s ease, border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+}
+
+.share:hover {
+  transform: translateY(-2px);
+  border-color: var(--teal);
+  color: var(--teal);
+}
+
+.share-light {
+  color: var(--cloud);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.28);
+}
+
+.share-light:hover {
+  color: var(--ink);
+  background: var(--cloud);
+  border-color: var(--cloud);
+}
+
+.share:focus-visible {
+  outline: 2px solid var(--brass-light);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .share {
+    transition: none;
+  }
+
+  .share:hover {
+    transform: none;
+  }
+}
