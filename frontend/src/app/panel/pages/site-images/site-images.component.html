@@ -31,8 +31,19 @@
             <option [value]="opcion.valor">{{ opcion.etiqueta }}</option>
           }
         </select>
-        <span class="field-help">En las soluciones, la primera foto va en la portada y las siguientes ilustran cada beneficio, en orden. En las demás páginas se muestran como galería.</span>
       </div>
+
+      @if (esSolucion(ubicacion)) {
+        <div class="field">
+          <label for="seccion">¿En qué parte de la página?</label>
+          <select id="seccion" name="seccion" [(ngModel)]="seccion">
+            @for (opcion of opcionesSeccion(ubicacion); track opcion.valor) {
+              <option [value]="opcion.valor">{{ opcion.etiqueta }}</option>
+            }
+          </select>
+          <span class="field-help">Si una parte no tiene imagen, la página usa su diseño de siempre.</span>
+        </div>
+      }
 
       <div class="field">
         <label for="titulo">Descripción</label>
@@ -78,6 +89,20 @@
                     (blur)="guardarTitulo(imagen, campo.value)"
                     [attr.aria-label]="'Descripción de ' + imagen.titulo"
                   />
+                  @if (esSolucion(imagen.ubicacion)) {
+                    <select
+                      #parte
+                      class="thumb-section"
+                      [value]="imagen.seccion"
+                      [disabled]="ocupado() === imagen.id"
+                      (change)="cambiarSeccion(imagen, parte.value)"
+                      [attr.aria-label]="'Parte de la página de ' + imagen.titulo"
+                    >
+                      @for (opcion of opcionesSeccion(imagen.ubicacion); track opcion.valor) {
+                        <option [value]="opcion.valor" [selected]="opcion.valor === imagen.seccion">{{ opcion.etiqueta }}</option>
+                      }
+                    </select>
+                  }
                   <div class="thumb-actions">
                     <button type="button" class="icon-btn" [disabled]="primero || ocupado() === imagen.id" (click)="mover(grupo, i, -1)" aria-label="Mover antes">←</button>
                     <button type="button" class="icon-btn" [disabled]="ultimo || ocupado() === imagen.id" (click)="mover(grupo, i, 1)" aria-label="Mover después">→</button>
