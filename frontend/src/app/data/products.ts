@@ -52,6 +52,33 @@ export const PRODUCTS: readonly Product[] = [
         image: '/productos/facturador/facturador-hotel.png',
       },
     ],
+    faqs: [
+      {
+        pregunta: '¿Los comprobantes de Facturador Amantix son válidos ante SUNAT?',
+        respuesta:
+          'Sí. Las facturas, boletas, notas de crédito y débito y las guías de remisión se envían a SUNAT y puedes ver el estado de cada comprobante desde el sistema.',
+      },
+      {
+        pregunta: '¿Qué necesito para empezar a facturar?',
+        respuesta:
+          'Tu RUC activo y tu Clave SOL. Con eso configuramos tu empresa, tus series y tu certificado digital, y te capacitamos para emitir tu primer comprobante.',
+      },
+      {
+        pregunta: '¿Puedo usarlo desde el celular?',
+        respuesta:
+          'Sí. Facturador Amantix funciona desde el navegador de la computadora, la tablet o el celular, sin instalar programas.',
+      },
+      {
+        pregunta: '¿Incluye inventario y punto de venta?',
+        respuesta:
+          'Sí. Incluye almacenes, listas de precios, punto de venta, reportes, SIRE para el registro de compras y ventas, y un panel para tu contador.',
+      },
+      {
+        pregunta: '¿Cuánto cuesta?',
+        respuesta:
+          'Los planes empiezan en S/ 80 al mes e incluyen soporte por WhatsApp. En la página de planes ves qué trae cada uno.',
+      },
+    ],
     productionUrl: 'https://facturito.tokefact.pe',
   },
   {
@@ -123,6 +150,33 @@ export const PRODUCTS: readonly Product[] = [
         image: '/productos/restaurante/sumaqta-insumos.png',
       },
     ],
+    faqs: [
+      {
+        pregunta: '¿Cómo toman los pedidos los mozos?',
+        respuesta:
+          'Desde su celular. El mozo elige la mesa, arma el pedido con la carta y la comanda llega a cocina al instante para imprimirse.',
+      },
+      {
+        pregunta: '¿Qué equipos necesito?',
+        respuesta:
+          'Una computadora en caja con una impresora térmica para comandas y los celulares de tus mozos. No necesitas comprar equipos especiales.',
+      },
+      {
+        pregunta: '¿Puedo emitir boletas y facturas al cobrar?',
+        respuesta:
+          'Sí. Al cerrar la cuenta eliges boleta o factura y el comprobante electrónico se emite en el momento, conectado a SUNAT.',
+      },
+      {
+        pregunta: '¿Se puede dividir la cuenta entre varias personas?',
+        respuesta:
+          'Sí. Repartes los productos de la mesa entre los comensales y cobras o facturas a cada uno por separado.',
+      },
+      {
+        pregunta: '¿Controla los insumos de la cocina?',
+        respuesta:
+          'Sí. Lleva el stock de insumos con su costo, merma y stock mínimo, y el historial de movimientos de cada insumo.',
+      },
+    ],
     productionUrl: 'https://sumaq.tokefact.pe',
   },
   {
@@ -174,6 +228,32 @@ export const PRODUCTS: readonly Product[] = [
         description:
           'Resumen del día por billetera y tipo de operación: ingresos, salidas, comisiones y cargos del banco para cuadrar la caja.',
         image: '/productos/agente/agente-reporte.png',
+      },
+    ],
+    faqs: [
+      {
+        pregunta: '¿Con qué bancos y billeteras funciona?',
+        respuesta:
+          'Registras operaciones contra BCP, BBVA, Interbank, Yape, Plin, Tunki, Western Union y efectivo, y puedes agregar las fuentes de fondos que use tu agencia.',
+      },
+      {
+        pregunta: '¿Calcula las comisiones?',
+        respuesta:
+          'Sí. Cada operación guarda su comisión y el reporte diario suma ingresos, salidas, comisiones y cargos del banco por billetera.',
+      },
+      {
+        pregunta: '¿Cómo cuadro la caja al final del día?',
+        respuesta:
+          'Con el cierre de caja diario: ves el saldo de cada billetera y el resumen por tipo de operación para cuadrar antes de cerrar.',
+      },
+      {
+        pregunta: '¿Puedo emitir boletas y registrar préstamos?',
+        respuesta: 'Sí. Emites boletas electrónicas SUNAT y otorgas préstamos desde la misma operación.',
+      },
+      {
+        pregunta: '¿Mis datos están separados de otras agencias?',
+        respuesta:
+          'Sí. Cada empresa trabaja en su propio espacio con su base de datos aislada; ninguna agencia ve la información de otra.',
       },
     ],
     productionUrl: 'https://agente.citec.com.pe',
