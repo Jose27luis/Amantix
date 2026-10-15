@@ -1,0 +1,23 @@
+<section class="local" aria-labelledby="local-titulo">
+  <div class="local-inner">
+    <div class="local-head">
+      <p class="local-place">
+        <svg width="16" height="16" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 18s6-5.2 6-10a6 6 0 1 0-12 0c0 4.8 6 10 6 10Zm0-7.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" /></svg>
+        Puerto Maldonado · Madre de Dios
+      </p>
+      <h2 id="local-titulo" class="local-title">Atendemos a negocios de Madre de Dios</h2>
+      <p class="local-lead">Elige el tipo de negocio que tienes y conoce cómo te ayudamos, con soporte de un equipo que está en tu ciudad.</p>
+    </div>
+
+    <div class="local-grid">
+      @for (solucion of soluciones; track solucion.slug) {
+        <a [routerLink]="['/soluciones', solucion.slug]" class="local-card">
+          <span class="local-card-place">{{ solucion.lugar }}</span>
+          <span class="local-card-title">{{ solucion.servicio }}</span>
+          <span class="local-card-text">{{ solucion.bajada }}</span>
+          <span class="local-card-more">Ver solución →</span>
+        </a>
+      }
+    </div>
+  </div>
+</section>
