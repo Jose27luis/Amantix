@@ -16,6 +16,8 @@ use App\Http\Controllers\Api\PlanController;
 use App\Http\Controllers\Api\PublicLeadController;
 use App\Http\Controllers\Api\PublicNewsController;
 use App\Http\Controllers\Api\PublicProductController;
+use App\Http\Controllers\Api\PublicSiteController;
+use App\Http\Controllers\Api\SiteImageController;
 use App\Http\Controllers\Api\SubscriptionController;
 use App\Http\Controllers\Api\TicketController;
 use App\Http\Controllers\Api\TicketMessageController;
@@ -24,6 +26,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('products', [PublicProductController::class, 'index']);
 Route::get('plans', [PlanController::class, 'index']);
+Route::get('site-images', [PublicSiteController::class, 'imagenes']);
+Route::get('site-images/files/{archivo}', [PublicSiteController::class, 'archivo']);
+Route::get('stats', [PublicSiteController::class, 'cifras']);
 Route::get('news', [PublicNewsController::class, 'index']);
 Route::get('news/images/{archivo}', [PublicNewsController::class, 'imagen']);
 Route::get('news/{slug}', [PublicNewsController::class, 'show']);
@@ -73,6 +78,11 @@ Route::middleware(['auth:sanctum', 'active'])->group(function (): void {
         Route::get('news/{news}', [NewsController::class, 'show']);
         Route::post('news/{news}', [NewsController::class, 'update']);
         Route::delete('news/{news}', [NewsController::class, 'destroy']);
+
+        Route::get('site-images', [SiteImageController::class, 'index']);
+        Route::post('site-images', [SiteImageController::class, 'store']);
+        Route::patch('site-images/{siteImage}', [SiteImageController::class, 'update']);
+        Route::delete('site-images/{siteImage}', [SiteImageController::class, 'destroy']);
 
         Route::get('users', [UserController::class, 'index']);
         Route::post('users', [UserController::class, 'store']);
