@@ -1,0 +1,36 @@
+@if (imagenes().length > 0) {
+  <section class="gallery" aria-labelledby="galeria-titulo">
+    <div class="gallery-inner">
+      <h2 id="galeria-titulo" class="gallery-title">{{ titulo() }}</h2>
+      <div class="grid" [class.grid-few]="imagenes().length < 3">
+        @for (imagen of imagenes(); track imagen.id; let i = $index) {
+          <button
+            type="button"
+            class="tile"
+            [class.tile-wide]="imagen.ancho > imagen.alto * 1.3 && i % 5 === 0"
+            [style.animation-delay.ms]="(i % 6) * 80"
+            (click)="abrir(i)"
+            [attr.aria-label]="'Ampliar: ' + imagen.titulo"
+          >
+            <img [src]="imagen.url" [alt]="imagen.titulo" loading="lazy" [attr.width]="imagen.ancho" [attr.height]="imagen.alto" />
+            <span class="tile-caption">{{ imagen.titulo }}</span>
+          </button>
+        }
+      </div>
+    </div>
+  </section>
+
+  @if (actual(); as imagen) {
+    <div class="lightbox" role="dialog" aria-modal="true" [attr.aria-label]="imagen.titulo" (click)="cerrar()">
+      <figure class="lightbox-figure" (click)="$event.stopPropagation()">
+        <img [src]="imagen.url" [alt]="imagen.titulo" />
+        <figcaption>{{ imagen.titulo }}</figcaption>
+      </figure>
+      <button type="button" class="lb-btn lb-close" (click)="cerrar()" aria-label="Cerrar">✕</button>
+      @if (imagenes().length > 1) {
+        <button type="button" class="lb-btn lb-prev" (click)="mover(-1); $event.stopPropagation()" aria-label="Anterior">←</button>
+        <button type="button" class="lb-btn lb-next" (click)="mover(1); $event.stopPropagation()" aria-label="Siguiente">→</button>
+      }
+    </div>
+  }
+}
