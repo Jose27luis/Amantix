@@ -1,6 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { catchError, of, switchMap } from 'rxjs';
+import { ChangeDetectionStrategy, Component, OnInit, computed, inject, input, signal } from '@angular/core';
 import { ImagenSitio, SiteContentService } from '../../core/site-content.service';
 
 @Component({
@@ -15,24 +13,25 @@ import { ImagenSitio, SiteContentService } from '../../core/site-content.service
     '(document:keydown.arrowleft)': 'mover(-1)',
   },
 })
-export class SiteGalleryComponent {
+export class SiteGalleryComponent implements OnInit {
   readonly ubicacion = input.required<string>();
   readonly titulo = input('Así trabajamos');
 
   private readonly contenido = inject(SiteContentService);
 
-  protected readonly imagenes = toSignal(
-    toObservable(this.ubicacion).pipe(
-      switchMap((ubicacion: string) => this.contenido.imagenes(ubicacion).pipe(catchError(() => of([] as readonly ImagenSitio[])))),
-    ),
-    { initialValue: [] as readonly ImagenSitio[] },
-  );
-
+  protected readonly imagenes = signal<readonly ImagenSitio[]>([]);
   protected readonly abierta = signal<number | null>(null);
   protected readonly actual = computed((): ImagenSitio | null => {
     const indice = this.abierta();
     return indice === null ? null : (this.imagenes()[indice] ?? null);
   });
+
+  ngOnInit(): void {
+    this.contenido.imagenes(this.ubicacion()).subscribe({
+      next: (imagenes: readonly ImagenSitio[]) => this.imagenes.set(imagenes),
+      error: () => this.imagenes.set([]),
+    });
+  }
 
   protected abrir(indice: number): void {
     this.abierta.set(indice);
