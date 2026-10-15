@@ -70,11 +70,11 @@ export class SystemDemoComponent {
   protected readonly titulo = computed((): string => {
     switch (this.sistema()) {
       case 'mozo4':
-        return 'Sumaqta · Salón';
+        return 'Ejemplo de salón';
       case 'agente':
-        return 'Agente Amantix · Cierre de caja';
+        return 'Ejemplo de cierre de caja';
       default:
-        return 'Facturador Amantix · Resumen';
+        return 'Ejemplo de ventas';
     }
   });
 }
