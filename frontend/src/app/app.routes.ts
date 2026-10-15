@@ -31,6 +31,10 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/gracias/gracias.component').then((m) => m.GraciasComponent),
   },
   {
+    path: 'soluciones/:slug',
+    loadComponent: () => import('./pages/local-landing/local-landing.component').then((m) => m.LocalLandingComponent),
+  },
+  {
     path: 'noticias',
     loadComponent: () => import('./pages/news/news.component').then((m) => m.NewsComponent),
   },
