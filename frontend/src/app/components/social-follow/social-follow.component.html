@@ -1,0 +1,38 @@
+@if (variante() === 'franja') {
+  <section class="band" aria-labelledby="siguenos-titulo">
+    <div class="band-inner">
+      <div class="band-copy">
+        <h2 id="siguenos-titulo" class="band-title">Síguenos y entérate primero</h2>
+        <p class="band-lead">
+          Cambios de SUNAT, novedades de nuestros sistemas y consejos para que tu negocio facture sin sustos. Publicamos
+          cada semana.
+        </p>
+      </div>
+      <ul class="band-links">
+        @for (perfil of redes; track perfil.red) {
+          <li>
+            <a [href]="perfil.url" target="_blank" rel="noopener" [class]="'follow follow-' + perfil.red">
+              <span class="follow-icon"><app-social-icon [red]="perfil.red" [tamano]="26" /></span>
+              <span class="follow-text">
+                <strong>{{ perfil.llamado }}</strong>
+                <span>{{ perfil.usuario }}</span>
+              </span>
+              <span class="follow-cta">Seguir</span>
+            </a>
+          </li>
+        }
+      </ul>
+    </div>
+  </section>
+} @else {
+  <aside class="card" aria-label="Síguenos en redes">
+    <span class="card-kicker">Comunidad Amantix</span>
+    <p class="card-title">¿Te sirvió? Síguenos para no perderte la próxima</p>
+    @for (perfil of redes; track perfil.red) {
+      <a [href]="perfil.url" target="_blank" rel="noopener" [class]="'card-btn follow-' + perfil.red">
+        <app-social-icon [red]="perfil.red" [tamano]="20" />
+        {{ perfil.llamado }}
+      </a>
+    }
+  </aside>
+}
