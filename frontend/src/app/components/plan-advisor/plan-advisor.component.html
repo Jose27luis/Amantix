@@ -1,0 +1,83 @@
+<section class="advisor" aria-labelledby="asesor-titulo">
+  <div class="advisor-inner">
+    <div class="questions reveal reveal-left">
+      <p class="kicker">Comparador de planes</p>
+      <h2 id="asesor-titulo" class="title">¿Qué plan te conviene?</h2>
+      <p class="lead">Responde tres preguntas y te decimos cuál elegir y cuánto pagarías.</p>
+
+      <fieldset class="question">
+        <legend>1. ¿Qué tipo de negocio tienes?</legend>
+        <div class="options">
+          @for (opcion of rubros; track opcion.valor) {
+            <button type="button" class="option" [class.option-on]="rubro() === opcion.valor" [attr.aria-pressed]="rubro() === opcion.valor" (click)="rubro.set(opcion.valor)">
+              {{ opcion.etiqueta }}
+            </button>
+          }
+        </div>
+      </fieldset>
+
+      <fieldset class="question">
+        <legend>2. ¿Cuántos sistemas necesitas?</legend>
+        <div class="options">
+          @for (cantidad of cantidades; track cantidad) {
+            <button type="button" class="option" [class.option-on]="sistemas() === cantidad" [attr.aria-pressed]="sistemas() === cantidad" (click)="sistemas.set(cantidad)">
+              {{ cantidad === 1 ? 'Solo uno' : cantidad === 2 ? 'Dos' : 'Los tres' }}
+            </button>
+          }
+        </div>
+      </fieldset>
+
+      <fieldset class="question">
+        <legend>3. ¿Cuántos locales tienes?</legend>
+        <div class="options">
+          <button type="button" class="option" [class.option-on]="!variosLocales()" [attr.aria-pressed]="!variosLocales()" (click)="variosLocales.set(false)">Uno</button>
+          <button type="button" class="option" [class.option-on]="variosLocales()" [attr.aria-pressed]="variosLocales()" (click)="variosLocales.set(true)">Más de uno</button>
+        </div>
+      </fieldset>
+    </div>
+
+    <div class="result reveal reveal-right" aria-live="polite">
+      <span class="result-kicker">Tu plan ideal</span>
+      @for (elegido of [plan()]; track elegido.name) {
+        <h3 class="result-plan">{{ elegido.name }}</h3>
+      }
+      <p class="result-text">{{ sugerencia() }}</p>
+
+      <div class="period" role="group" aria-label="Forma de pago">
+        <button type="button" class="period-btn" [class.period-on]="periodo() === 'mensual'" (click)="periodo.set('mensual')">Mensual</button>
+        <button type="button" class="period-btn" [class.period-on]="periodo() === 'anual'" (click)="periodo.set('anual')">Anual</button>
+      </div>
+
+      <p class="price">
+        <span class="price-amount">S/ {{ precio() }}</span>
+        <span class="price-period">/ {{ periodo() === 'anual' ? 'año' : 'mes' }}</span>
+      </p>
+
+      <div class="compare" aria-label="Comparación de un año de servicio">
+        <div class="compare-row">
+          <span>12 meses pagando mes a mes</span>
+          <strong>S/ {{ costoAnualMensual() }}</strong>
+        </div>
+        <div class="compare-track"><span class="compare-fill compare-full"></span></div>
+        <div class="compare-row">
+          <span>Pagando el año completo</span>
+          <strong>S/ {{ costoAnual() }}</strong>
+        </div>
+        <div class="compare-track"><span class="compare-fill" [style.width.%]="proporcionAnual()"></span></div>
+        <p class="saving">Con el pago anual te ahorras <strong>S/ {{ ahorro() }}</strong>: dos meses gratis.</p>
+      </div>
+
+      <ul class="includes">
+        @for (item of plan().features; track item) {
+          <li>{{ item }}</li>
+        }
+      </ul>
+
+      <div class="actions">
+        <a routerLink="/contacto" class="btn btn-primary">Solicitar este plan</a>
+        <a [href]="mensajeWhatsapp()" target="_blank" rel="noopener" class="btn-whatsapp">Consultar por WhatsApp</a>
+      </div>
+      <p class="fine">Precios en soles, sin IGV. Incluyen implementación SUNAT y capacitación inicial.</p>
+    </div>
+  </div>
+</section>
