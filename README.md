@@ -126,7 +126,7 @@ Amantix/
 - **Responsive** (móvil/escritorio).
 - **Multi-idioma** (opcional, a futuro): español por defecto.
 - **Integración**: enlaces directos a cada sistema en producción.
-- **Fotos del sitio**: el administrador sube fotos al inicio, a nosotros, a cada producto y a cada solución local. En las soluciones la primera va en la portada y las siguientes acompañan cada beneficio; en el resto se muestran como galería. Las fotos y las capturas de producto actuales están hechas con IA: el sitio nunca las presenta como reales.
+- **Imágenes del sitio**: el administrador sube imágenes al inicio, a nosotros, a cada producto y a cada solución local. En las soluciones elige en qué parte va cada una: portada, "lo que vas a controlar" o un beneficio. Una captura real del sistema se muestra en un marco con la etiqueta "Pantalla real" y se amplía al tocarla. Si una parte no tiene imagen, la página usa su diseño de siempre: la simulación en "lo que vas a controlar" y tarjetas en los beneficios. En el resto de páginas las imágenes forman una galería. Las fotos hechas con IA quedaron ocultas y el sitio nunca las presenta como reales.
 - **Ilustraciones de marca** por rubro (facturación, restaurante, agente y farmacia) en las soluciones locales, con movimiento suave que se apaga si el visitante pidió reducir animaciones.
 - **Simulación interactiva** en cada producto y solución: ventas por día, salón con mesas y pedidos, saldo por billetera. Los números son inventados y en pantalla se aclara que no es el sistema.
 - **Comparador de planes**: con el rubro, la cantidad de sistemas y de locales recomienda un plan y muestra cuánto se ahorra pagando el año.
