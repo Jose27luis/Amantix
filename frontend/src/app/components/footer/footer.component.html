@@ -28,6 +28,13 @@
     </div>
 
     <div class="footer-col">
+      <span class="footer-title">En Madre de Dios</span>
+      @for (solucion of soluciones; track solucion.slug) {
+        <a [routerLink]="['/soluciones', solucion.slug]" class="footer-link">{{ solucion.titulo }}</a>
+      }
+    </div>
+
+    <div class="footer-col">
       <span class="footer-title">Empresa</span>
       <a routerLink="/nosotros" class="footer-link">Nosotros</a>
       <a routerLink="/planes" class="footer-link">Planes</a>
