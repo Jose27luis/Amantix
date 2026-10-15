@@ -139,6 +139,11 @@
   border: 1px solid var(--line);
 }
 
+.rubros-art {
+  max-width: 260px;
+  margin: -10px auto 8px;
+}
+
 .rubros-title {
   margin: 0 0 14px;
   font-size: 1.1rem;
