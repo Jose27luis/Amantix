@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services\SiteImages;
 
 use App\Enums\SiteImageLocation;
+use App\Enums\SiteImageSection;
 use App\Models\SiteImage;
 use App\Models\User;
 use App\Services\Audit\AuditRecorder;
@@ -27,6 +28,7 @@ class SiteImageService
         try {
             $registro = SiteImage::query()->create([
                 'ubicacion' => $ubicacion,
+                'seccion' => SiteImageSection::from($datos['seccion'] ?? SiteImageSection::Galeria->value),
                 'titulo' => trim($datos['titulo']),
                 ...$archivo,
                 'orden' => (int) SiteImage::query()->where('ubicacion', $ubicacion)->max('orden') + 1,
