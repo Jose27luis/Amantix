@@ -2,11 +2,12 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { PRODUCTS } from '../../data/products';
 import { SITIO_URL, SeoService } from '../../core/seo.service';
+import { LocalSolutionsComponent } from '../../components/local-solutions/local-solutions.component';
 
 @Component({
   selector: 'app-productos',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, LocalSolutionsComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './productos.component.html',
   styleUrl: './productos.component.css',
