@@ -21,6 +21,7 @@ class SiteImageResource extends JsonResource
         return [
             'id' => $imagen->id,
             'ubicacion' => $imagen->ubicacion->value,
+            'seccion' => $imagen->seccion->value,
             'titulo' => $imagen->titulo,
             'url' => '/api/site-images/files/'.$imagen->archivo,
             'ancho' => $imagen->ancho,
