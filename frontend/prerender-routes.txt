@@ -1,12 +1,3 @@
-/
 /contacto
-/nosotros
 /planes
 /productos
-/productos/facturador-amantix
-/productos/restaurant-sumaqta
-/productos/agente-amantix
-/soluciones/facturacion-electronica-puerto-maldonado
-/soluciones/sistema-restaurantes-madre-de-dios
-/soluciones/sistema-agentes-bancarios-puerto-maldonado
-/soluciones/sistema-farmacias-boticas-madre-de-dios
