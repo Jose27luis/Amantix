@@ -1,0 +1,18 @@
+<section class="demo" aria-labelledby="demo-titulo">
+  <div class="demo-inner">
+    <div class="demo-copy reveal reveal-left">
+      <p class="demo-kicker">Pruébalo aquí mismo</p>
+      <h2 id="demo-titulo" class="demo-title">Así se ve {{ nombre() }} por dentro</h2>
+      <p class="demo-lead">
+        @switch (sistema()) {
+          @case ('mozo4') { Toca una mesa para ver su pedido y cuánto lleva. Así sigue tu caja el salón en tiempo real. }
+          @case ('agente') { Cambia de día y pasa el cursor por cada billetera: es el cuadre que verías antes de cerrar la caja. }
+          @default { Cambia de semana y pasa el cursor por cada día: es el resumen que verías al abrir el sistema. }
+        }
+      </p>
+      <p class="demo-note">Los números son de ejemplo. En la demo gratuita te lo mostramos con datos de tu negocio.</p>
+      <a routerLink="/contacto" class="btn btn-primary">Quiero ver mi negocio así</a>
+    </div>
+    <app-system-demo class="demo-window reveal reveal-right" [sistema]="sistema()" />
+  </div>
+</section>
