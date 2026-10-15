@@ -126,10 +126,9 @@ Amantix/
 - **Responsive** (móvil/escritorio).
 - **Multi-idioma** (opcional, a futuro): español por defecto.
 - **Integración**: enlaces directos a cada sistema en producción.
-- **Fotos del sitio**: el administrador sube fotos al inicio, a nosotros, a cada producto y a cada solución local. Si una página no tiene fotos, la galería no aparece.
+- **Fotos del sitio**: el administrador sube fotos al inicio, a nosotros, a cada producto y a cada solución local. En las soluciones la primera va en la portada y las siguientes acompañan cada beneficio; en el resto se muestran como galería. Las fotos y las capturas de producto actuales están hechas con IA: el sitio nunca las presenta como reales.
 - **Ilustraciones de marca** por rubro (facturación, restaurante, agente y farmacia) en las soluciones locales, con movimiento suave que se apaga si el visitante pidió reducir animaciones.
-- **Demo interactiva** en cada producto y solución: ventas por día en el Facturador, salón con mesas y pedidos en Sumaqta, saldo por billetera en el Agente. Los números son de ejemplo y lo dice en pantalla.
-- **Recorrido guiado** sobre la captura real de cada sistema, con puntos numerados que explican cada parte.
+- **Simulación interactiva** en cada producto y solución: ventas por día, salón con mesas y pedidos, saldo por billetera. Los números son inventados y en pantalla se aclara que no es el sistema.
 - **Comparador de planes**: con el rubro, la cantidad de sistemas y de locales recomienda un plan y muestra cuánto se ahorra pagando el año.
 - **Cifras reales** en el inicio, tomadas del panel. Una cifra solo aparece cuando ya es lo bastante grande para mostrarla; mientras tanto se queda oculta.
 
