@@ -10,7 +10,6 @@ use App\Models\News;
 use App\Services\News\NewsImageStore;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class PublicNewsController extends Controller
@@ -60,13 +59,9 @@ class PublicNewsController extends Controller
 
     public function imagen(string $archivo, NewsImageStore $imagenes): BinaryFileResponse
     {
-        abort_unless(preg_match('/^[0-9a-f-]{36}\.(jpg|png|webp)$/', $archivo) === 1, 404);
+        abort_unless($imagenes->existe($archivo), 404);
 
-        $disco = Storage::disk(NewsImageStore::DISCO);
-        $ruta = $imagenes->ruta($archivo);
-        abort_unless($disco->exists($ruta), 404);
-
-        return response()->file($disco->path($ruta), [
+        return response()->file($imagenes->rutaAbsoluta($archivo), [
             'Cache-Control' => 'public, max-age=31536000, immutable',
             'X-Content-Type-Options' => 'nosniff',
         ]);
