@@ -65,7 +65,11 @@
   background: var(--cloud);
   border: 1px solid var(--line);
   box-shadow: 0 18px 36px -30px rgba(15, 29, 46, 0.6);
-  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+  transition: opacity 0.7s ease, transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.local-card:hover {
+  transition-delay: 0s;
 }
 
 .local-card::before {
