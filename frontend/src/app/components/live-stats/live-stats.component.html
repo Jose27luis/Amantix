@@ -1,0 +1,16 @@
+@if (cifras().length > 0) {
+  <section class="stats" aria-label="Amantix en cifras">
+    <div class="stats-inner">
+      <p class="live"><span class="live-dot" aria-hidden="true"></span>Datos reales, actualizados cada pocos minutos</p>
+      <div class="grid">
+        @for (cifra of cifras(); track cifra.etiqueta; let i = $index) {
+          <div class="stat" [style.animation-delay.ms]="i * 120">
+            <span class="value">{{ cifra.valor }}</span>
+            <span class="label">{{ cifra.etiqueta }}</span>
+            <span class="detail">{{ cifra.detalle }}</span>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+}
