@@ -1,6 +1,7 @@
 User-agent: *
 Allow: /
 Allow: /api/news/images/
+Allow: /api/site-images/files/
 Disallow: /panel
 Disallow: /api/
 Disallow: /gracias
