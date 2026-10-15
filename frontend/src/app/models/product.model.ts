@@ -9,6 +9,11 @@ export interface ProductScreenshot {
   readonly image: string;
 }
 
+export interface PreguntaFrecuente {
+  readonly pregunta: string;
+  readonly respuesta: string;
+}
+
 export interface Product {
   readonly slug: string;
   readonly code: string;
@@ -20,5 +25,6 @@ export interface Product {
   readonly heroImage: string;
   readonly features: readonly ProductFeature[];
   readonly screenshots: readonly ProductScreenshot[];
+  readonly faqs: readonly PreguntaFrecuente[];
   readonly productionUrl: string;
 }
