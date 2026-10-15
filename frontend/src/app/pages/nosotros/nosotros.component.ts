@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { SeoService } from '../../core/seo.service';
+import { SiteGalleryComponent } from '../../components/site-gallery/site-gallery.component';
 
 interface Value {
   readonly title: string;
@@ -15,7 +16,7 @@ interface Fact {
 @Component({
   selector: 'app-nosotros',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, SiteGalleryComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './nosotros.component.html',
   styleUrl: './nosotros.component.css',
