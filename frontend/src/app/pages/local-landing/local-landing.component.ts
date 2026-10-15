@@ -1,18 +1,20 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Signal, computed, inject } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { Observable, catchError, of } from 'rxjs';
+import { ImagenSitio, SiteContentService } from '../../core/site-content.service';
 import { PAGINAS_LOCALES, PaginaLocal } from '../../data/local-pages';
 import { PRODUCTS } from '../../data/products';
 import { Product } from '../../models/product.model';
 import { SITIO_URL, SeoService } from '../../core/seo.service';
 import { FaqListComponent } from '../../components/faq-list/faq-list.component';
-import { SiteGalleryComponent } from '../../components/site-gallery/site-gallery.component';
 import { RubroIllustrationComponent } from '../../components/rubro-illustration/rubro-illustration.component';
 import { DemoSectionComponent } from '../../components/demo-section/demo-section.component';
 
 @Component({
   selector: 'app-local-landing',
   standalone: true,
-  imports: [RouterLink, FaqListComponent, SiteGalleryComponent, RubroIllustrationComponent, DemoSectionComponent],
+  imports: [RouterLink, FaqListComponent, RubroIllustrationComponent, DemoSectionComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './local-landing.component.html',
   styleUrl: './local-landing.component.css',
@@ -25,13 +27,20 @@ export class LocalLandingComponent {
   protected readonly producto: Product;
   protected readonly otras: readonly PaginaLocal[];
   protected readonly whatsapp: string;
+  protected readonly fotos: Signal<readonly ImagenSitio[]>;
+  protected readonly fotoPortada = computed((): ImagenSitio | null => this.fotos()[0] ?? null);
+  protected readonly fotosBeneficios = computed((): readonly ImagenSitio[] => this.fotos().slice(1));
 
   constructor() {
     const slug = inject(ActivatedRoute).snapshot.paramMap.get('slug');
     const encontrada = PAGINAS_LOCALES.find((item: PaginaLocal) => item.slug === slug);
+    const fotos$: Observable<readonly ImagenSitio[]> = encontrada
+      ? inject(SiteContentService).imagenes(encontrada.slug).pipe(catchError(() => of([])))
+      : of([]);
 
     this.existe = encontrada !== undefined;
     this.pagina = encontrada ?? PAGINAS_LOCALES[0];
+    this.fotos = toSignal(fotos$, { initialValue: [] });
     this.producto = PRODUCTS.find((item: Product) => item.slug === this.pagina.producto) ?? PRODUCTS[0];
     this.otras = PAGINAS_LOCALES.filter((item: PaginaLocal) => item.slug !== this.pagina.slug);
     this.whatsapp = `https://wa.me/51931110735?text=${encodeURIComponent(`Hola, quiero información sobre ${this.pagina.servicio.toLowerCase()} en ${this.pagina.lugar}.`)}`;
