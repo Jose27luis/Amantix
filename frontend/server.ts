@@ -44,6 +44,11 @@ export function app(): express.Express {
   );
 
   server.get('**', (req, res, next) => {
+    if (req.path === '/') {
+      next();
+      return;
+    }
+
     const prerenderizada = normalize(join(browserDistFolder, req.path, 'index.html'));
 
     if (prerenderizada.startsWith(browserDistFolder) && existsSync(prerenderizada)) {
