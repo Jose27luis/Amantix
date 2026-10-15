@@ -33,9 +33,17 @@
         </a>
       </div>
     </div>
-    <div class="hero-media">
+    <div class="hero-media" [class.hero-media-photo]="fotoPortada() !== null">
       <span class="halo" aria-hidden="true"></span>
-      <img [src]="pagina.imagen" [alt]="producto.name" width="900" height="491" fetchpriority="high" />
+      @if (fotoPortada(); as foto) {
+        <img class="hero-photo" [src]="foto.url" [alt]="foto.titulo" [attr.width]="foto.ancho" [attr.height]="foto.alto" fetchpriority="high" />
+        <figure class="hero-screen">
+          <img [src]="pagina.imagen" [alt]="'Pantalla de ' + producto.name" width="900" height="491" />
+          <figcaption>{{ producto.name }}</figcaption>
+        </figure>
+      } @else {
+        <img [src]="pagina.imagen" [alt]="producto.name" width="900" height="491" fetchpriority="high" />
+      }
     </div>
   </div>
 </section>
@@ -59,25 +67,37 @@
   </div>
 </section>
 
-<app-site-gallery
-  class="tinted"
-  [ubicacion]="pagina.slug"
-  [titulo]="'Negocios de ' + pagina.lugar + ' con Amantix'"
-  [bajada]="'Así se trabaja con ' + producto.name + ' en el día a día. Toca una foto para verla completa.'"
-/>
-
-<section class="benefits">
+<section class="benefits" [class.benefits-photo]="fotosBeneficios().length > 0">
   <div class="wrap">
     <h2 class="section-title reveal">Lo que resuelve en tu negocio</h2>
-    <div class="benefit-grid">
-      @for (beneficio of pagina.beneficios; track beneficio.titulo) {
-        <article class="benefit reveal reveal-scale" [style.transition-delay.ms]="$index * 90">
-          <span class="benefit-mark" aria-hidden="true"></span>
-          <h3>{{ beneficio.titulo }}</h3>
-          <p>{{ beneficio.descripcion }}</p>
-        </article>
-      }
-    </div>
+    @if (fotosBeneficios().length > 0) {
+      <div class="feature-rows">
+        @for (beneficio of pagina.beneficios; track beneficio.titulo; let i = $index) {
+          <article class="feature-row" [class.feature-row-flip]="i % 2 === 1">
+            @if (fotosBeneficios()[i]; as foto) {
+              <div class="feature-photo">
+                <img [src]="foto.url" [alt]="foto.titulo" [attr.width]="foto.ancho" [attr.height]="foto.alto" loading="lazy" />
+              </div>
+            }
+            <div class="feature-copy">
+              <span class="feature-number">0{{ i + 1 }}</span>
+              <h3>{{ beneficio.titulo }}</h3>
+              <p>{{ beneficio.descripcion }}</p>
+            </div>
+          </article>
+        }
+      </div>
+    } @else {
+      <div class="benefit-grid">
+        @for (beneficio of pagina.beneficios; track beneficio.titulo) {
+          <article class="benefit reveal reveal-scale" [style.transition-delay.ms]="$index * 90">
+            <span class="benefit-mark" aria-hidden="true"></span>
+            <h3>{{ beneficio.titulo }}</h3>
+            <p>{{ beneficio.descripcion }}</p>
+          </article>
+        }
+      </div>
+    }
   </div>
 </section>
 
