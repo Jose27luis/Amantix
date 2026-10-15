@@ -17,6 +17,10 @@ class SitemapController extends Controller
         ['ruta' => '/noticias', 'frecuencia' => 'weekly', 'prioridad' => '0.8'],
         ['ruta' => '/nosotros', 'frecuencia' => 'yearly', 'prioridad' => '0.6'],
         ['ruta' => '/contacto', 'frecuencia' => 'yearly', 'prioridad' => '0.7'],
+        ['ruta' => '/soluciones/facturacion-electronica-puerto-maldonado', 'frecuencia' => 'monthly', 'prioridad' => '0.9'],
+        ['ruta' => '/soluciones/sistema-restaurantes-madre-de-dios', 'frecuencia' => 'monthly', 'prioridad' => '0.9'],
+        ['ruta' => '/soluciones/sistema-agentes-bancarios-puerto-maldonado', 'frecuencia' => 'monthly', 'prioridad' => '0.9'],
+        ['ruta' => '/soluciones/sistema-farmacias-boticas-madre-de-dios', 'frecuencia' => 'monthly', 'prioridad' => '0.9'],
     ];
 
     public function __invoke(): Response
