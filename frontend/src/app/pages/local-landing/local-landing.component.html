@@ -59,6 +59,13 @@
   </div>
 </section>
 
+<app-site-gallery
+  class="tinted"
+  [ubicacion]="pagina.slug"
+  [titulo]="'Negocios de ' + pagina.lugar + ' con Amantix'"
+  [bajada]="'Así se trabaja con ' + producto.name + ' en el día a día. Toca una foto para verla completa.'"
+/>
+
 <section class="benefits">
   <div class="wrap">
     <h2 class="section-title reveal">Lo que resuelve en tu negocio</h2>
@@ -91,7 +98,6 @@
   </div>
 </section>
 
-<app-site-gallery [ubicacion]="pagina.slug" [titulo]="'Negocios de ' + pagina.lugar + ' con Amantix'" />
 
 <section class="product">
   <div class="wrap product-card reveal reveal-scale">
