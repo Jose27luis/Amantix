@@ -10,21 +10,23 @@
   </section>
 } @else {
 <section class="hero">
+  <span class="orb orb-a" aria-hidden="true"></span>
+  <span class="orb orb-b" aria-hidden="true"></span>
   <div class="wrap hero-grid">
     <div class="hero-copy">
-      <nav class="crumbs" aria-label="Ruta">
+      <nav class="crumbs enter" style="--paso: 0" aria-label="Ruta">
         <a routerLink="/">Inicio</a>
         <span aria-hidden="true">/</span>
         <a routerLink="/productos">Soluciones</a>
       </nav>
-      <p class="place">
-        <svg width="16" height="16" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 18s6-5.2 6-10a6 6 0 1 0-12 0c0 4.8 6 10 6 10Zm0-7.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" /></svg>
+      <p class="place enter" style="--paso: 1">
+        <svg class="pin" width="16" height="16" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 18s6-5.2 6-10a6 6 0 1 0-12 0c0 4.8 6 10 6 10Zm0-7.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" /></svg>
         {{ pagina.lugar }}, Perú
       </p>
-      <h1 class="title">{{ pagina.titulo }}</h1>
-      <p class="lead">{{ pagina.bajada }}</p>
-      <div class="actions">
-        <a routerLink="/contacto" class="btn btn-primary btn-big">Solicitar demo gratuita</a>
+      <h1 class="title enter" style="--paso: 2">{{ pagina.titulo }}</h1>
+      <p class="lead enter" style="--paso: 3">{{ pagina.bajada }}</p>
+      <div class="actions enter" style="--paso: 4">
+        <a routerLink="/contacto" class="btn btn-primary btn-big btn-shine">Solicitar demo gratuita</a>
         <a [href]="whatsapp" target="_blank" rel="noopener" class="btn-whatsapp">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22c5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2Z" /></svg>
           Escríbenos por WhatsApp
@@ -32,6 +34,7 @@
       </div>
     </div>
     <div class="hero-media">
+      <span class="halo" aria-hidden="true"></span>
       <img [src]="pagina.imagen" [alt]="producto.name" width="900" height="491" fetchpriority="high" />
     </div>
   </div>
@@ -39,16 +42,16 @@
 
 <section class="intro">
   <div class="wrap intro-grid">
-    <div class="intro-text">
+    <div class="intro-text reveal reveal-left">
       @for (parrafo of pagina.introduccion; track $index) {
         <p>{{ parrafo }}</p>
       }
     </div>
-    <aside class="rubros">
+    <aside class="rubros reveal reveal-right">
       <h2 class="rubros-title">Ideal para</h2>
       <ul>
         @for (rubro of pagina.rubros; track rubro) {
-          <li>{{ rubro }}</li>
+          <li class="chip-pop" [style.animation-delay.ms]="300 + $index * 70">{{ rubro }}</li>
         }
       </ul>
     </aside>
@@ -57,10 +60,10 @@
 
 <section class="benefits">
   <div class="wrap">
-    <h2 class="section-title">Lo que resuelve en tu negocio</h2>
+    <h2 class="section-title reveal">Lo que resuelve en tu negocio</h2>
     <div class="benefit-grid">
       @for (beneficio of pagina.beneficios; track beneficio.titulo) {
-        <article class="benefit">
+        <article class="benefit reveal reveal-scale" [style.transition-delay.ms]="$index * 90">
           <span class="benefit-mark" aria-hidden="true"></span>
           <h3>{{ beneficio.titulo }}</h3>
           <p>{{ beneficio.descripcion }}</p>
@@ -72,10 +75,10 @@
 
 <section class="steps">
   <div class="wrap">
-    <h2 class="section-title">Cómo empiezas</h2>
-    <ol class="step-list">
+    <h2 class="section-title reveal">Cómo empiezas</h2>
+    <ol class="step-list reveal">
       @for (paso of pagina.pasos; track paso.titulo; let i = $index) {
-        <li class="step">
+        <li class="step" [style.--orden]="i">
           <span class="step-number">{{ i + 1 }}</span>
           <h3>{{ paso.titulo }}</h3>
           <p>{{ paso.descripcion }}</p>
@@ -86,7 +89,7 @@
 </section>
 
 <section class="product">
-  <div class="wrap product-card">
+  <div class="wrap product-card reveal reveal-scale">
     <div>
       <p class="product-kicker">El sistema detrás</p>
       <h2>{{ producto.name }}</h2>
@@ -101,23 +104,24 @@
 
 <section class="faqs">
   <div class="wrap faq-grid">
-    <div>
+    <div class="reveal reveal-left">
       <h2 class="section-title">Preguntas frecuentes</h2>
       <p class="faq-lead">¿Tienes otra duda? Escríbenos y te respondemos el mismo día.</p>
       <a [href]="whatsapp" target="_blank" rel="noopener" class="faq-link">Preguntar por WhatsApp</a>
     </div>
-    <app-faq-list [preguntas]="pagina.faqs" />
+    <app-faq-list class="reveal reveal-right" [preguntas]="pagina.faqs" />
   </div>
 </section>
 
 <section class="more">
   <div class="wrap">
-    <h2 class="more-title">Otras soluciones en Madre de Dios</h2>
+    <h2 class="more-title reveal">Otras soluciones en Madre de Dios</h2>
     <div class="more-grid">
       @for (otra of otras; track otra.slug) {
-        <a [routerLink]="['/soluciones', otra.slug]" class="more-item">
+        <a [routerLink]="['/soluciones', otra.slug]" class="more-item reveal" [style.transition-delay.ms]="$index * 80">
           <span class="more-place">{{ otra.lugar }}</span>
           <span class="more-name">{{ otra.titulo }}</span>
+          <span class="more-arrow" aria-hidden="true">→</span>
         </a>
       }
     </div>
