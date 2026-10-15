@@ -6,6 +6,9 @@ import { Product } from '../../models/product.model';
 import { SITIO_URL, SeoService } from '../../core/seo.service';
 import { FaqListComponent } from '../../components/faq-list/faq-list.component';
 import { SiteGalleryComponent } from '../../components/site-gallery/site-gallery.component';
+import { DemoSectionComponent } from '../../components/demo-section/demo-section.component';
+import { ScreenshotTourComponent } from '../../components/screenshot-tour/screenshot-tour.component';
+import { RECORRIDOS, Recorrido } from '../../data/tours';
 
 const CATEGORIAS: Readonly<Record<Product['systemRef'], string>> = {
   pro8: 'BusinessApplication',
@@ -16,7 +19,7 @@ const CATEGORIAS: Readonly<Record<Product['systemRef'], string>> = {
 @Component({
   selector: 'app-producto-detalle',
   standalone: true,
-  imports: [RouterLink, FaqListComponent, SiteGalleryComponent],
+  imports: [RouterLink, FaqListComponent, SiteGalleryComponent, DemoSectionComponent, ScreenshotTourComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './producto-detalle.component.html',
   styleUrl: './producto-detalle.component.css',
@@ -28,6 +31,7 @@ export class ProductoDetalleComponent {
 
   protected readonly product: Product;
   protected readonly soluciones: readonly PaginaLocal[];
+  protected readonly recorrido: Recorrido | null;
 
   protected get host(): string {
     return this.product.productionUrl.replace(/^https?:\/\//, '');
@@ -40,9 +44,11 @@ export class ProductoDetalleComponent {
       this.router.navigate(['/productos']);
       this.product = PRODUCTS[0];
       this.soluciones = [];
+      this.recorrido = null;
       return;
     }
     this.product = match;
+    this.recorrido = RECORRIDOS[match.slug] ?? null;
     this.soluciones = PAGINAS_LOCALES.filter((pagina: PaginaLocal) => pagina.producto === match.slug);
     this.aplicarSeo(match);
   }
