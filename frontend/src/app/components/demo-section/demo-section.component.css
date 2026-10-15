@@ -1,0 +1,58 @@
+:host {
+  display: block;
+}
+
+.demo {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(56px, 7vw, 104px) 0;
+  background:
+    radial-gradient(700px 360px at 100% 0%, rgba(216, 183, 124, 0.28), transparent 70%),
+    radial-gradient(640px 380px at 0% 100%, rgba(61, 147, 137, 0.35), transparent 70%),
+    linear-gradient(125deg, #0f1d2e 0%, #17304b 60%, #12355e 100%);
+  color: var(--cloud);
+}
+
+.demo-inner {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 clamp(16px, 4vw, 56px);
+  display: grid;
+  grid-template-columns: minmax(0, 0.75fr) minmax(0, 1.25fr);
+  gap: clamp(28px, 4vw, 64px);
+  align-items: center;
+}
+
+.demo-kicker {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--brass-light);
+}
+
+.demo-title {
+  margin: 12px 0 16px;
+  font-size: clamp(1.9rem, 3.2vw, 2.8rem);
+  line-height: 1.08;
+  color: var(--cloud);
+}
+
+.demo-lead {
+  margin: 0 0 14px;
+  font-size: 1.05rem;
+  line-height: 1.65;
+  color: var(--line-2);
+}
+
+.demo-note {
+  margin: 0 0 24px;
+  font-size: 0.85rem;
+  color: var(--teal-light);
+}
+
+@media (max-width: 1000px) {
+  .demo-inner {
+    grid-template-columns: 1fr;
+  }
+}
