@@ -5,6 +5,7 @@ import { PAGINAS_LOCALES, PaginaLocal } from '../../data/local-pages';
 import { Product } from '../../models/product.model';
 import { SITIO_URL, SeoService } from '../../core/seo.service';
 import { FaqListComponent } from '../../components/faq-list/faq-list.component';
+import { SiteGalleryComponent } from '../../components/site-gallery/site-gallery.component';
 
 const CATEGORIAS: Readonly<Record<Product['systemRef'], string>> = {
   pro8: 'BusinessApplication',
@@ -15,7 +16,7 @@ const CATEGORIAS: Readonly<Record<Product['systemRef'], string>> = {
 @Component({
   selector: 'app-producto-detalle',
   standalone: true,
-  imports: [RouterLink, FaqListComponent],
+  imports: [RouterLink, FaqListComponent, SiteGalleryComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './producto-detalle.component.html',
   styleUrl: './producto-detalle.component.css',
