@@ -60,6 +60,24 @@
   </section>
 }
 
+<section class="detail-faq">
+  <div class="container faq-layout">
+    <div>
+      <span class="eyebrow">Preguntas frecuentes</span>
+      <h2 class="faq-title">Lo que más nos preguntan de {{ product.name }}</h2>
+      @if (soluciones.length > 0) {
+        <div class="local">
+          <span class="local-label">En Madre de Dios</span>
+          @for (solucion of soluciones; track solucion.slug) {
+            <a [routerLink]="['/soluciones', solucion.slug]" class="local-link">{{ solucion.titulo }}</a>
+          }
+        </div>
+      }
+    </div>
+    <app-faq-list [preguntas]="product.faqs" />
+  </div>
+</section>
+
 <section class="detail-cta">
   <div class="container detail-cta-inner reveal">
     <h2 class="detail-cta-title">¿Quieres ver {{ product.name }} en acción?</h2>
