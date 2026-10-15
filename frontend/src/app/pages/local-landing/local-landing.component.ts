@@ -3,18 +3,25 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Observable, catchError, of } from 'rxjs';
 import { ImagenSitio, SiteContentService } from '../../core/site-content.service';
-import { PAGINAS_LOCALES, PaginaLocal } from '../../data/local-pages';
+import { Beneficio, PAGINAS_LOCALES, PaginaLocal } from '../../data/local-pages';
 import { PRODUCTS } from '../../data/products';
 import { Product } from '../../models/product.model';
 import { SITIO_URL, SeoService } from '../../core/seo.service';
 import { FaqListComponent } from '../../components/faq-list/faq-list.component';
 import { RubroIllustrationComponent } from '../../components/rubro-illustration/rubro-illustration.component';
 import { DemoSectionComponent } from '../../components/demo-section/demo-section.component';
+import { ScreenFrameComponent } from '../../components/screen-frame/screen-frame.component';
+
+interface BeneficioConImagenes {
+  readonly beneficio: Beneficio;
+  readonly numero: number;
+  readonly imagenes: readonly ImagenSitio[];
+}
 
 @Component({
   selector: 'app-local-landing',
   standalone: true,
-  imports: [RouterLink, FaqListComponent, RubroIllustrationComponent, DemoSectionComponent],
+  imports: [RouterLink, FaqListComponent, RubroIllustrationComponent, DemoSectionComponent, ScreenFrameComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './local-landing.component.html',
   styleUrl: './local-landing.component.css',
@@ -28,8 +35,17 @@ export class LocalLandingComponent {
   protected readonly otras: readonly PaginaLocal[];
   protected readonly whatsapp: string;
   protected readonly fotos: Signal<readonly ImagenSitio[]>;
-  protected readonly fotoPortada = computed((): ImagenSitio | null => this.fotos()[0] ?? null);
-  protected readonly fotosBeneficios = computed((): readonly ImagenSitio[] => this.fotos().slice(1));
+  protected readonly fotoPortada = computed((): ImagenSitio | null => this.fotos().find((foto: ImagenSitio) => foto.seccion === 'portada') ?? null);
+  protected readonly capturasControl = computed((): readonly ImagenSitio[] => this.fotos().filter((foto: ImagenSitio) => foto.seccion === 'control'));
+  private readonly beneficios = computed((): readonly BeneficioConImagenes[] =>
+    this.pagina.beneficios.map((beneficio: Beneficio, indice: number) => ({
+      beneficio,
+      numero: indice + 1,
+      imagenes: this.fotos().filter((foto: ImagenSitio) => foto.seccion === `beneficio-${indice + 1}`),
+    })),
+  );
+  protected readonly beneficiosConImagen = computed(() => this.beneficios().filter((item: BeneficioConImagenes) => item.imagenes.length > 0));
+  protected readonly beneficiosSinImagen = computed(() => this.beneficios().filter((item: BeneficioConImagenes) => item.imagenes.length === 0));
 
   constructor() {
     const slug = inject(ActivatedRoute).snapshot.paramMap.get('slug');
