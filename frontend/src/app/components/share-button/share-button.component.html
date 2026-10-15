@@ -1,0 +1,6 @@
+<button type="button" class="share" [class.share-light]="claro()" (click)="compartir($event)" [attr.aria-label]="etiqueta() + ': ' + titulo()">
+  <svg width="17" height="17" viewBox="0 0 20 20" aria-hidden="true">
+    <path d="M10 13V3m0 0L6.5 6.5M10 3l3.5 3.5M5 10H4v7h12v-7h-1" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+  </svg>
+  <span aria-live="polite">{{ copiado() ? 'Enlace copiado' : etiqueta() }}</span>
+</button>
