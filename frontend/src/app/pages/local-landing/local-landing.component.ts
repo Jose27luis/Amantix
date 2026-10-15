@@ -6,11 +6,13 @@ import { Product } from '../../models/product.model';
 import { SITIO_URL, SeoService } from '../../core/seo.service';
 import { FaqListComponent } from '../../components/faq-list/faq-list.component';
 import { SiteGalleryComponent } from '../../components/site-gallery/site-gallery.component';
+import { RubroIllustrationComponent } from '../../components/rubro-illustration/rubro-illustration.component';
+import { DemoSectionComponent } from '../../components/demo-section/demo-section.component';
 
 @Component({
   selector: 'app-local-landing',
   standalone: true,
-  imports: [RouterLink, FaqListComponent, SiteGalleryComponent],
+  imports: [RouterLink, FaqListComponent, SiteGalleryComponent, RubroIllustrationComponent, DemoSectionComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './local-landing.component.html',
   styleUrl: './local-landing.component.css',
