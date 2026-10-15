@@ -33,14 +33,10 @@
         </a>
       </div>
     </div>
-    <div class="hero-media" [class.hero-media-photo]="fotoPortada() !== null">
+    <div class="hero-media">
       <span class="halo" aria-hidden="true"></span>
       @if (fotoPortada(); as foto) {
         <img class="hero-photo" [src]="foto.url" [alt]="foto.titulo" [attr.width]="foto.ancho" [attr.height]="foto.alto" fetchpriority="high" />
-        <figure class="hero-screen">
-          <img [src]="pagina.imagen" [alt]="'Pantalla de ' + producto.name" width="900" height="491" />
-          <figcaption>{{ producto.name }}</figcaption>
-        </figure>
       } @else {
         <img [src]="pagina.imagen" [alt]="producto.name" width="900" height="491" fetchpriority="high" />
       }
@@ -127,7 +123,7 @@
       <p>{{ producto.shortDescription }}</p>
     </div>
     <div class="product-actions">
-      <a [routerLink]="['/productos', producto.slug]" class="btn btn-ghost-light">Ver el sistema por dentro</a>
+      <a [routerLink]="['/productos', producto.slug]" class="btn btn-ghost-light">Conocer el sistema</a>
       <a routerLink="/planes" class="btn btn-primary">Ver planes desde S/ 80</a>
     </div>
   </div>
