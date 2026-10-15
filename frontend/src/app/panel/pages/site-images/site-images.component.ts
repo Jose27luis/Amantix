@@ -2,8 +2,9 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@a
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { finalize } from 'rxjs';
-import { CambioImagen, ListadoImagenes, SiteImagesApiService, UbicacionImagen } from '../../services/site-images-api.service';
-import { ImagenSitio } from '../../../core/site-content.service';
+import { CambioImagen, ListadoImagenes, OpcionSeccion, SiteImagesApiService, UbicacionImagen } from '../../services/site-images-api.service';
+import { ImagenSitio, SeccionImagen } from '../../../core/site-content.service';
+import { PAGINAS_LOCALES, PaginaLocal } from '../../../data/local-pages';
 import { mensajeError } from '../../models/labels';
 import { prepararImagen, tipoAceptado } from '../../core/image-prep';
 
@@ -29,6 +30,7 @@ export class SiteImagesComponent {
   protected readonly listado = signal<ListadoImagenes | null>(null);
 
   protected ubicacion = 'inicio';
+  protected seccion: SeccionImagen = 'portada';
   protected titulo = '';
   protected readonly archivo = signal<File | null>(null);
   protected readonly vista = signal<string | null>(null);
@@ -89,7 +91,7 @@ export class SiteImagesComponent {
     this.error.set(null);
 
     this.api
-      .subir(this.ubicacion, this.titulo.trim(), archivo)
+      .subir(this.ubicacion, this.esSolucion(this.ubicacion) ? this.seccion : 'galeria', this.titulo.trim(), archivo)
       .pipe(finalize(() => this.subiendo.set(false)))
       .subscribe({
         next: () => {
@@ -107,6 +109,32 @@ export class SiteImagesComponent {
     const limpio = titulo.trim();
     if (limpio.length >= 3 && limpio !== imagen.titulo) {
       this.cambiar(imagen, { titulo: limpio });
+    }
+  }
+
+  protected esSolucion(ubicacion: string): boolean {
+    return PAGINAS_LOCALES.some((pagina: PaginaLocal) => pagina.slug === ubicacion);
+  }
+
+  protected opcionesSeccion(ubicacion: string): readonly OpcionSeccion[] {
+    const pagina = PAGINAS_LOCALES.find((item: PaginaLocal) => item.slug === ubicacion);
+    const opciones = this.listado()?.secciones ?? [];
+    if (!pagina) {
+      return opciones.filter((opcion: OpcionSeccion) => opcion.valor === 'galeria');
+    }
+    return opciones
+      .filter((opcion: OpcionSeccion) => opcion.valor !== 'galeria')
+      .map((opcion: OpcionSeccion): OpcionSeccion => {
+        const numero = Number(opcion.valor.replace('beneficio-', ''));
+        const beneficio = opcion.valor.startsWith('beneficio-') ? pagina.beneficios[numero - 1] : undefined;
+        return beneficio ? { valor: opcion.valor, etiqueta: `Beneficio: ${beneficio.titulo}` } : opcion;
+      });
+  }
+
+  protected cambiarSeccion(imagen: ImagenSitio, valor: string): void {
+    const opcion = this.listado()?.secciones.find((item: OpcionSeccion) => item.valor === valor);
+    if (opcion && opcion.valor !== imagen.seccion) {
+      this.cambiar(imagen, { seccion: opcion.valor });
     }
   }
 
