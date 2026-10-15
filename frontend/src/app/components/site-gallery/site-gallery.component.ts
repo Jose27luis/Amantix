@@ -36,7 +36,7 @@ export class SiteGalleryComponent implements OnInit {
 
   ngOnInit(): void {
     this.contenido.imagenes(this.ubicacion()).subscribe({
-      next: (imagenes: readonly ImagenSitio[]) => this.imagenes.set(imagenes),
+      next: (imagenes: readonly ImagenSitio[]) => this.imagenes.set(imagenes.filter((imagen: ImagenSitio) => imagen.seccion === 'galeria')),
       error: () => this.imagenes.set([]),
     });
   }
