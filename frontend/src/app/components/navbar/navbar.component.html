@@ -8,6 +8,27 @@
     <div class="nav-links">
       <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link">Inicio</a>
       <a routerLink="/productos" routerLinkActive="active" class="nav-link">Productos</a>
+      <div class="drop" [class.drop-open]="solucionesAbierto()">
+        <button
+          type="button"
+          class="nav-link drop-btn"
+          [attr.aria-expanded]="solucionesAbierto()"
+          aria-controls="menu-soluciones"
+          (click)="alternarSoluciones()"
+        >
+          Soluciones
+          <svg width="12" height="12" viewBox="0 0 20 20" aria-hidden="true"><path d="m5 8 5 5 5-5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+        </button>
+        <div class="drop-panel" id="menu-soluciones">
+          <span class="drop-label">En Madre de Dios</span>
+          @for (solucion of soluciones; track solucion.slug) {
+            <a [routerLink]="['/soluciones', solucion.slug]" routerLinkActive="drop-active" class="drop-item" (click)="closeMenu()">
+              <span class="drop-name">{{ solucion.servicio }}</span>
+              <span class="drop-place">{{ solucion.lugar }}</span>
+            </a>
+          }
+        </div>
+      </div>
       <a routerLink="/planes" routerLinkActive="active" class="nav-link">Planes</a>
       <a routerLink="/noticias" routerLinkActive="active" class="nav-link">Noticias</a>
       <a routerLink="/nosotros" routerLinkActive="active" class="nav-link">Nosotros</a>
@@ -32,6 +53,10 @@
     <div class="mobile-menu">
       <a routerLink="/" class="mobile-link" (click)="closeMenu()">Inicio</a>
       <a routerLink="/productos" class="mobile-link" (click)="closeMenu()">Productos</a>
+      <span class="mobile-label">Soluciones en Madre de Dios</span>
+      @for (solucion of soluciones; track solucion.slug) {
+        <a [routerLink]="['/soluciones', solucion.slug]" class="mobile-sub" (click)="closeMenu()">{{ solucion.servicio }}</a>
+      }
       <a routerLink="/planes" class="mobile-link" (click)="closeMenu()">Planes</a>
       <a routerLink="/noticias" class="mobile-link" (click)="closeMenu()">Noticias</a>
       <a routerLink="/nosotros" class="mobile-link" (click)="closeMenu()">Nosotros</a>
