@@ -174,7 +174,7 @@
 
 .benefits {
   padding: clamp(48px, 6vw, 88px) 0;
-  background: var(--mist);
+  background: var(--cloud);
 }
 
 .benefit-grid {
@@ -186,7 +186,7 @@
 .benefit {
   padding: 26px 24px;
   border-radius: 18px;
-  background: var(--cloud);
+  background: var(--mist);
   border: 1px solid var(--line);
   box-shadow: 0 16px 34px -28px rgba(15, 29, 46, 0.55);
 }
