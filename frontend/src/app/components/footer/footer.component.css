@@ -45,6 +45,42 @@
   color: var(--brass);
 }
 
+.footer-social {
+  list-style: none;
+  margin: 20px 0 0;
+  padding: 0;
+  display: flex;
+  gap: 10px;
+}
+
+.social {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--cloud);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.social-facebook:hover {
+  background: #1877f2;
+  transform: translateY(-2px);
+}
+
+.social-tiktok:hover {
+  background: #111;
+  transform: translateY(-2px);
+}
+
+.social:focus-visible {
+  outline: 2px solid var(--brass-light);
+  outline-offset: 3px;
+}
+
 .footer-title {
   display: block;
   font-family: var(--font-mono);
