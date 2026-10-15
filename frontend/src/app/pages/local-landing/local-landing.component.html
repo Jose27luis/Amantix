@@ -48,6 +48,7 @@
       }
     </div>
     <aside class="rubros reveal reveal-right">
+      <app-rubro-illustration class="rubros-art" [tipo]="pagina.ilustracion" />
       <h2 class="rubros-title">Ideal para</h2>
       <ul>
         @for (rubro of pagina.rubros; track rubro) {
@@ -72,6 +73,8 @@
     </div>
   </div>
 </section>
+
+<app-demo-section [sistema]="producto.systemRef" [nombre]="producto.name" />
 
 <section class="steps">
   <div class="wrap">
