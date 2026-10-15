@@ -1,5 +1,8 @@
 import { ChangeDetectionStrategy, Component, computed, input, signal } from '@angular/core';
-import { FACEBOOK_URL, SITIO_URL } from '../../../core/seo.service';
+import { SITIO_URL } from '../../../core/seo.service';
+import { REDES_SOCIALES } from '../../../core/social';
+
+const PAGINA_FACEBOOK = REDES_SOCIALES.find((perfil) => perfil.red === 'facebook')?.url;
 
 type Red = 'facebook' | 'linkedin';
 
@@ -41,7 +44,9 @@ export class SocialPublishComponent {
   protected readonly aviso = signal<string | null>(null);
 
   protected readonly url = computed(() => `${SITIO_URL}/noticias/${this.slug()}`);
-  protected readonly enlaceFacebook = FACEBOOK_URL;
+  protected readonly enlaceFacebook = computed(
+    () => PAGINA_FACEBOOK ?? `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(this.url())}`,
+  );
   protected readonly enlaceLinkedin = computed(() => `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(this.url())}`);
   protected readonly recortaLinkedin = computed(() => this.texto('linkedin').length < this.texto('facebook').length);
 
