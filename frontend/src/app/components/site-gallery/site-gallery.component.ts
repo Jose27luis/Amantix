@@ -16,11 +16,19 @@ import { ImagenSitio, SiteContentService } from '../../core/site-content.service
 export class SiteGalleryComponent implements OnInit {
   readonly ubicacion = input.required<string>();
   readonly titulo = input('Así trabajamos');
+  readonly bajada = input('');
 
   private readonly contenido = inject(SiteContentService);
 
   protected readonly imagenes = signal<readonly ImagenSitio[]>([]);
   protected readonly abierta = signal<number | null>(null);
+  protected readonly distribucion = computed((): 'pocas' | 'fila' | 'mosaico' => {
+    const total = this.imagenes().length;
+    if (total < 3) {
+      return 'pocas';
+    }
+    return total < 5 ? 'fila' : 'mosaico';
+  });
   protected readonly actual = computed((): ImagenSitio | null => {
     const indice = this.abierta();
     return indice === null ? null : (this.imagenes()[indice] ?? null);
