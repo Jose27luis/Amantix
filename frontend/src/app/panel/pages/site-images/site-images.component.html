@@ -1,0 +1,100 @@
+<section class="page">
+  <header class="page-head">
+    <div>
+      <span class="eyebrow">Sitio · Imágenes</span>
+      <h1 class="page-title">Imágenes del sitio</h1>
+      <p class="page-lead">Sube fotos de tu equipo, tus clientes o tu local y elige en qué página aparecen. Se muestran en una galería con vista ampliada.</p>
+    </div>
+  </header>
+
+  <div class="layout">
+    <form class="card upload" (ngSubmit)="subir()">
+      <h2 class="card-title">Subir imagen</h2>
+
+      <label class="drop" [class.drop-on]="arrastrando()" (dragover)="sobre($event)" (dragleave)="arrastrando.set(false)" (drop)="soltar($event)">
+        <input type="file" accept="image/jpeg,image/png,image/webp" (change)="elegir($event)" />
+        @if (vista(); as url) {
+          <img [src]="url" alt="Vista previa" class="drop-img" />
+          <span class="drop-change">Cambiar imagen</span>
+        } @else {
+          <span class="drop-empty">
+            <svg width="30" height="30" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 14l4-4 3 3 3-3 4 4M3 4h14v12H3V4Zm9 3.5h.01" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+            {{ preparando() ? 'Preparando imagen…' : 'Arrastra la foto o haz clic para elegirla' }}
+          </span>
+        }
+      </label>
+
+      <div class="field">
+        <label for="ubicacion">¿En qué página aparece?</label>
+        <select id="ubicacion" name="ubicacion" [(ngModel)]="ubicacion">
+          @for (opcion of listado()?.ubicaciones ?? []; track opcion.valor) {
+            <option [value]="opcion.valor">{{ opcion.etiqueta }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="titulo">Descripción</label>
+        <input id="titulo" name="titulo" type="text" maxlength="160" [(ngModel)]="titulo" />
+        <span class="field-help">Se muestra al pasar el cursor y ayuda a Google a entender la foto.</span>
+      </div>
+
+      @if (error(); as mensaje) {
+        <p class="alert alert-error" role="alert">{{ mensaje }}</p>
+      }
+      @if (aviso(); as mensaje) {
+        <p class="alert alert-ok" role="status">{{ mensaje }}</p>
+      }
+
+      <button type="submit" class="btn btn-primary" [disabled]="subiendo() || preparando() || !archivo()">
+        {{ subiendo() ? 'Subiendo…' : 'Publicar imagen' }}
+      </button>
+    </form>
+
+    <div class="col-list">
+      @if (cargando() && !listado()) {
+        <p class="muted">Cargando imágenes…</p>
+      } @else if (grupos().length === 0) {
+        <div class="card empty">
+          <h2 class="card-title">Todavía no hay imágenes</h2>
+          <p class="card-sub">Sube la primera: por ejemplo, una foto de tu equipo para la página Nosotros o de un cliente usando Sumaqta.</p>
+        </div>
+      } @else {
+        @for (grupo of grupos(); track grupo.ubicacion.valor) {
+          <section class="card group">
+            <h2 class="card-title">{{ grupo.ubicacion.etiqueta }}</h2>
+            <p class="card-sub">{{ grupo.imagenes.length }} {{ grupo.imagenes.length === 1 ? 'imagen' : 'imágenes' }}</p>
+            <div class="thumbs">
+              @for (imagen of grupo.imagenes; track imagen.id; let i = $index; let primero = $first; let ultimo = $last) {
+                <article class="thumb" [class.thumb-hidden]="!imagen.visible">
+                  <img [src]="imagen.url" [alt]="imagen.titulo" loading="lazy" />
+                  <input
+                    #campo
+                    type="text"
+                    class="thumb-title"
+                    [value]="imagen.titulo"
+                    maxlength="160"
+                    (blur)="guardarTitulo(imagen, campo.value)"
+                    [attr.aria-label]="'Descripción de ' + imagen.titulo"
+                  />
+                  <div class="thumb-actions">
+                    <button type="button" class="icon-btn" [disabled]="primero || ocupado() === imagen.id" (click)="mover(grupo, i, -1)" aria-label="Mover antes">←</button>
+                    <button type="button" class="icon-btn" [disabled]="ultimo || ocupado() === imagen.id" (click)="mover(grupo, i, 1)" aria-label="Mover después">→</button>
+                    <button type="button" class="text-btn" [disabled]="ocupado() === imagen.id" (click)="alternarVisible(imagen)">
+                      {{ imagen.visible ? 'Ocultar' : 'Mostrar' }}
+                    </button>
+                    @if (confirmar() === imagen.id) {
+                      <button type="button" class="text-btn danger" [disabled]="ocupado() === imagen.id" (click)="borrar(imagen)">Confirmar</button>
+                    } @else {
+                      <button type="button" class="text-btn danger" (click)="confirmar.set(imagen.id)">Borrar</button>
+                    }
+                  </div>
+                </article>
+              }
+            </div>
+          </section>
+        }
+      }
+    </div>
+  </div>
+</section>
