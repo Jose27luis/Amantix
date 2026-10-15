@@ -1,4 +1,5 @@
 import { PreguntaFrecuente } from '../models/product.model';
+import { TipoIlustracion } from '../components/rubro-illustration/rubro-illustration.component';
 
 export interface Beneficio {
   readonly titulo: string;
@@ -20,6 +21,7 @@ export interface PaginaLocal {
   readonly pasos: readonly Beneficio[];
   readonly faqs: readonly PreguntaFrecuente[];
   readonly imagen: string;
+  readonly ilustracion: TipoIlustracion;
 }
 
 const PASOS_COMUNES: readonly Beneficio[] = [
@@ -71,6 +73,7 @@ export const PAGINAS_LOCALES: readonly PaginaLocal[] = [
       },
     ],
     imagen: '/productos/prod-facturador.png',
+    ilustracion: 'facturacion',
   },
   {
     slug: 'sistema-restaurantes-madre-de-dios',
@@ -113,6 +116,7 @@ export const PAGINAS_LOCALES: readonly PaginaLocal[] = [
       },
     ],
     imagen: '/productos/prod-restaurante.png',
+    ilustracion: 'restaurante',
   },
   {
     slug: 'sistema-agentes-bancarios-puerto-maldonado',
@@ -155,6 +159,7 @@ export const PAGINAS_LOCALES: readonly PaginaLocal[] = [
       },
     ],
     imagen: '/productos/prod-agente.png',
+    ilustracion: 'agente',
   },
   {
     slug: 'sistema-farmacias-boticas-madre-de-dios',
@@ -197,5 +202,6 @@ export const PAGINAS_LOCALES: readonly PaginaLocal[] = [
       },
     ],
     imagen: '/productos/prod-facturador.png',
+    ilustracion: 'farmacia',
   },
 ];
