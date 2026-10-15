@@ -1,0 +1,11 @@
+<div class="faq">
+  @for (item of preguntas(); track item.pregunta; let primero = $first) {
+    <details class="faq-item" [open]="primero">
+      <summary class="faq-q">
+        <span>{{ item.pregunta }}</span>
+        <span class="faq-icon" aria-hidden="true"></span>
+      </summary>
+      <p class="faq-a">{{ item.respuesta }}</p>
+    </details>
+  }
+</div>
