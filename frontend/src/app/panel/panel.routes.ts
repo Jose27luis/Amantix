@@ -90,6 +90,12 @@ export const PANEL_ROUTES: Routes = [
         loadComponent: () => import('./pages/news-editor/news-editor.component').then((m) => m.NewsEditorComponent),
       },
       {
+        path: 'site-images',
+        canActivate: [passwordGuard, adminGuard],
+        title: 'Imágenes del sitio · Panel Amantix',
+        loadComponent: () => import('./pages/site-images/site-images.component').then((m) => m.SiteImagesComponent),
+      },
+      {
         path: 'users',
         canActivate: [passwordGuard, adminGuard],
         title: 'Usuarios · Panel Amantix',
