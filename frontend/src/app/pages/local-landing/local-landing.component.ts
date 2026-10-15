@@ -5,11 +5,12 @@ import { PRODUCTS } from '../../data/products';
 import { Product } from '../../models/product.model';
 import { SITIO_URL, SeoService } from '../../core/seo.service';
 import { FaqListComponent } from '../../components/faq-list/faq-list.component';
+import { SiteGalleryComponent } from '../../components/site-gallery/site-gallery.component';
 
 @Component({
   selector: 'app-local-landing',
   standalone: true,
-  imports: [RouterLink, FaqListComponent],
+  imports: [RouterLink, FaqListComponent, SiteGalleryComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './local-landing.component.html',
   styleUrl: './local-landing.component.css',
