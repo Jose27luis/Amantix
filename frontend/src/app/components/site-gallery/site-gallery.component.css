@@ -14,10 +14,6 @@
   padding: 0 clamp(16px, 4vw, 56px);
 }
 
-:host(.tinted) .gallery {
-  background: var(--mist);
-}
-
 .gallery-head {
   max-width: 760px;
   margin-bottom: 28px;
