@@ -6,11 +6,12 @@ import { filter, map } from 'rxjs/operators';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { FooterComponent } from './components/footer/footer.component';
 import { WhatsappButtonComponent } from './components/whatsapp-button/whatsapp-button.component';
+import { SocialFollowComponent } from './components/social-follow/social-follow.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, NavbarComponent, FooterComponent, WhatsappButtonComponent],
+  imports: [RouterOutlet, NavbarComponent, FooterComponent, WhatsappButtonComponent, SocialFollowComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
