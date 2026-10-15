@@ -1,6 +1,6 @@
 <section class="local" aria-labelledby="local-titulo">
   <div class="local-inner">
-    <div class="local-head">
+    <div class="local-head reveal">
       <p class="local-place">
         <svg width="16" height="16" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 18s6-5.2 6-10a6 6 0 1 0-12 0c0 4.8 6 10 6 10Zm0-7.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" /></svg>
         Puerto Maldonado · Madre de Dios
@@ -11,7 +11,7 @@
 
     <div class="local-grid">
       @for (solucion of soluciones; track solucion.slug) {
-        <a [routerLink]="['/soluciones', solucion.slug]" class="local-card">
+        <a [routerLink]="['/soluciones', solucion.slug]" class="local-card reveal reveal-scale" [style.transition-delay.ms]="$index * 100">
           <span class="local-card-place">{{ solucion.lugar }}</span>
           <span class="local-card-title">{{ solucion.servicio }}</span>
           <span class="local-card-text">{{ solucion.bajada }}</span>
