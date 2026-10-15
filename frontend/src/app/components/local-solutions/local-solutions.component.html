@@ -12,6 +12,7 @@
     <div class="local-grid">
       @for (solucion of soluciones; track solucion.slug) {
         <a [routerLink]="['/soluciones', solucion.slug]" class="local-card reveal reveal-scale" [style.transition-delay.ms]="$index * 100">
+          <app-rubro-illustration class="local-card-art" [tipo]="solucion.ilustracion" />
           <span class="local-card-place">{{ solucion.lugar }}</span>
           <span class="local-card-title">{{ solucion.servicio }}</span>
           <span class="local-card-text">{{ solucion.bajada }}</span>
