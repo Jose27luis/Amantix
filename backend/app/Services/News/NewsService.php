@@ -36,12 +36,12 @@ class NewsService
                 'titulo' => trim($datos['titulo']),
                 'resumen' => $this->resumen($datos['resumen'] ?? null, $datos['contenido']),
                 'contenido' => $this->normalizar($datos['contenido']),
-                ...$archivo,
+                ...$this->columnasImagen($archivo),
                 'estado' => $estado,
                 'publicada_en' => $estado === NewsStatus::Publicada ? now() : null,
             ]);
         } catch (Throwable $error) {
-            $this->imagenes->borrar($archivo['imagen']);
+            $this->imagenes->borrar($archivo['archivo']);
             throw $error;
         }
 
@@ -82,14 +82,14 @@ class NewsService
                 }
 
                 if ($nuevaImagen !== null) {
-                    $noticia->fill($nuevaImagen);
+                    $noticia->fill($this->columnasImagen($nuevaImagen));
                 }
 
                 $noticia->save();
             });
         } catch (Throwable $error) {
             if ($nuevaImagen !== null) {
-                $this->imagenes->borrar($nuevaImagen['imagen']);
+                $this->imagenes->borrar($nuevaImagen['archivo']);
             }
             throw $error;
         }
@@ -109,6 +109,15 @@ class NewsService
         $this->auditoria->registrar($autor, 'noticia_borrada', $noticia, ['titulo' => $noticia->titulo]);
         $noticia->delete();
         $this->imagenes->borrar($imagen);
+    }
+
+    private function columnasImagen(array $archivo): array
+    {
+        return [
+            'imagen' => $archivo['archivo'],
+            'imagen_ancho' => $archivo['ancho'],
+            'imagen_alto' => $archivo['alto'],
+        ];
     }
 
     private function slugUnico(string $titulo, ?int $ignorar = null): string
