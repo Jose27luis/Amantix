@@ -1,16 +1,19 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { PRODUCTS } from '../../data/products';
+import { REDES_SOCIALES } from '../../core/social';
+import { SocialIconComponent } from '../social-icon/social-icon.component';
 
 @Component({
   selector: 'app-footer',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, SocialIconComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './footer.component.html',
   styleUrl: './footer.component.css',
 })
 export class FooterComponent {
   protected readonly products = PRODUCTS;
+  protected readonly redes = REDES_SOCIALES;
   protected readonly year = new Date().getFullYear();
 }
