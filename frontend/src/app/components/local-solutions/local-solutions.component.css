@@ -98,6 +98,17 @@
   outline-offset: 3px;
 }
 
+.local-card-art {
+  width: 100%;
+  max-width: 220px;
+  margin: -6px auto 4px;
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.local-card:hover .local-card-art {
+  transform: scale(1.06) rotate(-2deg);
+}
+
 .local-card-place {
   font-size: 0.8rem;
   font-weight: 700;
