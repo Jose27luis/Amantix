@@ -2,9 +2,12 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
 
+export type SeccionImagen = 'galeria' | 'portada' | 'control' | 'beneficio-1' | 'beneficio-2' | 'beneficio-3' | 'beneficio-4';
+
 export interface ImagenSitio {
   readonly id: number;
   readonly ubicacion: string;
+  readonly seccion: SeccionImagen;
   readonly titulo: string;
   readonly url: string;
   readonly ancho: number;
