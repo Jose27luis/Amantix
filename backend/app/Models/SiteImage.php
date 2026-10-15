@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\SiteImageLocation;
+use App\Enums\SiteImageSection;
 use Illuminate\Database\Eloquent\Model;
 
 class SiteImage extends Model
@@ -13,6 +14,7 @@ class SiteImage extends Model
 
     protected $fillable = [
         'ubicacion',
+        'seccion',
         'titulo',
         'archivo',
         'ancho',
@@ -25,6 +27,7 @@ class SiteImage extends Model
     {
         return [
             'ubicacion' => SiteImageLocation::class,
+            'seccion' => SiteImageSection::class,
             'ancho' => 'integer',
             'alto' => 'integer',
             'orden' => 'integer',
