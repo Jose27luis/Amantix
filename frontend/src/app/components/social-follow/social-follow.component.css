@@ -1,0 +1,222 @@
+:host {
+  display: block;
+}
+
+.band {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(44px, 6vw, 72px) 0;
+  background:
+    radial-gradient(600px 320px at 100% 0%, rgba(24, 119, 242, 0.35), transparent 70%),
+    radial-gradient(520px 300px at 0% 100%, rgba(216, 183, 124, 0.3), transparent 70%),
+    linear-gradient(120deg, #0f1d2e 0%, #17304b 60%, #12355e 100%);
+  color: var(--cloud);
+}
+
+.band::after {
+  content: '';
+  position: absolute;
+  right: -60px;
+  bottom: -90px;
+  width: 360px;
+  height: 360px;
+  background: url('/amantix-logo.png') center / contain no-repeat;
+  opacity: 0.08;
+  transform: rotate(-12deg);
+  pointer-events: none;
+}
+
+.band-inner {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 clamp(16px, 4vw, 56px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+
+.band-copy {
+  max-width: 620px;
+}
+
+.band-title {
+  margin: 0;
+  font-size: clamp(1.7rem, 3vw, 2.4rem);
+  line-height: 1.1;
+  color: var(--cloud);
+}
+
+.band-lead {
+  margin: 12px 0 0;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: var(--line-2);
+}
+
+.band-links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.follow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 300px;
+  padding: 14px 14px 14px 16px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: var(--cloud);
+  backdrop-filter: blur(6px);
+  transition: transform 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
+}
+
+.follow:hover {
+  transform: translateY(-3px);
+  background: rgba(255, 255, 255, 0.14);
+  box-shadow: 0 18px 36px -18px rgba(24, 119, 242, 0.8);
+}
+
+.follow:focus-visible {
+  outline: 2px solid var(--brass-light);
+  outline-offset: 3px;
+}
+
+.follow-icon {
+  flex: none;
+  width: 50px;
+  height: 50px;
+  border-radius: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--cloud);
+}
+
+.follow-facebook .follow-icon {
+  background: #1877f2;
+  box-shadow: 0 8px 20px -8px rgba(24, 119, 242, 0.9);
+}
+
+.follow-tiktok .follow-icon {
+  background: #111;
+  box-shadow: 3px 3px 0 #25f4ee, -3px -3px 0 #fe2c55;
+}
+
+.follow-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.follow-text strong {
+  font-size: 1rem;
+}
+
+.follow-text span {
+  font-size: 0.85rem;
+  color: var(--line-2);
+}
+
+.follow-cta {
+  padding: 9px 16px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--brass-light), var(--brass));
+  color: var(--ink);
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.card {
+  height: 100%;
+  min-height: 220px;
+  justify-content: center;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 22px;
+  border-radius: 16px;
+  color: var(--cloud);
+  background:
+    radial-gradient(260px 160px at 100% 0%, rgba(24, 119, 242, 0.45), transparent 70%),
+    linear-gradient(140deg, #0f1d2e, #17304b);
+}
+
+.card-kicker {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--brass-light);
+}
+
+.card-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.card-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 46px;
+  border-radius: 12px;
+  font-weight: 700;
+  color: var(--cloud);
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.card-btn.follow-facebook {
+  background: #1877f2;
+}
+
+.card-btn.follow-tiktok {
+  background: #111;
+}
+
+.card-btn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.08);
+}
+
+.card-btn:focus-visible {
+  outline: 2px solid var(--brass-light);
+  outline-offset: 3px;
+}
+
+@media (max-width: 640px) {
+  .follow {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .band-links,
+  .band-links li {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .follow,
+  .card-btn {
+    transition: none;
+  }
+
+  .follow:hover,
+  .card-btn:hover {
+    transform: none;
+  }
+}
