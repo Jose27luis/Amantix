@@ -1,0 +1,24 @@
+<article class="card">
+  <div class="card-media">
+    <img [src]="noticia().imagen.url" alt="" class="media-blur" loading="lazy" />
+    <img
+      [src]="noticia().imagen.url"
+      [alt]="noticia().titulo"
+      class="media-img"
+      [attr.width]="noticia().imagen.ancho"
+      [attr.height]="noticia().imagen.alto"
+      [attr.loading]="prioridad() ? 'eager' : 'lazy'"
+    />
+  </div>
+  <div class="card-body">
+    <time class="card-date" [attr.datetime]="noticia().publicada_en">{{ fecha() }}</time>
+    <h3 class="card-title">
+      <a [routerLink]="['/noticias', noticia().slug]" class="card-link">{{ noticia().titulo }}</a>
+    </h3>
+    <p class="card-summary">{{ noticia().resumen }}</p>
+    <div class="card-foot">
+      <span class="card-more" aria-hidden="true">Leer noticia</span>
+      <app-share-button [url]="url()" [titulo]="noticia().titulo" [texto]="noticia().resumen" />
+    </div>
+  </div>
+</article>
