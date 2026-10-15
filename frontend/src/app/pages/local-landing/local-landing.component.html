@@ -63,33 +63,30 @@
   </div>
 </section>
 
-<section class="benefits" [class.benefits-photo]="fotosBeneficios().length > 0">
+<section class="benefits">
   <div class="wrap">
     <h2 class="section-title reveal">Lo que resuelve en tu negocio</h2>
-    @if (fotosBeneficios().length > 0) {
+    @if (beneficiosConImagen().length > 0) {
       <div class="feature-rows">
-        @for (beneficio of pagina.beneficios; track beneficio.titulo; let i = $index) {
+        @for (item of beneficiosConImagen(); track item.beneficio.titulo; let i = $index) {
           <article class="feature-row" [class.feature-row-flip]="i % 2 === 1">
-            @if (fotosBeneficios()[i]; as foto) {
-              <div class="feature-photo">
-                <img [src]="foto.url" [alt]="foto.titulo" [attr.width]="foto.ancho" [attr.height]="foto.alto" loading="lazy" />
-              </div>
-            }
+            <app-screen-frame class="feature-shot" [imagenes]="item.imagenes" [nombre]="producto.name" />
             <div class="feature-copy">
-              <span class="feature-number">0{{ i + 1 }}</span>
-              <h3>{{ beneficio.titulo }}</h3>
-              <p>{{ beneficio.descripcion }}</p>
+              <span class="feature-number">0{{ item.numero }}</span>
+              <h3>{{ item.beneficio.titulo }}</h3>
+              <p>{{ item.beneficio.descripcion }}</p>
             </div>
           </article>
         }
       </div>
-    } @else {
-      <div class="benefit-grid">
-        @for (beneficio of pagina.beneficios; track beneficio.titulo) {
-          <article class="benefit reveal reveal-scale" [style.transition-delay.ms]="$index * 90">
+    }
+    @if (beneficiosSinImagen().length > 0) {
+      <div class="benefit-grid" [class.benefit-grid-after]="beneficiosConImagen().length > 0">
+        @for (item of beneficiosSinImagen(); track item.beneficio.titulo) {
+          <article class="benefit">
             <span class="benefit-mark" aria-hidden="true"></span>
-            <h3>{{ beneficio.titulo }}</h3>
-            <p>{{ beneficio.descripcion }}</p>
+            <h3>{{ item.beneficio.titulo }}</h3>
+            <p>{{ item.beneficio.descripcion }}</p>
           </article>
         }
       </div>
@@ -97,7 +94,24 @@
   </div>
 </section>
 
-<app-demo-section [sistema]="producto.systemRef" [nombre]="producto.name" />
+@if (capturasControl().length > 0) {
+  <section class="control" aria-labelledby="control-titulo">
+    <div class="wrap">
+      <header class="control-head">
+        <p class="control-kicker">Lo que vas a controlar</p>
+        <h2 id="control-titulo" class="control-title">Todo tu negocio en {{ producto.name }}</h2>
+        <p class="control-lead">Pantallas reales del sistema. Toca una para verla en grande.</p>
+      </header>
+      <app-screen-frame class="control-shot" [imagenes]="capturasControl()" [nombre]="producto.name" />
+      <div class="control-actions">
+        <a routerLink="/contacto" class="btn btn-primary">Agendar demo gratuita</a>
+        <a [href]="whatsapp" target="_blank" rel="noopener" class="btn btn-ghost-light">Preguntar por WhatsApp</a>
+      </div>
+    </div>
+  </section>
+} @else {
+  <app-demo-section [sistema]="producto.systemRef" [nombre]="producto.name" />
+}
 
 <section class="steps">
   <div class="wrap">
