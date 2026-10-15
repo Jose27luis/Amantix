@@ -1,0 +1,31 @@
+@if (principal(); as imagen) {
+  <div class="stack" [class.stack-double]="secundaria() !== null">
+    <figure class="frame">
+      <div class="bar">
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        <span class="bar-label">Pantalla real de {{ nombre() }}</span>
+      </div>
+      <button type="button" class="shot" (click)="ampliada.set(imagen)" [attr.aria-label]="'Ampliar: ' + imagen.titulo">
+        <img [src]="imagen.url" [alt]="imagen.titulo" [attr.width]="imagen.ancho" [attr.height]="imagen.alto" loading="lazy" />
+      </button>
+    </figure>
+
+    @if (secundaria(); as extra) {
+      <figure class="frame frame-extra">
+        <button type="button" class="shot" (click)="ampliada.set(extra)" [attr.aria-label]="'Ampliar: ' + extra.titulo">
+          <img [src]="extra.url" [alt]="extra.titulo" [attr.width]="extra.ancho" [attr.height]="extra.alto" loading="lazy" />
+        </button>
+      </figure>
+    }
+  </div>
+
+  @if (ampliada(); as vista) {
+    <div class="viewer" role="dialog" aria-modal="true" [attr.aria-label]="vista.titulo" (click)="ampliada.set(null)">
+      <figure class="viewer-figure" (click)="$event.stopPropagation()">
+        <img [src]="vista.url" [alt]="vista.titulo" />
+        <figcaption>{{ vista.titulo }}</figcaption>
+      </figure>
+      <button type="button" class="viewer-close" (click)="ampliada.set(null)" aria-label="Cerrar">✕</button>
+    </div>
+  }
+}
