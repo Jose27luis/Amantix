@@ -126,6 +126,12 @@ Amantix/
 - **Responsive** (móvil/escritorio).
 - **Multi-idioma** (opcional, a futuro): español por defecto.
 - **Integración**: enlaces directos a cada sistema en producción.
+- **Fotos del sitio**: el administrador sube fotos al inicio, a nosotros, a cada producto y a cada solución local. Si una página no tiene fotos, la galería no aparece.
+- **Ilustraciones de marca** por rubro (facturación, restaurante, agente y farmacia) en las soluciones locales, con movimiento suave que se apaga si el visitante pidió reducir animaciones.
+- **Demo interactiva** en cada producto y solución: ventas por día en el Facturador, salón con mesas y pedidos en Sumaqta, saldo por billetera en el Agente. Los números son de ejemplo y lo dice en pantalla.
+- **Recorrido guiado** sobre la captura real de cada sistema, con puntos numerados que explican cada parte.
+- **Comparador de planes**: con el rubro, la cantidad de sistemas y de locales recomienda un plan y muestra cuánto se ahorra pagando el año.
+- **Cifras reales** en el inicio, tomadas del panel. Una cifra solo aparece cuando ya es lo bastante grande para mostrarla; mientras tanto se queda oculta.
 
 ---
 
@@ -154,6 +160,7 @@ Hecho:
 - Panel: login, dashboard de leads, leads con seguimiento, usuarios administradores y perfil.
 - Clientes, suscripciones, usuarios cliente, conversión de leads y soporte por tickets con adjuntos. El dashboard suma clientes, ingresos y soporte.
 - Noticias con publicación en redes (sección 12.7) y SEO del sitio (sección 13).
+- Fotos administrables, ilustraciones por rubro, demos interactivas, recorrido guiado, comparador de planes y cifras reales (sección 6).
 
 Pendiente, en este orden:
 
