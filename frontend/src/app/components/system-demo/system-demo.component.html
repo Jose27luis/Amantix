@@ -1,0 +1,183 @@
+<div class="window">
+  <div class="window-bar">
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <span class="window-title">{{ titulo() }}</span>
+    <span class="sample">Datos de ejemplo</span>
+  </div>
+
+  <div class="window-body">
+    @switch (sistema()) {
+      @case ('pro8') {
+        <div class="kpis">
+          <div class="kpi">
+            <span class="kpi-label">Ventas de la semana</span>
+            <span class="kpi-value">{{ soles(totalSemana()) }}</span>
+          </div>
+          <div class="kpi">
+            <span class="kpi-label">Comprobantes del mes</span>
+            <span class="kpi-value">{{ totalComprobantes }}</span>
+          </div>
+          <div class="kpi kpi-ok">
+            <span class="kpi-label">Estado ante SUNAT</span>
+            <span class="kpi-value">Al día</span>
+          </div>
+        </div>
+
+        <div class="panel-grid">
+          <div class="box">
+            <div class="box-head">
+              <h3>Ventas por día</h3>
+              <div class="tabs" role="tablist" aria-label="Semana">
+                @for (item of semanas; track item.nombre; let i = $index) {
+                  <button type="button" role="tab" class="tab" [class.tab-on]="semana() === i" [attr.aria-selected]="semana() === i" (click)="semana.set(i); diaActivo.set(null)">
+                    {{ item.nombre }}
+                  </button>
+                }
+              </div>
+            </div>
+            <div class="columns" (mouseleave)="diaActivo.set(null)">
+              @for (columna of columnasVentas(); track columna.etiqueta; let i = $index) {
+                <button
+                  type="button"
+                  class="column"
+                  [class.column-on]="diaActivo() === i"
+                  (mouseenter)="diaActivo.set(i)"
+                  (focus)="diaActivo.set(i)"
+                  (blur)="diaActivo.set(null)"
+                  [attr.aria-label]="columna.etiqueta + ': ' + soles(columna.valor)"
+                >
+                  @if (diaActivo() === i) {
+                    <span class="tip">{{ soles(columna.valor) }}</span>
+                  }
+                  <span class="column-bar" [style.height.%]="columna.alto"></span>
+                  <span class="column-label">{{ columna.etiqueta }}</span>
+                </button>
+              }
+            </div>
+          </div>
+
+          <div class="box">
+            <div class="box-head"><h3>Comprobantes del mes</h3></div>
+            <ul class="bars">
+              @for (barra of comprobantes; track barra.etiqueta) {
+                <li>
+                  <div class="bar-head"><span>{{ barra.etiqueta }}</span><strong>{{ barra.valor }}</strong></div>
+                  <div class="bar-track"><span class="bar-fill" [style.width.%]="barra.alto"></span></div>
+                </li>
+              }
+            </ul>
+          </div>
+        </div>
+      }
+
+      @case ('mozo4') {
+        <div class="kpis">
+          <div class="kpi">
+            <span class="kpi-label">Mesas atendidas</span>
+            <span class="kpi-value">{{ ocupadas }} de {{ mesas.length }}</span>
+          </div>
+          <div class="kpi">
+            <span class="kpi-label">Mesa {{ mesa().numero }}</span>
+            <span class="kpi-value">{{ mesa().estado === 'libre' ? 'Libre' : soles(totalMesa()) }}</span>
+          </div>
+        </div>
+
+        <div class="panel-grid">
+          <div class="box">
+            <div class="box-head">
+              <h3>Salón · toca una mesa</h3>
+              <ul class="legend">
+                @for (estado of estadosMesa; track estado) {
+                  <li><span [class]="'legend-dot mesa-' + estado"></span>{{ etiquetasMesa[estado] }}</li>
+                }
+              </ul>
+            </div>
+            <div class="tables">
+              @for (item of mesas; track item.numero) {
+                <button
+                  type="button"
+                  [class]="'table-btn mesa-' + item.estado"
+                  [class.table-on]="mesaElegida() === item.numero"
+                  (click)="mesaElegida.set(item.numero)"
+                  [attr.aria-pressed]="mesaElegida() === item.numero"
+                  [attr.aria-label]="'Mesa ' + item.numero + ', ' + etiquetasMesa[item.estado]"
+                >
+                  <strong>{{ item.numero }}</strong>
+                  <span>{{ item.personas > 0 ? item.personas + ' pers.' : 'Libre' }}</span>
+                </button>
+              }
+            </div>
+          </div>
+
+          <div class="box">
+            <div class="box-head"><h3>Pedido de la mesa {{ mesa().numero }}</h3></div>
+            @if (mesa().pedido.length > 0) {
+              <ul class="order">
+                @for (linea of mesa().pedido; track linea.plato) {
+                  <li><span>{{ linea.cantidad }} × {{ linea.plato }}</span><strong>{{ soles(linea.precio * linea.cantidad) }}</strong></li>
+                }
+              </ul>
+              <div class="order-total"><span>Total</span><strong>{{ soles(totalMesa()) }}</strong></div>
+            } @else {
+              <p class="empty">Mesa libre. Cuando el mozo tome el pedido desde su celular, aparece aquí al instante.</p>
+            }
+            <div class="box-head sub"><h3>Platos más vendidos hoy</h3></div>
+            <ul class="bars">
+              @for (barra of platos; track barra.etiqueta) {
+                <li>
+                  <div class="bar-head"><span>{{ barra.etiqueta }}</span><strong>{{ barra.valor }}</strong></div>
+                  <div class="bar-track"><span class="bar-fill" [style.width.%]="barra.alto"></span></div>
+                </li>
+              }
+            </ul>
+          </div>
+        </div>
+      }
+
+      @case ('agente') {
+        <div class="kpis">
+          <div class="kpi">
+            <span class="kpi-label">Movimiento del día</span>
+            <span class="kpi-value">{{ soles(totalCaja()) }}</span>
+          </div>
+          <div class="kpi kpi-ok">
+            <span class="kpi-label">Comisiones ganadas</span>
+            <span class="kpi-value">{{ soles(comisiones()) }}</span>
+          </div>
+        </div>
+
+        <div class="box">
+          <div class="box-head">
+            <h3>Saldo por billetera</h3>
+            <div class="tabs" role="tablist" aria-label="Día">
+              @for (item of dias; track item.dia; let i = $index) {
+                <button type="button" role="tab" class="tab" [class.tab-on]="diaCaja() === i" [attr.aria-selected]="diaCaja() === i" (click)="diaCaja.set(i); billeteraActiva.set(null)">
+                  {{ item.dia }}
+                </button>
+              }
+            </div>
+          </div>
+          <div class="columns columns-wide" (mouseleave)="billeteraActiva.set(null)">
+            @for (columna of billeteras(); track columna.etiqueta; let i = $index) {
+              <button
+                type="button"
+                class="column"
+                [class.column-on]="billeteraActiva() === i"
+                (mouseenter)="billeteraActiva.set(i)"
+                (focus)="billeteraActiva.set(i)"
+                (blur)="billeteraActiva.set(null)"
+                [attr.aria-label]="columna.etiqueta + ': ' + soles(columna.valor)"
+              >
+                @if (billeteraActiva() === i) {
+                  <span class="tip">{{ soles(columna.valor) }}</span>
+                }
+                <span class="column-bar" [style.height.%]="columna.alto"></span>
+                <span class="column-label">{{ columna.etiqueta }}</span>
+              </button>
+            }
+          </div>
+        </div>
+      }
+    }
+  </div>
+</div>
