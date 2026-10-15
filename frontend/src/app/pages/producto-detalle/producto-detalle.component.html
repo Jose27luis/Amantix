@@ -39,6 +39,12 @@
   </div>
 </section>
 
+<app-demo-section [sistema]="product.systemRef" [nombre]="product.name" />
+
+@if (recorrido; as datos) {
+  <app-screenshot-tour [recorrido]="datos" [nombre]="product.name" />
+}
+
 @if (product.screenshots.length) {
   <section class="showcase">
     <div class="container">
