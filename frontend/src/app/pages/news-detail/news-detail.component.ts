@@ -9,6 +9,10 @@ import { fechaNoticia } from '../../news/news-text';
 import { SITIO_URL, SeoService } from '../../core/seo.service';
 import { NewsContentComponent } from '../../components/news-content/news-content.component';
 import { NewsShareComponent } from '../../components/news-share/news-share.component';
+import { NewsCardComponent } from '../../components/news-card/news-card.component';
+import { ShareButtonComponent } from '../../components/share-button/share-button.component';
+import { SocialFollowComponent } from '../../components/social-follow/social-follow.component';
+import { SocialIconComponent } from '../../components/social-icon/social-icon.component';
 
 type Estado =
   | { readonly tipo: 'cargando' }
@@ -19,7 +23,15 @@ type Estado =
 @Component({
   selector: 'app-news-detail',
   standalone: true,
-  imports: [RouterLink, NewsContentComponent, NewsShareComponent],
+  imports: [
+    RouterLink,
+    NewsContentComponent,
+    NewsShareComponent,
+    NewsCardComponent,
+    ShareButtonComponent,
+    SocialFollowComponent,
+    SocialIconComponent,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './news-detail.component.html',
   styleUrl: './news-detail.component.css',
@@ -30,6 +42,23 @@ export class NewsDetailComponent {
 
   protected readonly fechaNoticia = fechaNoticia;
   protected readonly sitio = SITIO_URL;
+
+  protected enlaceWhatsapp(noticia: Noticia): string {
+    return `https://wa.me/?text=${encodeURIComponent(`${noticia.titulo}\n${SITIO_URL}/noticias/${noticia.slug}`)}`;
+  }
+
+  protected enlaceFacebook(noticia: Noticia): string {
+    return `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(`${SITIO_URL}/noticias/${noticia.slug}`)}`;
+  }
+
+  protected enlaceLinkedin(noticia: Noticia): string {
+    return `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(`${SITIO_URL}/noticias/${noticia.slug}`)}`;
+  }
+
+  protected minutosLectura(noticia: Noticia): number {
+    const palabras = (noticia.contenido ?? '').trim().split(/\s+/u).filter((palabra: string) => palabra !== '').length;
+    return Math.max(1, Math.round(palabras / 200));
+  }
 
   protected readonly estado = toSignal(
     inject(ActivatedRoute).paramMap.pipe(
