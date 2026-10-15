@@ -4,6 +4,7 @@ import { PRODUCTS } from '../../data/products';
 import { SeoService } from '../../core/seo.service';
 import { LocalSolutionsComponent } from '../../components/local-solutions/local-solutions.component';
 import { SiteGalleryComponent } from '../../components/site-gallery/site-gallery.component';
+import { LiveStatsComponent } from '../../components/live-stats/live-stats.component';
 
 interface Pillar {
   readonly code: string;
@@ -20,7 +21,7 @@ interface SecurityControl {
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [RouterLink, LocalSolutionsComponent, SiteGalleryComponent],
+  imports: [RouterLink, LocalSolutionsComponent, SiteGalleryComponent, LiveStatsComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
