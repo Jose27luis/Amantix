@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api;
 
 use App\Enums\SiteImageLocation;
+use App\Enums\SiteImageSection;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreSiteImageRequest;
 use App\Http\Requests\UpdateSiteImageRequest;
@@ -28,6 +29,10 @@ class SiteImageController extends Controller
             'ubicaciones' => array_map(
                 static fn (SiteImageLocation $ubicacion): array => ['valor' => $ubicacion->value, 'etiqueta' => $ubicacion->etiqueta()],
                 SiteImageLocation::cases(),
+            ),
+            'secciones' => array_map(
+                static fn (SiteImageSection $seccion): array => ['valor' => $seccion->value, 'etiqueta' => $seccion->etiqueta()],
+                SiteImageSection::cases(),
             ),
         ]);
     }
