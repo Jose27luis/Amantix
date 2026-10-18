@@ -13,6 +13,7 @@ export interface Noticia {
   readonly resumen: string;
   readonly contenido?: string;
   readonly imagen: ImagenNoticia;
+  readonly imagen_compartir: ImagenNoticia;
   readonly estado: EstadoNoticia;
   readonly publicada_en: string | null;
   readonly actualizada_en: string | null;
