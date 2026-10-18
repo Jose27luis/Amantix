@@ -1071,6 +1071,7 @@ Reglas:
 - El servidor revisa los primeros bytes del archivo y acepta solo JPG, PNG o WEBP de hasta 8 MB y mínimo 200 × 200 px.
 - Si no se escribe resumen, se arma con el inicio del texto, sin viñetas ni enlaces.
 - Cada noticia tiene vista previa para Facebook, WhatsApp y LinkedIn (Open Graph) y datos `NewsArticle` para Google.
+- Para la vista previa se arma una versión horizontal de 1200 × 630 con la imagen completa al centro sobre un fondo difuminado de la misma imagen. Así Facebook la muestra grande aunque el afiche sea vertical, que de otro modo sale como miniatura.
 - Al final de cada noticia hay botones para compartir y tres noticias recientes.
 
 Publicar en redes:
