@@ -31,6 +31,7 @@ Route::get('site-images/files/{archivo}', [PublicSiteController::class, 'archivo
 Route::get('stats', [PublicSiteController::class, 'cifras']);
 Route::get('news', [PublicNewsController::class, 'index']);
 Route::get('news/images/{archivo}', [PublicNewsController::class, 'imagen']);
+Route::get('news/share-images/{archivo}', [PublicNewsController::class, 'imagenCompartir']);
 Route::get('news/{slug}', [PublicNewsController::class, 'show']);
 Route::post('leads', [PublicLeadController::class, 'store'])->middleware('throttle:leads');
 
