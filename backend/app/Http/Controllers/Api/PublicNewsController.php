@@ -66,4 +66,15 @@ class PublicNewsController extends Controller
             'X-Content-Type-Options' => 'nosniff',
         ]);
     }
+
+    public function imagenCompartir(string $archivo, NewsImageStore $imagenes): BinaryFileResponse
+    {
+        abort_unless($imagenes->existe($archivo), 404);
+
+        return response()->file($imagenes->rutaAbsolutaCompartir($archivo), [
+            'Content-Type' => 'image/jpeg',
+            'Cache-Control' => 'public, max-age=31536000, immutable',
+            'X-Content-Type-Options' => 'nosniff',
+        ]);
+    }
 }
