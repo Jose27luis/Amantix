@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Resources;
 
 use App\Models\News;
+use App\Services\Images\SharePreviewRenderer;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -37,6 +38,11 @@ class NewsResource extends JsonResource
                 'url' => '/api/news/images/'.$noticia->imagen,
                 'ancho' => $noticia->imagen_ancho,
                 'alto' => $noticia->imagen_alto,
+            ],
+            'imagen_compartir' => [
+                'url' => '/api/news/share-images/'.$noticia->imagen.'?v='.SharePreviewRenderer::VERSION,
+                'ancho' => SharePreviewRenderer::ANCHO,
+                'alto' => SharePreviewRenderer::ALTO,
             ],
             'estado' => $noticia->estado->value,
             'publicada_en' => $noticia->publicada_en?->toIso8601String(),
