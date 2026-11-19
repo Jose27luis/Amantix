@@ -95,6 +95,23 @@
             <div class="full"><dt>Instrucciones</dt><dd>{{ metodo.instrucciones }}</dd></div>
           }
         </dl>
+        <div class="qr-bloque">
+          @if (metodo.qr_url) {
+            <img class="qr" [src]="metodo.qr_url" [alt]="'Código QR de ' + metodo.nombre" />
+          } @else {
+            <span class="qr-vacio">Sin QR</span>
+          }
+          <div class="qr-acciones">
+            <label class="btn btn-ghost btn-sm">
+              <input type="file" accept="image/png,image/jpeg,image/webp" class="sr-only" (change)="subirQr(metodo, $event)" />
+              {{ subiendoQr() === metodo.id ? 'Subiendo…' : metodo.qr_url ? 'Cambiar QR' : 'Subir QR' }}
+            </label>
+            @if (metodo.qr_url) {
+              <button type="button" class="text-btn danger" (click)="quitarQr(metodo)">Quitar QR</button>
+            }
+            <span class="field-help">PNG o JPG de hasta 2 MB. El cliente lo escanea desde Mis pagos.</span>
+          </div>
+        </div>
         <div class="metodo-acciones">
           <button type="button" class="btn btn-ghost btn-sm" (click)="editar(metodo)">Editar</button>
           <button type="button" class="btn btn-ghost btn-sm" (click)="alternarActivo(metodo)">{{ metodo.activo ? 'Ocultar' : 'Mostrar' }}</button>
