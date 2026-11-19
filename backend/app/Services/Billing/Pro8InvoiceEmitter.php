@@ -6,8 +6,10 @@ namespace App\Services\Billing;
 
 use App\Models\BillingInvoice;
 use App\Models\Company;
-use App\Models\Receivable;
+use App\Models\PaymentApplication;
+use App\Models\PaymentReport;
 use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 
@@ -16,18 +18,18 @@ class Pro8InvoiceEmitter
     private const AFECTACION_EXONERADA = '20';
     private const TIPO_OPERACION_VENTA = '0101';
 
-    public function emitir(Receivable $cuenta): BillingInvoice
+    public function emitir(PaymentReport $pago): BillingInvoice
     {
-        $cuenta->loadMissing(['empresa', 'suscripcion']);
-        $empresa = $cuenta->empresa;
+        $pago->loadMissing(['empresa', 'aplicaciones.cuenta.suscripcion']);
+        $empresa = $pago->empresa;
         $tipo = $this->tipo($empresa);
 
         $comprobante = BillingInvoice::query()->firstOrCreate(
-            ['cuenta_id' => $cuenta->id],
+            ['pago_id' => $pago->id],
             [
                 'empresa_id' => $empresa->id,
                 'tipo' => $tipo,
-                'total' => $cuenta->monto,
+                'total' => $pago->monto,
                 'estado' => BillingInvoice::ESTADO_PENDIENTE,
             ],
         );
@@ -41,13 +43,24 @@ class Pro8InvoiceEmitter
             return $this->fallo($comprobante, 'Falta configurar el token de pro8.');
         }
 
+        if ($pago->aplicaciones->isEmpty()) {
+            return $this->fallo($comprobante, 'El pago no tiene cuentas aplicadas.');
+        }
+
+        $candado = Cache::lock('amantix:emitir-pago:'.$pago->id, 90);
+        if (! $candado->get()) {
+            return $comprobante;
+        }
+
         try {
             $respuesta = Http::withToken($token)
                 ->acceptJson()
                 ->timeout(60)
-                ->post(rtrim((string) config('services.pro8.url'), '/').'/api/documents', $this->cuerpo($cuenta, $empresa, $tipo));
+                ->post(rtrim((string) config('services.pro8.url'), '/').'/api/documents', $this->cuerpo($pago, $empresa, $tipo));
         } catch (ConnectionException $error) {
             return $this->fallo($comprobante, 'pro8 no respondió: '.$error->getMessage());
+        } finally {
+            $candado->release();
         }
 
         $datos = $respuesta->json();
@@ -59,6 +72,7 @@ class Pro8InvoiceEmitter
 
         $comprobante->fill([
             'tipo' => $tipo,
+            'total' => $pago->monto,
             'numero' => (string) ($datos['data']['number'] ?? ''),
             'external_id' => (string) ($datos['data']['external_id'] ?? ''),
             'estado_sunat' => (string) ($datos['data']['state_type_description'] ?? ''),
@@ -87,14 +101,15 @@ class Pro8InvoiceEmitter
         return strlen($empresa->ruc) === 11 ? BillingInvoice::TIPO_FACTURA : BillingInvoice::TIPO_BOLETA;
     }
 
-    private function cuerpo(Receivable $cuenta, Company $empresa, string $tipo): array
+    private function cuerpo(PaymentReport $pago, Company $empresa, string $tipo): array
     {
-        $monto = round((float) $cuenta->monto, 2);
         $esFactura = $tipo === BillingInvoice::TIPO_FACTURA;
         $hoy = now();
+        $items = $pago->aplicaciones->map(fn (PaymentApplication $aplicacion): array => $this->item($aplicacion))->values()->all();
+        $total = round(array_sum(array_column($items, 'total_item')), 2);
 
         return [
-            'idempotency_key' => 'amantix-cobranza-'.$cuenta->id.'-'.$cuenta->created_at?->timestamp,
+            'idempotency_key' => 'amantix-pago-'.$pago->id.'-'.$pago->created_at?->timestamp,
             'serie_documento' => $esFactura ? config('services.pro8.serie_factura') : config('services.pro8.serie_boleta'),
             'numero_documento' => '#',
             'fecha_de_emision' => $hoy->toDateString(),
@@ -116,29 +131,38 @@ class Pro8InvoiceEmitter
                 'total_exportacion' => 0,
                 'total_operaciones_gravadas' => 0,
                 'total_operaciones_inafectas' => 0,
-                'total_operaciones_exoneradas' => $monto,
+                'total_operaciones_exoneradas' => $total,
                 'total_operaciones_gratuitas' => 0,
                 'total_igv' => 0,
                 'total_impuestos' => 0,
-                'total_valor' => $monto,
-                'total_venta' => $monto,
+                'total_valor' => $total,
+                'total_venta' => $total,
             ],
-            'items' => [[
-                'codigo_interno' => $cuenta->suscripcion_id !== null ? 'AMX-SUS-'.$cuenta->suscripcion?->producto_id : 'AMX-VARIOS',
-                'descripcion' => $cuenta->concepto,
-                'unidad_de_medida' => 'ZZ',
-                'cantidad' => 1,
-                'valor_unitario' => $monto,
-                'codigo_tipo_precio' => '01',
-                'precio_unitario' => $monto,
-                'codigo_tipo_afectacion_igv' => self::AFECTACION_EXONERADA,
-                'total_base_igv' => $monto,
-                'porcentaje_igv' => 18,
-                'total_igv' => 0,
-                'total_impuestos' => 0,
-                'total_valor_item' => $monto,
-                'total_item' => $monto,
-            ]],
+            'items' => $items,
+        ];
+    }
+
+    private function item(PaymentApplication $aplicacion): array
+    {
+        $cuenta = $aplicacion->cuenta;
+        $monto = round((float) $aplicacion->monto, 2);
+        $parcial = $monto + 0.001 < (float) $cuenta->monto;
+
+        return [
+            'codigo_interno' => $cuenta->suscripcion_id !== null ? 'AMX-SUS-'.$cuenta->suscripcion?->producto_id : 'AMX-VARIOS',
+            'descripcion' => $parcial ? 'PAGO A CUENTA DE '.$cuenta->concepto : $cuenta->concepto,
+            'unidad_de_medida' => 'ZZ',
+            'cantidad' => 1,
+            'valor_unitario' => $monto,
+            'codigo_tipo_precio' => '01',
+            'precio_unitario' => $monto,
+            'codigo_tipo_afectacion_igv' => self::AFECTACION_EXONERADA,
+            'total_base_igv' => $monto,
+            'porcentaje_igv' => 18,
+            'total_igv' => 0,
+            'total_impuestos' => 0,
+            'total_valor_item' => $monto,
+            'total_item' => $monto,
         ];
     }
 }
