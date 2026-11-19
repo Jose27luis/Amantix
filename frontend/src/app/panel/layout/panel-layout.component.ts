@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, PLATFORM_ID, computed, inject, sign
 import { isPlatformBrowser } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { Meta } from '@angular/platform-browser';
+import { PaymentBellComponent } from '../components/payment-bell/payment-bell.component';
 import { SessionService } from '../core/session.service';
 import { BillingApiService } from '../services/billing-api.service';
 import { LeadsApiService } from '../services/leads-api.service';
@@ -12,7 +13,7 @@ const CLAVE_COLAPSO = 'amantix.panel.sidebar';
 @Component({
   selector: 'app-panel-layout',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, PaymentBellComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './panel-layout.component.html',
   styleUrl: './panel-layout.component.css',
