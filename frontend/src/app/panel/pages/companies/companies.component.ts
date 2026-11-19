@@ -7,7 +7,7 @@ import { finalize } from 'rxjs';
 import { CompaniesApiService } from '../../services/companies-api.service';
 import { CatalogApiService } from '../../services/catalog-api.service';
 import { DatosEmpresa, Empresa, Paginado, ProductoResumen } from '../../models/panel.models';
-import { fechaCorta, mensajeError } from '../../models/labels';
+import { enlaceWhatsapp, etiquetaEstadoSuscripcion, fechaCorta, formatoSoles, mensajeError } from '../../models/labels';
 
 @Component({
   selector: 'app-companies',
@@ -26,10 +26,14 @@ export class CompaniesComponent {
     initialValue: [] as readonly ProductoResumen[],
   });
   protected readonly fechaCorta = fechaCorta;
+  protected readonly formatoSoles = formatoSoles;
+  protected readonly enlaceWhatsapp = enlaceWhatsapp;
+  protected readonly etiquetaEstado = etiquetaEstadoSuscripcion;
 
   protected buscar = '';
   protected productoId = '';
   protected renuevaEn = '';
+  protected situacion = '';
   private pagina = 1;
 
   protected readonly cargando = signal(true);
@@ -54,6 +58,10 @@ export class CompaniesComponent {
     const renueva = inject(ActivatedRoute).snapshot.queryParamMap.get('renueva_en');
     if (renueva && /^\d+$/.test(renueva)) {
       this.renuevaEn = renueva;
+    }
+    const situacion = inject(ActivatedRoute).snapshot.queryParamMap.get('situacion');
+    if (situacion === 'con_deuda' || situacion === 'vencidos' || situacion === 'sin_suscripcion') {
+      this.situacion = situacion;
     }
     this.cargar();
   }
@@ -117,7 +125,7 @@ export class CompaniesComponent {
     this.error.set(null);
 
     this.api
-      .listar({ buscar: this.buscar, producto_id: this.productoId, renueva_en: this.renuevaEn, page: this.pagina })
+      .listar({ buscar: this.buscar, producto_id: this.productoId, renueva_en: this.renuevaEn, situacion: this.situacion, page: this.pagina })
       .subscribe({
         next: (resultado: Paginado<Empresa>) => {
           this.resultado.set(resultado);
