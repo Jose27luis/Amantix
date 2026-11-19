@@ -9,6 +9,12 @@
   margin-top: 16px;
 }
 
+.head-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 .inset {
   display: flex;
   flex-direction: column;
