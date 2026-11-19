@@ -1,0 +1,97 @@
+.back {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--teal);
+  align-self: flex-start;
+}
+
+.spaced {
+  margin-top: 14px;
+}
+
+.mono {
+  font-family: var(--font-mono);
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.check input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--teal);
+}
+
+.metodos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.metodo {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.metodo.inactivo {
+  opacity: 0.65;
+}
+
+.metodo-cabeza {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.metodo-datos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 16px;
+  margin: 0;
+}
+
+.metodo-datos .full {
+  grid-column: 1 / -1;
+}
+
+.metodo-datos dt {
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--slate);
+}
+
+.metodo-datos dd {
+  margin: 2px 0 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  word-break: break-all;
+}
+
+.metodo-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.text-btn {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.text-btn.danger {
+  color: var(--danger);
+}
