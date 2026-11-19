@@ -144,9 +144,19 @@
               <input id="sus-alta" type="date" formControlName="fecha_alta" />
             </div>
             <div class="field">
+              <label for="sus-dia">Día de cobro</label>
+              <select id="sus-dia" formControlName="dia_cobro">
+                <option value="">Mismo día del alta</option>
+                @for (dia of dias; track dia) {
+                  <option [value]="dia">Día {{ dia }}</option>
+                }
+              </select>
+              <span class="field-help">Si el mes no tiene ese día, se cobra el último día del mes.</span>
+            </div>
+            <div class="field">
               <label for="sus-cobro">Primer cobro</label>
               <input id="sus-cobro" type="date" formControlName="proxima_renovacion" />
-              <span class="field-help">Si lo dejas vacío, se calcula con el periodo. La cuenta se genera 3 días antes.</span>
+              <span class="field-help">Si lo dejas vacío, se calcula con el periodo y el día de cobro.</span>
             </div>
             <div class="field full">
               <label for="sus-concepto">Concepto de la factura</label>
@@ -172,7 +182,9 @@
               <th>Plan</th>
               <th>Precio</th>
               <th>Alta</th>
+              <th>Día de cobro</th>
               <th>Próximo cobro</th>
+              <th>Avisos</th>
               <th>Estado</th>
             </tr>
           </thead>
@@ -188,6 +200,22 @@
                 </td>
                 <td class="mono">{{ formatoSoles(suscripcion.precio) }}<span class="sub">{{ suscripcion.periodo === 'anual' ? 'al año' : 'al mes' }}</span></td>
                 <td class="mono">{{ fechaCorta(suscripcion.fecha_alta) }}</td>
+                <td>
+                  <select
+                    class="compact"
+                    [ngModel]="suscripcion.dia_cobro ?? ''"
+                    (ngModelChange)="cambiarDia(suscripcion, $event)"
+                    [disabled]="ocupadoSuscripcion() === suscripcion.id"
+                    [attr.aria-label]="'Día de cobro de ' + (suscripcion.producto?.nombre ?? 'la suscripción')"
+                  >
+                    @for (dia of dias; track dia) {
+                      <option [value]="dia">Día {{ dia }}</option>
+                    }
+                  </select>
+                  @if (suscripcion.cuenta_externa) {
+                    <span class="sub">{{ suscripcion.cuenta_externa }}</span>
+                  }
+                </td>
                 <td class="mono">
                   @if (renovando() === suscripcion.id) {
                     <div class="inline-edit">
@@ -201,6 +229,17 @@
                       <button type="button" class="text-btn" (click)="empezarRenovacion(suscripcion)">Cambiar fecha</button>
                     }
                   }
+                </td>
+                <td>
+                  <label class="switch">
+                    <input
+                      type="checkbox"
+                      [ngModel]="suscripcion.avisar"
+                      (ngModelChange)="cambiarAvisos(suscripcion, $event)"
+                      [disabled]="ocupadoSuscripcion() === suscripcion.id"
+                    />
+                    {{ suscripcion.avisar ? 'Sí' : 'No' }}
+                  </label>
                 </td>
                 <td>
                   <select
@@ -217,7 +256,7 @@
                 </td>
               </tr>
             } @empty {
-              <tr><td colspan="6" class="empty">Esta empresa todavía no tiene suscripciones.</td></tr>
+              <tr><td colspan="8" class="empty">Esta empresa todavía no tiene suscripciones.</td></tr>
             }
           </tbody>
         </table>
