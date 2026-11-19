@@ -323,6 +323,7 @@
 .chip-propuesta,
 .chip-en_atencion,
 .chip-en_revision,
+.chip-parcial,
 .chip-esperando {
   --chip-fondo: var(--steel-50);
   --chip-texto: var(--steel);
