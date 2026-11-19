@@ -19,6 +19,7 @@ class PaymentAccount extends Model
         'numero',
         'cci',
         'instrucciones',
+        'qr_ruta',
         'activo',
         'orden',
     ];
