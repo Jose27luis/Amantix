@@ -56,6 +56,7 @@ export class CompanyDetailComponent implements OnInit {
   protected readonly productos = toSignal(this.catalogo.productos$, { initialValue: [] as readonly ProductoResumen[] });
   protected readonly planes = toSignal(this.catalogo.planes$, { initialValue: [] as readonly Plan[] });
   protected readonly estadosSuscripcion = ESTADOS_SUSCRIPCION;
+  protected readonly dias = Array.from({ length: 31 }, (_: unknown, indice: number) => indice + 1);
   protected readonly etiquetaEstadoSuscripcion = etiquetaEstadoSuscripcion;
   protected readonly etiquetaEstadoTicket = etiquetaEstadoTicket;
   protected readonly etiquetaPrioridad = etiquetaPrioridad;
@@ -101,6 +102,7 @@ export class CompanyDetailComponent implements OnInit {
     periodo: ['mensual' as Periodo, [Validators.required]],
     fecha_alta: [fechaHoy(), [Validators.required]],
     proxima_renovacion: [''],
+    dia_cobro: [''],
     concepto: ['', [Validators.maxLength(200)]],
   });
 
@@ -190,6 +192,7 @@ export class CompanyDetailComponent implements OnInit {
         periodo: valores.periodo,
         fecha_alta: valores.fecha_alta,
         ...(valores.proxima_renovacion !== '' ? { proxima_renovacion: valores.proxima_renovacion } : {}),
+        ...(valores.dia_cobro !== '' ? { dia_cobro: Number(valores.dia_cobro) } : {}),
         ...(valores.concepto.trim() !== '' ? { concepto: valores.concepto.trim() } : {}),
       })
       .pipe(finalize(() => this.guardandoSuscripcion.set(false)))
@@ -205,6 +208,17 @@ export class CompanyDetailComponent implements OnInit {
 
   protected cambiarEstado(suscripcion: Suscripcion, estado: EstadoSuscripcion): void {
     this.actualizarSuscripcion(suscripcion, { estado });
+  }
+
+  protected cambiarDia(suscripcion: Suscripcion, valor: string | number): void {
+    const dia = Number(valor);
+    if (dia >= 1 && dia <= 31 && dia !== suscripcion.dia_cobro) {
+      this.actualizarSuscripcion(suscripcion, { dia_cobro: dia });
+    }
+  }
+
+  protected cambiarAvisos(suscripcion: Suscripcion, avisar: boolean): void {
+    this.actualizarSuscripcion(suscripcion, { avisar });
   }
 
   protected empezarRenovacion(suscripcion: Suscripcion): void {
