@@ -35,6 +35,16 @@ export function etiquetaEstadoPago(estado: EstadoPago): string {
   return ESTADOS_PAGO[estado];
 }
 
+export function textoDia(dia: number): string {
+  if (dia === 0) {
+    return 'El día del cobro';
+  }
+  const cantidad = Math.abs(dia);
+  const dias = cantidad === 1 ? 'día' : 'días';
+
+  return dia < 0 ? `${cantidad} ${dias} antes` : `${cantidad} ${dias} después`;
+}
+
 export const ESTADOS_TICKET: readonly { readonly valor: EstadoTicket; readonly etiqueta: string }[] = [
   { valor: 'abierto', etiqueta: 'Abierto' },
   { valor: 'en_atencion', etiqueta: 'En atención' },
