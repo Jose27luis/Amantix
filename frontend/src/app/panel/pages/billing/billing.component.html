@@ -3,7 +3,7 @@
     <div>
       <span class="eyebrow">Gestión · Cobranza</span>
       <h1 class="page-title">Cobranza</h1>
-      <p class="page-lead">Las cuentas se generan solas 3 días antes de cada vencimiento. Al aceptar un pago se emite la factura en pro8 con el RUC de Amantix.</p>
+      <p class="page-lead">Los clientes pagan un monto contra su deuda. Al aceptarlo se reparte desde la cuenta más antigua y se emite la factura en pro8.</p>
     </div>
     <div class="head-actions">
       <a routerLink="/panel/billing/settings" class="btn btn-ghost btn-sm">Configuración</a>
@@ -24,15 +24,15 @@
         <strong class="kpi-mini-value">{{ formatoSoles(datos.monto_vencido) }}</strong>
         <span class="kpi-mini-sub">{{ datos.vencidas }} {{ datos.vencidas === 1 ? 'cuenta vencida' : 'cuentas vencidas' }}</span>
       </div>
-      <div class="kpi-mini tone-brass">
+      <button type="button" class="kpi-mini tone-brass kpi-boton" (click)="cambiarPestana('pagos'); filtrarPagos('en_revision')">
         <span class="kpi-mini-label">Pagos por revisar</span>
         <strong class="kpi-mini-value">{{ datos.pagos_en_revision }}</strong>
         <span class="kpi-mini-sub">reportados por los clientes</span>
-      </div>
+      </button>
       <div class="kpi-mini tone-teal">
         <span class="kpi-mini-label">Cobrado este mes</span>
         <strong class="kpi-mini-value">{{ formatoSoles(datos.cobrado_mes) }}</strong>
-        <span class="kpi-mini-sub">cuentas pagadas</span>
+        <span class="kpi-mini-sub">pagos aceptados</span>
       </div>
     </div>
   }
@@ -80,37 +80,33 @@
         <p class="alert alert-error spaced" role="alert">{{ mensaje }}</p>
       }
       <div class="form-actions spaced">
-        <button type="button" class="btn btn-primary btn-sm" [disabled]="ocupado() === -1" (click)="crearCuenta()">{{ ocupado() === -1 ? 'Guardando…' : 'Crear cuenta' }}</button>
+        <button type="button" class="btn btn-primary btn-sm" [disabled]="ocupado() === 'nueva'" (click)="crearCuenta()">{{ ocupado() === 'nueva' ? 'Guardando…' : 'Crear cuenta' }}</button>
       </div>
     </div>
   }
 
   @if (avisos().length > 0) {
     <div class="card">
-      <div class="section-head">
-        <div>
-          <h2 class="card-title">Avisos de hoy</h2>
-          <p class="card-sub">{{ avisos().length }} {{ avisos().length === 1 ? 'cliente para avisar' : 'clientes para avisar' }} según la configuración de cobros.</p>
-        </div>
-      </div>
+      <h2 class="card-title">Avisos de hoy</h2>
+      <p class="card-sub">{{ avisos().length }} {{ avisos().length === 1 ? 'cliente para avisar' : 'clientes para avisar' }} según la configuración de cobros.</p>
       <ul class="avisos spaced">
-        @for (aviso of avisos(); track aviso.cuenta.id) {
+        @for (item of avisos(); track item.cuenta.id) {
           <li class="aviso">
             <div class="aviso-datos">
-              <strong>{{ aviso.cuenta.empresa?.razon_social }}</strong>
-              <span class="sub">{{ aviso.cuenta.concepto }}</span>
+              <strong>{{ item.cuenta.empresa?.razon_social }}</strong>
+              <span class="sub">{{ item.cuenta.concepto }}</span>
               <span class="sub">
-                {{ formatoSoles(aviso.cuenta.monto) }} · vence {{ fechaCorta(aviso.cuenta.vence) }} ·
-                <span [class.atrasado]="aviso.dias_para_vencer < 0">{{ textoDia(aviso.dia_relativo) }}</span>
+                Debe {{ formatoSoles(item.cuenta.saldo) }} · vence {{ fechaCorta(item.cuenta.vence) }} ·
+                <span [class.atrasado]="item.dias_para_vencer < 0">{{ textoDia(item.dia_relativo) }}</span>
               </span>
             </div>
             <div class="aviso-acciones">
-              @if (aviso.whatsapp) {
-                <button type="button" class="btn btn-primary btn-sm" (click)="enviarAviso(aviso)">Enviar por WhatsApp</button>
+              @if (item.whatsapp) {
+                <button type="button" class="btn btn-primary btn-sm" (click)="enviarAviso(item)">Enviar por WhatsApp</button>
               } @else {
                 <span class="muted">Sin teléfono</span>
               }
-              <button type="button" class="text-btn" (click)="marcarAviso(aviso)">Marcar como avisado</button>
+              <button type="button" class="text-btn" (click)="marcarAviso(item)">Marcar como avisado</button>
             </div>
           </li>
         }
@@ -118,242 +114,316 @@
     </div>
   }
 
-  @if (pagos().length > 0) {
-    <div class="card">
-      <h2 class="card-title">Pagos por revisar</h2>
-      <p class="card-sub">Revisa la captura y el número de operación antes de aceptar. Al aceptar se emite el comprobante.</p>
-      <div class="pagos spaced">
-        @for (pago of pagos(); track pago.id) {
-          <article class="pago">
-            <div class="pago-captura">
-              @if (pago.tiene_captura && pago.captura_es_imagen && capturas()[pago.id]) {
-                <button type="button" class="captura-btn" (click)="verCaptura(pago)" aria-label="Ver la captura en grande">
-                  <img [src]="capturas()[pago.id]" alt="Captura del pago" />
-                </button>
-              } @else if (pago.tiene_captura) {
-                <button type="button" class="btn btn-ghost btn-sm" (click)="verCaptura(pago)">Ver comprobante PDF</button>
-              } @else {
-                <span class="muted">Sin captura</span>
-              }
-            </div>
-            <div class="pago-datos">
-              <strong>{{ pago.cuenta?.empresa?.razon_social ?? '—' }}</strong>
-              <span class="sub mono">{{ pago.cuenta?.empresa?.ruc }}</span>
-              <span class="pago-concepto">{{ pago.cuenta?.concepto }}</span>
-              <dl class="pago-detalle">
-                <div><dt>Monto</dt><dd class="mono">{{ formatoSoles(pago.monto) }}</dd></div>
-                <div><dt>Debe</dt><dd class="mono">{{ formatoSoles(pago.cuenta?.monto ?? 0) }}</dd></div>
-                <div><dt>Pagó a</dt><dd>{{ pago.metodo_nombre ?? etiquetaMetodo(pago.metodo) }}</dd></div>
-                <div><dt>N.° operación</dt><dd class="mono">{{ pago.numero_operacion ?? '—' }}</dd></div>
-                <div><dt>Fecha de pago</dt><dd class="mono">{{ fechaCorta(pago.fecha_pago) }}</dd></div>
-                <div><dt>Reportó</dt><dd>{{ pago.reportado_por ?? '—' }}</dd></div>
-              </dl>
-              @if (rechazando() === pago.id) {
-                <div class="inline-form">
-                  <input type="text" name="motivoRechazo" maxlength="255" [(ngModel)]="motivoRechazo" aria-label="Motivo del rechazo" />
-                  <button type="button" class="btn btn-primary btn-sm" [disabled]="ocupado() === pago.id || motivoRechazo.trim().length < 3" (click)="rechazar(pago)">Rechazar</button>
-                  <button type="button" class="btn btn-ghost btn-sm" (click)="rechazando.set(null)">Cancelar</button>
-                </div>
-                <span class="field-help">Escribe el motivo. El cliente lo verá.</span>
-              } @else {
-                <div class="pago-acciones">
-                  <button type="button" class="btn btn-primary btn-sm" [disabled]="ocupado() === pago.id" (click)="aceptar(pago)">{{ ocupado() === pago.id ? 'Emitiendo…' : 'Aceptar y facturar' }}</button>
-                  <button type="button" class="btn btn-ghost btn-sm" [disabled]="ocupado() === pago.id" (click)="empezarRechazo(pago)">Rechazar</button>
-                </div>
-              }
-            </div>
-          </article>
-        }
-      </div>
-    </div>
-  }
-
-  <form class="card filters" (ngSubmit)="filtrar()">
-    <div class="field field-search">
-      <label for="buscar">Buscar</label>
-      <input id="buscar" type="search" name="buscar" [(ngModel)]="buscar" />
-      <span class="field-help">Cliente, RUC o concepto</span>
-    </div>
-    <div class="field">
-      <label for="estado">Mostrar</label>
-      <select id="estado" name="estado" [(ngModel)]="estado">
-        @for (item of filtros; track item.valor) {
-          <option [value]="item.valor">{{ item.etiqueta }}</option>
-        }
-      </select>
-    </div>
-    <div class="filter-actions">
-      <button type="submit" class="btn btn-primary btn-sm">Filtrar</button>
-    </div>
-  </form>
+  <div class="pestanas" role="tablist">
+    <button type="button" role="tab" class="pestana" [class.activa]="pestana() === 'cuentas'" [attr.aria-selected]="pestana() === 'cuentas'" (click)="cambiarPestana('cuentas')">Cuentas por cobrar</button>
+    <button type="button" role="tab" class="pestana" [class.activa]="pestana() === 'pagos'" [attr.aria-selected]="pestana() === 'pagos'" (click)="cambiarPestana('pagos')">
+      Pagos
+      @if ((resumen()?.pagos_en_revision ?? 0) > 0) {
+        <span class="contador">{{ resumen()?.pagos_en_revision }}</span>
+      }
+    </button>
+  </div>
 
   @if (empresaId !== '') {
-    <p class="muted">Mostrando las cuentas de un solo cliente. <a routerLink="/panel/billing" class="link">Ver todas</a></p>
+    <p class="muted">Mostrando un solo cliente. <a routerLink="/panel/billing" class="link">Ver todos</a></p>
   }
 
-  @if (accion(); as activa) {
-    <div class="card accion">
-      <div class="section-head">
-        <h2 class="card-title">{{ activa.tipo === 'cobrar' ? 'Registrar cobro' : activa.tipo === 'editar' ? 'Editar cuenta' : 'Anular cuenta' }}</h2>
-        <button type="button" class="btn btn-ghost btn-sm" (click)="accion.set(null)">Cancelar</button>
+  @if (pestana() === 'pagos') {
+    <div class="card filters">
+      <div class="segmento" role="group" aria-label="Estado del pago">
+        @for (item of estadosPago; track item.valor) {
+          <button type="button" [class.activo]="estadoPago() === item.valor" (click)="filtrarPagos(item.valor)">{{ item.etiqueta }}</button>
+        }
       </div>
-      <p class="card-sub">{{ activa.cuenta.empresa?.razon_social }} · {{ activa.cuenta.concepto }} · {{ formatoSoles(activa.cuenta.monto) }}</p>
-      @if (activa.tipo === 'cobrar') {
-        <div class="form-grid spaced">
-          <div class="field">
-            <label for="cobro-metodo">Pagó a</label>
-            <select id="cobro-metodo" name="cobroCon" [(ngModel)]="cobroCon">
-              @for (metodo of metodosPago(); track metodo.id) {
-                <option [value]="metodo.id">{{ metodo.nombre }}</option>
-              }
-              <option value="efectivo">Efectivo</option>
-            </select>
-          </div>
-          <div class="field">
-            <label for="cobro-operacion">N.° de operación</label>
-            <input id="cobro-operacion" type="text" name="numero_operacion" maxlength="60" [(ngModel)]="pago.numero_operacion" />
-          </div>
-          <div class="field">
-            <label for="cobro-fecha">Fecha de pago</label>
-            <input id="cobro-fecha" type="date" name="fecha_pago" [(ngModel)]="pago.fecha_pago" />
-          </div>
-          <div class="field">
-            <label for="cobro-monto">Monto (S/)</label>
-            <input id="cobro-monto" type="number" name="monto" min="0.01" step="0.01" [(ngModel)]="pago.monto" />
-          </div>
-          <div class="field full">
-            <label for="cobro-captura">Captura (opcional)</label>
-            <input id="cobro-captura" type="file" accept="image/jpeg,image/png,image/webp,application/pdf" (change)="elegirCaptura($event)" />
-          </div>
-        </div>
-        <p class="field-help spaced">Al guardar, la cuenta queda pagada y se emite el comprobante en pro8.</p>
-        <div class="form-actions spaced">
-          <button type="button" class="btn btn-primary btn-sm" [disabled]="ocupado() === activa.cuenta.id" (click)="confirmarCobro(activa.cuenta)">{{ ocupado() === activa.cuenta.id ? 'Emitiendo…' : 'Registrar y facturar' }}</button>
-        </div>
-      } @else if (activa.tipo === 'editar') {
-        <div class="form-grid spaced">
-          <div class="field full">
-            <label for="editar-concepto">Concepto</label>
-            <input id="editar-concepto" type="text" name="edicionConcepto" maxlength="255" [(ngModel)]="edicion.concepto" />
-          </div>
-          <div class="field">
-            <label for="editar-monto">Monto (S/)</label>
-            <input id="editar-monto" type="number" name="edicionMonto" min="0.01" step="0.01" [(ngModel)]="edicion.monto" />
-          </div>
-          <div class="field">
-            <label for="editar-vence">Vence</label>
-            <input id="editar-vence" type="date" name="edicionVence" [(ngModel)]="edicion.vence" />
-          </div>
-        </div>
-        <div class="form-actions spaced">
-          <button type="button" class="btn btn-primary btn-sm" [disabled]="ocupado() === activa.cuenta.id" (click)="confirmarEdicion(activa.cuenta)">Guardar cambios</button>
-        </div>
-      } @else {
-        <div class="field spaced">
-          <label for="anular-motivo">Motivo</label>
-          <input id="anular-motivo" type="text" name="motivoAnulacion" maxlength="255" [(ngModel)]="motivoAnulacion" />
-        </div>
-        <div class="form-actions spaced">
-          <button type="button" class="btn btn-primary btn-sm" [disabled]="ocupado() === activa.cuenta.id || motivoAnulacion.trim().length < 3" (click)="confirmarAnulacion(activa.cuenta)">Anular cuenta</button>
-        </div>
-      }
-      @if (errorAccion(); as mensaje) {
-        <p class="alert alert-error spaced" role="alert">{{ mensaje }}</p>
-      }
+      <form class="buscar-pago" (ngSubmit)="buscarPagos()">
+        <input type="search" name="buscarPago" [(ngModel)]="buscarPago" aria-label="Buscar pagos por cliente, RUC o número de operación" />
+        <button type="submit" class="btn btn-ghost btn-sm">Buscar</button>
+      </form>
     </div>
-  }
 
-  @if (cuentas(); as pagina) {
-    <div class="table-wrap" [class.loading]="cargando()">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Cliente</th>
-            <th>Concepto</th>
-            <th>Monto</th>
-            <th>Vence</th>
-            <th>Estado</th>
-            <th>Comprobante</th>
-            <th><span class="sr-only">Acciones</span></th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (cuenta of pagina.data; track cuenta.id) {
-            <tr>
-              <td>
-                @if (cuenta.empresa) {
-                  <a [routerLink]="['/panel/companies', cuenta.empresa.id]" class="link">{{ cuenta.empresa.razon_social }}</a>
-                  <span class="sub mono">{{ cuenta.empresa.ruc }}</span>
-                }
-              </td>
-              <td class="concepto">
-                {{ cuenta.concepto }}
-                @if (cuenta.producto) {
-                  <span class="sub">{{ cuenta.producto }}</span>
-                }
-                @if (cuenta.motivo_anulacion) {
-                  <span class="sub">Anulada: {{ cuenta.motivo_anulacion }}</span>
-                }
-              </td>
-              <td class="mono">{{ formatoSoles(cuenta.monto) }}</td>
-              <td class="mono">{{ fechaCorta(cuenta.vence) }}</td>
-              <td>
-                @if (cuenta.vencida) {
-                  <span class="chip chip-vencida">Vencida</span>
+    @if (pagos(); as lista) {
+      <div class="pagos" [class.loading]="cargandoPagos()">
+        @for (item of lista.data; track item.id) {
+          @if (item.estado === 'en_revision') {
+            @let rev = revision(item);
+            <article class="pago">
+              <div class="pago-captura">
+                @if (item.tiene_captura && item.captura_es_imagen && capturas()[item.id]) {
+                  <button type="button" class="captura-btn" (click)="verCaptura(item)" aria-label="Ver la captura en grande">
+                    <img [src]="capturas()[item.id]" alt="Captura del pago" />
+                  </button>
+                } @else if (item.tiene_captura) {
+                  <button type="button" class="btn btn-ghost btn-sm" (click)="verCaptura(item)">Ver comprobante PDF</button>
                 } @else {
-                  <span [class]="'chip chip-' + cuenta.estado">{{ etiquetaEstado(cuenta.estado) }}</span>
+                  <span class="muted">Sin captura</span>
                 }
-              </td>
-              <td>
-                @if (cuenta.comprobante; as comprobante) {
-                  @if (comprobante.estado === 'emitido') {
-                    @if (comprobante.pdf_url) {
-                      <a [href]="comprobante.pdf_url" target="_blank" rel="noopener" class="link mono">{{ comprobante.numero }}</a>
+              </div>
+              <div class="pago-datos">
+                <strong>{{ item.empresa?.razon_social ?? '—' }}</strong>
+                <span class="sub mono">{{ item.empresa?.ruc }}</span>
+                <dl class="pago-detalle">
+                  <div><dt>Reportó</dt><dd class="mono">{{ formatoSoles(item.monto) }}</dd></div>
+                  <div><dt>Debe hoy</dt><dd class="mono" [class.alerta-monto]="item.monto > (item.deuda_empresa ?? 0) + 0.001">{{ formatoSoles(item.deuda_empresa ?? 0) }}</dd></div>
+                  <div><dt>Pagó a</dt><dd>{{ item.metodo_nombre ?? etiquetaMetodo(item.metodo) }}</dd></div>
+                  <div><dt>Fecha de pago</dt><dd class="mono">{{ fechaCorta(item.fecha_pago) }}</dd></div>
+                  <div><dt>Reportó</dt><dd>{{ item.reportado_por ?? '—' }}</dd></div>
+                  <div><dt>Para</dt><dd>{{ item.cuenta?.concepto ?? 'Lo más antiguo' }}</dd></div>
+                </dl>
+                <div class="ajustes">
+                  <div class="field">
+                    <label [for]="'monto-' + item.id">Monto a aplicar (S/)</label>
+                    <input [id]="'monto-' + item.id" type="number" min="0.01" step="0.01" [ngModel]="rev.monto" (ngModelChange)="cambiarRevision(item, { monto: $event })" />
+                  </div>
+                  <div class="field">
+                    <label [for]="'numero-' + item.id">N.° de operación</label>
+                    <input [id]="'numero-' + item.id" type="text" maxlength="60" class="mono" [ngModel]="rev.numero" (ngModelChange)="cambiarRevision(item, { numero: $event })" />
+                  </div>
+                </div>
+                @if (rev.rechazando) {
+                  <div class="inline-form">
+                    <input type="text" maxlength="255" [ngModel]="rev.motivo" (ngModelChange)="cambiarRevision(item, { motivo: $event })" aria-label="Motivo del rechazo" />
+                    <button type="button" class="btn btn-primary btn-sm" [disabled]="ocupado() === 'pago-' + item.id || rev.motivo.trim().length < 3" (click)="rechazar(item)">Rechazar</button>
+                    <button type="button" class="btn btn-ghost btn-sm" (click)="cambiarRevision(item, { rechazando: false })">Cancelar</button>
+                  </div>
+                  <span class="field-help">Escribe el motivo. El cliente lo verá.</span>
+                } @else {
+                  <div class="pago-acciones">
+                    <button type="button" class="btn btn-primary btn-sm" [disabled]="ocupado() === 'pago-' + item.id" (click)="aceptar(item)">{{ ocupado() === 'pago-' + item.id ? 'Aplicando…' : 'Aceptar y facturar' }}</button>
+                    <button type="button" class="btn btn-ghost btn-sm" [disabled]="ocupado() === 'pago-' + item.id" (click)="cambiarRevision(item, { rechazando: true })">Rechazar</button>
+                  </div>
+                }
+              </div>
+            </article>
+          } @else {
+            <article class="pago-fila">
+              <div class="pago-fila-principal">
+                <strong>{{ item.empresa?.razon_social ?? '—' }}</strong>
+                <span class="sub">
+                  {{ item.metodo_nombre ?? etiquetaMetodo(item.metodo) }} · {{ item.numero_operacion ?? 'sin número' }} · pagó el {{ fechaCorta(item.fecha_pago) }}
+                </span>
+                @if (item.estado === 'aceptado' && item.aplicaciones.length > 0) {
+                  <span class="sub">Aplicado a: @for (a of item.aplicaciones; track a.cuenta_id) {<span class="aplicado">{{ a.concepto }} ({{ formatoSoles(a.monto) }})</span>}</span>
+                }
+                @if (item.estado === 'rechazado') {
+                  <span class="sub error-text">Motivo: {{ item.motivo_rechazo }}</span>
+                }
+                @if (item.monto_reportado !== null && item.monto_reportado !== item.monto) {
+                  <span class="sub">El cliente reportó {{ formatoSoles(item.monto_reportado) }}</span>
+                }
+              </div>
+              <div class="pago-fila-lado">
+                <b class="mono">{{ formatoSoles(item.monto) }}</b>
+                <span [class]="'chip chip-' + item.estado">{{ etiquetaEstadoPago(item.estado) }}</span>
+                @if (item.estado === 'aceptado') {
+                  @if (item.comprobante?.estado === 'emitido') {
+                    @if (item.comprobante?.pdf_url) {
+                      <a [href]="item.comprobante?.pdf_url" target="_blank" rel="noopener" class="link mono">{{ item.comprobante?.numero }}</a>
                     } @else {
-                      <span class="mono">{{ comprobante.numero }}</span>
+                      <span class="mono">{{ item.comprobante?.numero }}</span>
                     }
-                    <span class="sub">{{ comprobante.estado_sunat }}</span>
                   } @else {
-                    <span class="error-text">No emitido</span>
-                    <span class="sub">{{ comprobante.error }}</span>
+                    <span class="error-text" [attr.title]="item.comprobante?.error ?? ''">Sin comprobante</span>
+                    <button type="button" class="text-btn" [disabled]="ocupado() === 'pago-' + item.id" (click)="reintentar(item)">{{ ocupado() === 'pago-' + item.id ? 'Emitiendo…' : 'Emitir comprobante' }}</button>
                   }
-                } @else {
-                  <span class="muted">—</span>
                 }
-              </td>
-              <td class="acciones">
-                @if (cuenta.estado === 'pendiente' || cuenta.estado === 'en_revision') {
-                  <button type="button" class="text-btn" (click)="abrirAccion('cobrar', cuenta)">Cobrar</button>
-                  <button type="button" class="text-btn" (click)="abrirAccion('editar', cuenta)">Editar</button>
-                  @if (recordatorio(cuenta); as enlace) {
-                    <a [href]="enlace" target="_blank" rel="noopener" class="text-btn">Recordar</a>
-                  }
-                  <button type="button" class="text-btn danger" (click)="abrirAccion('anular', cuenta)">Anular</button>
+                @if (item.tiene_captura) {
+                  <button type="button" class="text-btn" (click)="verCaptura(item)">Ver captura</button>
                 }
-                @if (cuenta.estado === 'pagada' && cuenta.comprobante?.estado !== 'emitido') {
-                  <button type="button" class="text-btn" [disabled]="ocupado() === cuenta.id" (click)="reintentar(cuenta)">{{ ocupado() === cuenta.id ? 'Emitiendo…' : 'Emitir comprobante' }}</button>
-                }
-              </td>
-            </tr>
-          } @empty {
-            <tr>
-              <td colspan="7" class="empty">No hay cuentas con estos filtros.</td>
-            </tr>
+              </div>
+            </article>
           }
-        </tbody>
-      </table>
-    </div>
+        } @empty {
+          <p class="empty-card">{{ estadoPago() === 'en_revision' ? 'No hay pagos por revisar.' : 'No hay pagos con este filtro.' }}</p>
+        }
+      </div>
 
-    @if (pagina.meta.last_page > 1) {
-      <div class="pagination">
-        <span>{{ pagina.meta.from }}–{{ pagina.meta.to }} de {{ pagina.meta.total }} cuentas</span>
-        <div class="pagination-actions">
-          <button type="button" class="btn btn-ghost btn-sm" [disabled]="pagina.meta.current_page <= 1" (click)="irA(pagina.meta.current_page - 1)">← Anterior</button>
-          <button type="button" class="btn btn-ghost btn-sm" [disabled]="pagina.meta.current_page >= pagina.meta.last_page" (click)="irA(pagina.meta.current_page + 1)">Siguiente →</button>
+      @if (lista.meta.last_page > 1) {
+        <div class="pagination">
+          <span>{{ lista.meta.from }}–{{ lista.meta.to }} de {{ lista.meta.total }} pagos</span>
+          <div class="pagination-actions">
+            <button type="button" class="btn btn-ghost btn-sm" [disabled]="lista.meta.current_page <= 1" (click)="irAPagos(lista.meta.current_page - 1)">← Anterior</button>
+            <button type="button" class="btn btn-ghost btn-sm" [disabled]="lista.meta.current_page >= lista.meta.last_page" (click)="irAPagos(lista.meta.current_page + 1)">Siguiente →</button>
+          </div>
         </div>
+      }
+    }
+  } @else {
+    <form class="card filters" (ngSubmit)="filtrar()">
+      <div class="field field-search">
+        <label for="buscar">Buscar</label>
+        <input id="buscar" type="search" name="buscar" [(ngModel)]="buscar" />
+        <span class="field-help">Cliente, RUC o concepto</span>
+      </div>
+      <div class="field">
+        <label for="estado">Mostrar</label>
+        <select id="estado" name="estado" [(ngModel)]="estado">
+          @for (item of filtros; track item.valor) {
+            <option [value]="item.valor">{{ item.etiqueta }}</option>
+          }
+        </select>
+      </div>
+      <div class="filter-actions">
+        <button type="submit" class="btn btn-primary btn-sm">Filtrar</button>
+      </div>
+    </form>
+
+    @if (accion(); as activa) {
+      <div class="card accion">
+        <div class="section-head">
+          <h2 class="card-title">{{ activa.tipo === 'cobrar' ? 'Registrar cobro' : activa.tipo === 'editar' ? 'Editar cuenta' : 'Anular cuenta' }}</h2>
+          <button type="button" class="btn btn-ghost btn-sm" (click)="accion.set(null)">Cancelar</button>
+        </div>
+        <p class="card-sub">{{ activa.cuenta.empresa?.razon_social }} · {{ activa.cuenta.concepto }} · saldo {{ formatoSoles(activa.cuenta.saldo) }}</p>
+        @if (activa.tipo === 'cobrar') {
+          <div class="form-grid spaced">
+            <div class="field">
+              <label for="cobro-metodo">Pagó a</label>
+              <select id="cobro-metodo" name="cobroCon" [(ngModel)]="cobroCon">
+                @for (metodo of metodosPago(); track metodo.id) {
+                  <option [value]="metodo.id">{{ metodo.nombre }}</option>
+                }
+                <option value="efectivo">Efectivo</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="cobro-monto">Monto (S/)</label>
+              <input id="cobro-monto" type="number" name="monto" min="0.01" step="0.01" [(ngModel)]="pago.monto" />
+              <span class="field-help">Si es mayor al saldo, el resto se aplica a sus cuentas más antiguas.</span>
+            </div>
+            <div class="field">
+              <label for="cobro-operacion">N.° de operación</label>
+              <input id="cobro-operacion" type="text" name="numero_operacion" maxlength="60" [(ngModel)]="pago.numero_operacion" />
+            </div>
+            <div class="field">
+              <label for="cobro-fecha">Fecha de pago</label>
+              <input id="cobro-fecha" type="date" name="fecha_pago" [(ngModel)]="pago.fecha_pago" />
+            </div>
+            <div class="field full">
+              <label for="cobro-captura">Captura (opcional)</label>
+              <input id="cobro-captura" type="file" accept="image/jpeg,image/png,image/webp,application/pdf" (change)="elegirCaptura($event)" />
+            </div>
+          </div>
+          <div class="form-actions spaced">
+            <button type="button" class="btn btn-primary btn-sm" [disabled]="ocupado() === 'cuenta-' + activa.cuenta.id" (click)="confirmarCobro(activa.cuenta)">{{ ocupado() === 'cuenta-' + activa.cuenta.id ? 'Aplicando…' : 'Registrar y facturar' }}</button>
+          </div>
+        } @else if (activa.tipo === 'editar') {
+          <div class="form-grid spaced">
+            <div class="field full">
+              <label for="editar-concepto">Concepto</label>
+              <input id="editar-concepto" type="text" name="edicionConcepto" maxlength="255" [(ngModel)]="edicion.concepto" />
+            </div>
+            <div class="field">
+              <label for="editar-monto">Monto (S/)</label>
+              <input id="editar-monto" type="number" name="edicionMonto" min="0.01" step="0.01" [(ngModel)]="edicion.monto" />
+              @if (activa.cuenta.monto_pagado > 0) {
+                <span class="field-help">Ya pagó {{ formatoSoles(activa.cuenta.monto_pagado) }}; no puede ser menor.</span>
+              }
+            </div>
+            <div class="field">
+              <label for="editar-vence">Vence</label>
+              <input id="editar-vence" type="date" name="edicionVence" [(ngModel)]="edicion.vence" />
+            </div>
+          </div>
+          <div class="form-actions spaced">
+            <button type="button" class="btn btn-primary btn-sm" [disabled]="ocupado() === 'cuenta-' + activa.cuenta.id" (click)="confirmarEdicion(activa.cuenta)">Guardar cambios</button>
+          </div>
+        } @else {
+          <div class="field spaced">
+            <label for="anular-motivo">Motivo</label>
+            <input id="anular-motivo" type="text" name="motivoAnulacion" maxlength="255" [(ngModel)]="motivoAnulacion" />
+          </div>
+          <div class="form-actions spaced">
+            <button type="button" class="btn btn-primary btn-sm" [disabled]="ocupado() === 'cuenta-' + activa.cuenta.id || motivoAnulacion.trim().length < 3" (click)="confirmarAnulacion(activa.cuenta)">Anular cuenta</button>
+          </div>
+        }
+        @if (errorAccion(); as mensaje) {
+          <p class="alert alert-error spaced" role="alert">{{ mensaje }}</p>
+        }
       </div>
     }
-  } @else if (cargando()) {
-    <p class="muted">Cargando cuentas…</p>
+
+    @if (cuentas(); as pagina) {
+      <div class="table-wrap" [class.loading]="cargando()">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Cliente</th>
+              <th>Concepto</th>
+              <th class="num">Monto</th>
+              <th class="num">Pagado</th>
+              <th class="num">Saldo</th>
+              <th>Vence</th>
+              <th>Estado</th>
+              <th><span class="sr-only">Acciones</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (cuenta of pagina.data; track cuenta.id) {
+              <tr>
+                <td>
+                  @if (cuenta.empresa) {
+                    <a [routerLink]="['/panel/companies', cuenta.empresa.id]" class="link">{{ cuenta.empresa.razon_social }}</a>
+                    <span class="sub mono">{{ cuenta.empresa.ruc }}</span>
+                  }
+                </td>
+                <td class="concepto">
+                  {{ cuenta.concepto }}
+                  @if (cuenta.producto) {
+                    <span class="sub">{{ cuenta.producto }}</span>
+                  }
+                  @if (cuenta.motivo_anulacion) {
+                    <span class="sub">Anulada: {{ cuenta.motivo_anulacion }}</span>
+                  }
+                  @for (a of cuenta.aplicaciones; track a.pago_id) {
+                    @if (a.comprobante?.pdf_url) {
+                      <a class="sub link" [href]="a.comprobante?.pdf_url" target="_blank" rel="noopener">{{ a.comprobante?.numero }} · {{ formatoSoles(a.monto) }}</a>
+                    }
+                  }
+                </td>
+                <td class="mono num">{{ formatoSoles(cuenta.monto) }}</td>
+                <td class="mono num">{{ cuenta.monto_pagado > 0 ? formatoSoles(cuenta.monto_pagado) : '—' }}</td>
+                <td class="mono num strong">{{ formatoSoles(cuenta.saldo) }}</td>
+                <td class="mono">{{ fechaCorta(cuenta.vence) }}</td>
+                <td>
+                  @if (cuenta.vencida) {
+                    <span class="chip chip-vencida">Vencida</span>
+                  } @else {
+                    <span [class]="'chip chip-' + cuenta.estado">{{ etiquetaEstado(cuenta.estado) }}</span>
+                  }
+                </td>
+                <td class="acciones">
+                  @if (cuenta.estado === 'pendiente' || cuenta.estado === 'parcial' || cuenta.estado === 'en_revision') {
+                    <button type="button" class="text-btn" (click)="abrirAccion('cobrar', cuenta)">Cobrar</button>
+                    <button type="button" class="text-btn" (click)="abrirAccion('editar', cuenta)">Editar</button>
+                    @if (recordatorio(cuenta); as enlace) {
+                      <a [href]="enlace" target="_blank" rel="noopener" class="text-btn">Recordar</a>
+                    }
+                    @if (cuenta.monto_pagado === 0) {
+                      <button type="button" class="text-btn danger" (click)="abrirAccion('anular', cuenta)">Anular</button>
+                    }
+                  }
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="8" class="empty">No hay cuentas con estos filtros.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      @if (pagina.meta.last_page > 1) {
+        <div class="pagination">
+          <span>{{ pagina.meta.from }}–{{ pagina.meta.to }} de {{ pagina.meta.total }} cuentas</span>
+          <div class="pagination-actions">
+            <button type="button" class="btn btn-ghost btn-sm" [disabled]="pagina.meta.current_page <= 1" (click)="irA(pagina.meta.current_page - 1)">← Anterior</button>
+            <button type="button" class="btn btn-ghost btn-sm" [disabled]="pagina.meta.current_page >= pagina.meta.last_page" (click)="irA(pagina.meta.current_page + 1)">Siguiente →</button>
+          </div>
+        </div>
+      }
+    } @else if (cargando()) {
+      <p class="muted">Cargando cuentas…</p>
+    }
   }
 </section>
