@@ -9,6 +9,11 @@
   margin-top: 16px;
 }
 
+.num {
+  text-align: right;
+  white-space: nowrap;
+}
+
 .switch {
   display: inline-flex;
   align-items: center;
