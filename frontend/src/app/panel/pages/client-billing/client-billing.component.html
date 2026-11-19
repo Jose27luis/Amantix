@@ -1,0 +1,123 @@
+<section class="page">
+  <header class="page-head">
+    <div>
+      <span class="eyebrow">Mi empresa · Pagos</span>
+      <h1 class="page-title">Mis pagos</h1>
+      <p class="page-lead">Paga por Yape, Plin o transferencia y sube aquí la captura con el número de operación. Cuando lo revisemos, te emitimos el comprobante.</p>
+    </div>
+  </header>
+
+  @if (aviso(); as mensaje) {
+    <p class="alert alert-ok" role="status">{{ mensaje }}</p>
+  }
+  @if (error(); as mensaje) {
+    <p class="alert alert-error" role="alert">{{ mensaje }}</p>
+  }
+
+  @if (datos(); as cobranza) {
+    <div class="card">
+      <h2 class="card-title">Por pagar</h2>
+      <div class="cuentas spaced">
+        @for (cuenta of cobranza.por_pagar; track cuenta.id) {
+          <article class="cuenta" [class.vencida]="cuenta.vencida">
+            <div class="cuenta-cabeza">
+              <div>
+                <span class="cuenta-concepto">{{ cuenta.concepto }}</span>
+                <span class="sub">Vence el {{ fechaCorta(cuenta.vence) }}</span>
+              </div>
+              <div class="cuenta-monto">
+                <strong class="mono">{{ formatoSoles(cuenta.monto) }}</strong>
+                @if (cuenta.vencida && cuenta.estado === 'pendiente') {
+                  <span class="chip chip-vencida">Vencida</span>
+                } @else {
+                  <span [class]="'chip chip-' + cuenta.estado">{{ etiquetaEstado(cuenta.estado) }}</span>
+                }
+              </div>
+            </div>
+
+            @if (ultimoRechazo(cuenta); as rechazo) {
+              <p class="alert alert-error">No pudimos validar tu pago anterior: {{ rechazo.motivo_rechazo }}. Puedes reportarlo de nuevo.</p>
+            }
+
+            @if (cuenta.estado === 'en_revision') {
+              <p class="muted">Recibimos tu pago y lo estamos revisando.</p>
+            } @else if (reportando() === cuenta.id) {
+              <div class="form-grid spaced">
+                <div class="field">
+                  <label [for]="'metodo-' + cuenta.id">Medio de pago</label>
+                  <select [id]="'metodo-' + cuenta.id" name="metodo" [(ngModel)]="pago.metodo">
+                    @for (item of metodos; track item.valor) {
+                      <option [value]="item.valor">{{ item.etiqueta }}</option>
+                    }
+                  </select>
+                </div>
+                <div class="field">
+                  <label [for]="'operacion-' + cuenta.id">N.° de operación</label>
+                  <input [id]="'operacion-' + cuenta.id" type="text" name="numero_operacion" maxlength="60" [(ngModel)]="pago.numero_operacion" />
+                </div>
+                <div class="field">
+                  <label [for]="'fecha-' + cuenta.id">Fecha del pago</label>
+                  <input [id]="'fecha-' + cuenta.id" type="date" name="fecha_pago" [(ngModel)]="pago.fecha_pago" />
+                </div>
+                <div class="field">
+                  <label [for]="'captura-' + cuenta.id">Captura del pago</label>
+                  <input [id]="'captura-' + cuenta.id" type="file" accept="image/jpeg,image/png,image/webp,application/pdf" (change)="elegirCaptura($event)" />
+                  <span class="field-help">Imagen o PDF de hasta 5 MB.</span>
+                </div>
+              </div>
+              @if (errorReporte(); as mensaje) {
+                <p class="alert alert-error spaced" role="alert">{{ mensaje }}</p>
+              }
+              <div class="form-actions spaced">
+                <button type="button" class="btn btn-primary btn-sm" [disabled]="enviando()" (click)="enviar(cuenta)">{{ enviando() ? 'Enviando…' : 'Enviar pago' }}</button>
+                <button type="button" class="btn btn-ghost btn-sm" [disabled]="enviando()" (click)="reportando.set(null)">Cancelar</button>
+              </div>
+            } @else {
+              <div class="form-actions">
+                <button type="button" class="btn btn-primary btn-sm" (click)="abrirReporte(cuenta)">Reportar pago</button>
+              </div>
+            }
+          </article>
+        } @empty {
+          <p class="muted">No tienes pagos pendientes.</p>
+        }
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">Pagos realizados</h2>
+      <div class="table-wrap spaced">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Concepto</th>
+              <th>Monto</th>
+              <th>Pagado</th>
+              <th>Comprobante</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (cuenta of cobranza.pagadas; track cuenta.id) {
+              <tr>
+                <td class="concepto">{{ cuenta.concepto }}</td>
+                <td class="mono">{{ formatoSoles(cuenta.monto) }}</td>
+                <td class="mono">{{ fechaCorta(cuenta.pagada_at) }}</td>
+                <td>
+                  @if (cuenta.comprobante?.estado === 'emitido' && cuenta.comprobante?.pdf_url) {
+                    <a [href]="cuenta.comprobante?.pdf_url" target="_blank" rel="noopener" class="link mono">{{ cuenta.comprobante?.numero }}</a>
+                  } @else {
+                    <span class="muted">En proceso</span>
+                  }
+                </td>
+              </tr>
+            } @empty {
+              <tr><td colspan="4" class="empty">Todavía no hay pagos registrados.</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  } @else if (cargando()) {
+    <p class="muted">Cargando tus pagos…</p>
+  }
+</section>
