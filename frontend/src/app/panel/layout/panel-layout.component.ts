@@ -3,6 +3,7 @@ import { isPlatformBrowser } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { Meta } from '@angular/platform-browser';
 import { SessionService } from '../core/session.service';
+import { BillingApiService } from '../services/billing-api.service';
 import { LeadsApiService } from '../services/leads-api.service';
 import { TicketsApiService } from '../services/tickets-api.service';
 
@@ -22,6 +23,7 @@ export class PanelLayoutComponent {
   protected readonly sesion = inject(SessionService);
   protected readonly leads = inject(LeadsApiService);
   protected readonly tickets = inject(TicketsApiService);
+  protected readonly cobranza = inject(BillingApiService);
 
   protected readonly menuAbierto = signal(false);
   protected readonly colapsado = signal(this.leerPreferencia());
@@ -40,6 +42,7 @@ export class PanelLayoutComponent {
     if (this.sesion.esAdministrador()) {
       this.leads.refrescarPendientes();
       this.tickets.refrescarPendientes();
+      this.cobranza.refrescarPendientes();
     }
   }
 
