@@ -54,6 +54,20 @@ export const PANEL_ROUTES: Routes = [
         loadComponent: () => import('./pages/company-detail/company-detail.component').then((m) => m.CompanyDetailComponent),
       },
       {
+        path: 'billing',
+        canMatch: [adminMatch],
+        canActivate: [passwordGuard, adminGuard],
+        title: 'Cobranza · Panel Amantix',
+        loadComponent: () => import('./pages/billing/billing.component').then((m) => m.BillingComponent),
+      },
+      {
+        path: 'billing',
+        canMatch: [clientMatch],
+        canActivate: [passwordGuard, clientGuard],
+        title: 'Mis pagos · Panel Amantix',
+        loadComponent: () => import('./pages/client-billing/client-billing.component').then((m) => m.ClientBillingComponent),
+      },
+      {
         path: 'tickets',
         canActivate: [passwordGuard],
         title: 'Soporte · Panel Amantix',
