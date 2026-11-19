@@ -311,6 +311,7 @@
 .chip-nuevo,
 .chip-abierto,
 .chip-suspendida,
+.chip-pendiente,
 .chip-media {
   --chip-fondo: var(--brass-50);
   --chip-texto: #7f6234;
@@ -321,6 +322,7 @@
 .chip-demo,
 .chip-propuesta,
 .chip-en_atencion,
+.chip-en_revision,
 .chip-esperando {
   --chip-fondo: var(--steel-50);
   --chip-texto: var(--steel);
@@ -329,6 +331,8 @@
 
 .chip-ganado,
 .chip-activa,
+.chip-pagada,
+.chip-aceptado,
 .chip-resuelto {
   --chip-fondo: var(--teal-50);
   --chip-texto: var(--teal);
@@ -337,6 +341,9 @@
 
 .chip-perdido,
 .chip-baja,
+.chip-anulada,
+.chip-rechazado,
+.chip-vencida,
 .chip-alta {
   --chip-fondo: var(--danger-50);
   --chip-texto: #8a3b39;
