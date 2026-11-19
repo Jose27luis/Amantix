@@ -16,6 +16,8 @@ class StoreSubscriptionRequest extends FormRequest
             'producto_id' => ['required', 'integer', 'exists:productos,id'],
             'plan_id' => ['required', 'integer', 'exists:planes,id'],
             'precio' => ['nullable', 'numeric', 'min:0', 'max:999999'],
+            'concepto' => ['nullable', 'string', 'max:200'],
+            'cuenta_externa' => ['nullable', 'string', 'max:120'],
             'periodo' => ['nullable', Rule::enum(BillingPeriod::class)],
             'fecha_alta' => ['required', 'date'],
             'proxima_renovacion' => ['nullable', 'date', 'after:fecha_alta'],
