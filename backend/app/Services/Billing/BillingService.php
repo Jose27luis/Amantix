@@ -9,6 +9,7 @@ use App\Enums\PaymentReportStatus;
 use App\Enums\ReceivableStatus;
 use App\Models\BillingInvoice;
 use App\Models\Company;
+use App\Models\PaymentAccount;
 use App\Models\PaymentReport;
 use App\Models\Receivable;
 use App\Models\User;
@@ -42,6 +43,27 @@ class BillingService
         return $cuenta;
     }
 
+    public function editar(Receivable $cuenta, array $datos, User $autor): Receivable
+    {
+        if (! $cuenta->estado->cobrable()) {
+            throw ValidationException::withMessages(['cuenta' => 'Solo se editan cuentas pendientes o en revisión.']);
+        }
+
+        if (isset($datos['concepto'])) {
+            $datos['concepto'] = mb_strtoupper(trim((string) $datos['concepto']));
+        }
+
+        $cuenta->fill(array_intersect_key($datos, array_flip(['concepto', 'monto', 'vence'])));
+        $cambios = array_keys($cuenta->getDirty());
+        $cuenta->save();
+
+        if ($cambios !== []) {
+            $this->auditoria->registrar($autor, 'cuenta_cobrar_editada', $cuenta, ['campos' => $cambios]);
+        }
+
+        return $cuenta;
+    }
+
     public function anular(Receivable $cuenta, string $motivo, User $autor): Receivable
     {
         if (! $cuenta->estado->cobrable()) {
@@ -69,11 +91,13 @@ class BillingService
 
         $pago = DB::transaction(function () use ($cuenta, $datos, $captura, $autor, $origen): PaymentReport {
             $archivo = $captura === null ? [] : $this->capturas->guardar($cuenta->empresa_id, $captura);
+            $metodoPago = isset($datos['metodo_pago_id']) ? PaymentAccount::query()->findOrFail((int) $datos['metodo_pago_id']) : null;
 
             $pago = $cuenta->pagos()->create([
                 'empresa_id' => $cuenta->empresa_id,
                 'monto' => $datos['monto'] ?? $cuenta->monto,
-                'metodo' => PaymentMethod::from((string) $datos['metodo']),
+                'metodo' => $metodoPago?->tipo ?? PaymentMethod::from((string) $datos['metodo']),
+                'metodo_pago_id' => $metodoPago?->id,
                 'numero_operacion' => $datos['numero_operacion'] ?? null,
                 'fecha_pago' => $datos['fecha_pago'],
                 'origen' => $origen,
