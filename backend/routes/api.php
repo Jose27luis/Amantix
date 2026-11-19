@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Http\Controllers\Api\AttachmentController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BillingController;
+use App\Http\Controllers\Api\BillingSettingsController;
 use App\Http\Controllers\Api\ClientBillingController;
 use App\Http\Controllers\Api\ClientSummaryController;
 use App\Http\Controllers\Api\CompanyController;
@@ -83,6 +84,10 @@ Route::middleware(['auth:sanctum', 'active'])->group(function (): void {
         Route::post('billing/receivables', [BillingController::class, 'store']);
         Route::patch('billing/receivables/{receivable}', [BillingController::class, 'update']);
         Route::post('billing/receivables/{receivable}/void', [BillingController::class, 'anular']);
+        Route::get('billing/settings', [BillingSettingsController::class, 'show']);
+        Route::put('billing/settings', [BillingSettingsController::class, 'update']);
+        Route::get('billing/notices', [BillingSettingsController::class, 'avisos']);
+        Route::post('billing/receivables/{receivable}/notices', [BillingSettingsController::class, 'marcar']);
         Route::get('billing/payment-accounts', [PaymentAccountController::class, 'index']);
         Route::post('billing/payment-accounts', [PaymentAccountController::class, 'store']);
         Route::patch('billing/payment-accounts/{paymentAccount}', [PaymentAccountController::class, 'update']);
