@@ -119,6 +119,10 @@
       <span class="topbar-brand">AMANTIX · PANEL</span>
     </header>
 
+    @if (sesion.esAdministrador()) {
+      <app-payment-bell />
+    }
+
     <div class="content">
       <router-outlet />
     </div>
