@@ -2,6 +2,45 @@
   margin-top: 14px;
 }
 
+.resumen {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.resumen-etiqueta {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--slate);
+}
+
+.resumen-monto {
+  font-size: 1.9rem;
+  color: var(--ink);
+}
+
+.formulario {
+  border-color: var(--teal);
+}
+
+.qr {
+  width: 180px;
+  max-width: 100%;
+  aspect-ratio: 1;
+  object-fit: contain;
+  border-radius: 8px;
+  background: #fff;
+  border: 1px solid var(--line);
+}
+
+.error-text {
+  color: var(--danger);
+  font-weight: 600;
+}
+
 .mono {
   font-family: var(--font-mono);
 }
