@@ -35,4 +35,9 @@ class Company extends Model
     {
         return $this->hasMany(Ticket::class, 'empresa_id');
     }
+
+    public function cuentasPorCobrar(): HasMany
+    {
+        return $this->hasMany(Receivable::class, 'empresa_id');
+    }
 }
