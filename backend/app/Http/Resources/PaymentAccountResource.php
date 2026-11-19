@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Resources;
 
 use App\Models\PaymentAccount;
+use App\Services\Billing\PaymentQrStore;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -26,6 +27,7 @@ class PaymentAccountResource extends JsonResource
             'numero' => $metodo->numero,
             'cci' => $metodo->cci,
             'instrucciones' => $metodo->instrucciones,
+            'qr_url' => PaymentQrStore::url($metodo),
             'activo' => $metodo->activo,
             'orden' => $metodo->orden,
         ];
