@@ -29,6 +29,8 @@ class PaymentReport extends Model
         'captura_tipo',
         'origen',
         'reportado_por',
+        'reportado_nombre',
+        'integracion_id',
         'estado',
         'motivo_rechazo',
         'revisado_por',
@@ -59,6 +61,11 @@ class PaymentReport extends Model
     public function metodoPago(): BelongsTo
     {
         return $this->belongsTo(PaymentAccount::class, 'metodo_pago_id');
+    }
+
+    public function integracion(): BelongsTo
+    {
+        return $this->belongsTo(Integration::class, 'integracion_id');
     }
 
     public function reportadoPor(): BelongsTo
