@@ -11,6 +11,7 @@ use App\Http\Requests\ReasonRequest;
 use App\Http\Requests\ReceivableIndexRequest;
 use App\Http\Requests\ReportPaymentRequest;
 use App\Http\Requests\StoreReceivableRequest;
+use App\Http\Requests\UpdateReceivableRequest;
 use App\Http\Resources\PaymentReportResource;
 use App\Http\Resources\ReceivableResource;
 use App\Models\Company;
@@ -25,7 +26,7 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class BillingController extends Controller
 {
-    private const RELACIONES = ['empresa', 'suscripcion.producto', 'pagos.reportadoPor', 'pagos.revisadoPor', 'comprobante'];
+    private const RELACIONES = ['empresa', 'suscripcion.producto', 'pagos.reportadoPor', 'pagos.revisadoPor', 'pagos.metodoPago', 'comprobante'];
 
     public function resumen(): JsonResponse
     {
@@ -80,6 +81,13 @@ class BillingController extends Controller
         return response()->json(ReceivableResource::make($cuenta->load(self::RELACIONES))->resolve($request), 201);
     }
 
+    public function update(UpdateReceivableRequest $request, Receivable $receivable, BillingService $servicio): JsonResponse
+    {
+        $cuenta = $servicio->editar($receivable, $request->validated(), $this->usuario($request));
+
+        return response()->json(ReceivableResource::make($cuenta->load(self::RELACIONES))->resolve($request));
+    }
+
     public function anular(ReasonRequest $request, Receivable $receivable, BillingService $servicio): JsonResponse
     {
         $cuenta = $servicio->anular($receivable, (string) $request->validated('motivo'), $this->usuario($request));
@@ -104,7 +112,7 @@ class BillingController extends Controller
     public function pagosEnRevision(Request $request): AnonymousResourceCollection
     {
         $pagos = PaymentReport::query()
-            ->with(['cuenta.empresa', 'cuenta.suscripcion.producto', 'reportadoPor'])
+            ->with(['cuenta.empresa', 'cuenta.suscripcion.producto', 'reportadoPor', 'metodoPago'])
             ->where('estado', PaymentReportStatus::EnRevision)
             ->orderBy('created_at')
             ->get();
