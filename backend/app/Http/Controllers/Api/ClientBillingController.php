@@ -8,7 +8,9 @@ use App\Enums\ReceivableStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ReportPaymentRequest;
 use App\Http\Resources\PaymentAccountResource;
+use App\Http\Resources\PaymentReportResource;
 use App\Http\Resources\ReceivableResource;
+use App\Models\Company;
 use App\Models\PaymentAccount;
 use App\Models\PaymentReport;
 use App\Models\Receivable;
@@ -19,51 +21,63 @@ use Illuminate\Http\Request;
 
 class ClientBillingController extends Controller
 {
-    private const RELACIONES = ['suscripcion.producto', 'pagos.metodoPago', 'comprobante'];
-
-    public function index(Request $request): JsonResponse
+    public function index(Request $request, BillingService $servicio): JsonResponse
     {
-        $usuario = $this->usuario($request);
+        $empresa = $this->empresa($request);
 
         $porPagar = Receivable::query()
-            ->with(self::RELACIONES)
-            ->where('empresa_id', $usuario->empresa_id)
-            ->whereIn('estado', [ReceivableStatus::Pendiente, ReceivableStatus::EnRevision])
+            ->with(['suscripcion.producto', 'aplicaciones'])
+            ->where('empresa_id', $empresa->id)
+            ->whereIn('estado', ReceivableStatus::cobrables())
             ->orderBy('vence')
             ->get();
 
-        $pagadas = Receivable::query()
-            ->with(self::RELACIONES)
-            ->where('empresa_id', $usuario->empresa_id)
-            ->where('estado', ReceivableStatus::Pagada)
-            ->orderByDesc('pagada_at')
+        $pagos = PaymentReport::query()
+            ->with(['metodoPago', 'aplicaciones.cuenta', 'comprobante'])
+            ->where('empresa_id', $empresa->id)
+            ->latest()
             ->limit(24)
             ->get();
 
         return response()->json([
+            'deuda' => $servicio->deuda($empresa),
             'por_pagar' => ReceivableResource::collection($porPagar)->resolve($request),
-            'pagadas' => ReceivableResource::collection($pagadas)->resolve($request),
+            'pagos' => PaymentReportResource::collection($pagos)->resolve($request),
             'metodos_pago' => PaymentAccountResource::collection(
                 PaymentAccount::query()->where('activo', true)->orderBy('orden')->orderBy('id')->get()
             )->resolve($request),
         ]);
     }
 
-    public function reportar(ReportPaymentRequest $request, Receivable $receivable, BillingService $servicio): JsonResponse
+    public function reportar(ReportPaymentRequest $request, BillingService $servicio): JsonResponse
     {
         $usuario = $this->usuario($request);
-        abort_unless($receivable->empresa_id === $usuario->empresa_id, 404);
+        $empresa = $this->empresa($request);
+        $datos = $request->validated();
 
-        $servicio->reportar($receivable, $request->validated(), $request->file('captura'), $usuario, PaymentReport::ORIGEN_PORTAL);
+        $preferida = null;
+        if (isset($datos['cuenta_id'])) {
+            $preferida = Receivable::query()->where('empresa_id', $empresa->id)->find((int) $datos['cuenta_id']);
+            abort_if($preferida === null, 404, 'Cuenta no encontrada.');
+        }
 
-        return response()->json(ReceivableResource::make($receivable->refresh()->load(self::RELACIONES))->resolve($request), 201);
+        $pago = $servicio->reportar($empresa, $datos, $request->file('captura'), $usuario, PaymentReport::ORIGEN_PORTAL, null, $preferida);
+
+        return response()->json(PaymentReportResource::make($pago->load(['metodoPago', 'aplicaciones.cuenta', 'comprobante']))->resolve($request), 201);
+    }
+
+    private function empresa(Request $request): Company
+    {
+        $empresa = Company::query()->find($this->usuario($request)->empresa_id);
+        abort_if($empresa === null, 403, 'Tu usuario no pertenece a una empresa cliente.');
+
+        return $empresa;
     }
 
     private function usuario(Request $request): User
     {
         $usuario = $request->user();
         abort_unless($usuario instanceof User, 401);
-        abort_if($usuario->empresa_id === null, 403, 'Tu usuario no pertenece a una empresa cliente.');
 
         return $usuario;
     }
