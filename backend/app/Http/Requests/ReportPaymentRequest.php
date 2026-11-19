@@ -36,6 +36,8 @@ class ReportPaymentRequest extends FormRequest
             ],
             'fecha_pago' => ['required', 'date', 'before_or_equal:today'],
             'monto' => ['nullable', 'numeric', 'min:0.01', 'max:999999'],
+            'cuenta_id' => ['nullable', 'integer', 'min:1'],
+            'clave_idempotencia' => ['nullable', 'string', 'min:8', 'max:80', 'regex:/^[A-Za-z0-9._:-]+$/'],
             'captura' => [
                 Rule::requiredIf($esCliente),
                 'nullable',
