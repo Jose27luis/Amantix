@@ -10,12 +10,13 @@ use App\Enums\TicketStatus;
 use App\Models\Company;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\DB;
 
 class CompanySearch
 {
     public function buscar(array $filtros): LengthAwarePaginator
     {
-        $porCobrar = [ReceivableStatus::Pendiente, ReceivableStatus::EnRevision];
+        $porCobrar = ReceivableStatus::cobrables();
 
         return Company::query()
             ->with(['suscripciones' => fn ($consulta) => $consulta->with('producto')->where('estado', '<>', SubscriptionStatus::Baja)->orderBy('proxima_renovacion')])
@@ -27,7 +28,7 @@ class CompanySearch
             ])
             ->withSum([
                 'cuentasPorCobrar as deuda' => fn (Builder $consulta): Builder => $consulta->whereIn('estado', $porCobrar),
-            ], 'monto')
+            ], DB::raw('monto - monto_pagado'))
             ->withMin([
                 'suscripciones as proxima_renovacion' => fn (Builder $consulta): Builder => $consulta->where('estado', SubscriptionStatus::Activa),
             ], 'proxima_renovacion')
