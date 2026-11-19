@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\Companies;
 
+use App\Enums\ReceivableStatus;
 use App\Enums\SubscriptionStatus;
 use App\Enums\TicketStatus;
 use App\Models\Company;
@@ -14,14 +15,34 @@ class CompanySearch
 {
     public function buscar(array $filtros): LengthAwarePaginator
     {
+        $porCobrar = [ReceivableStatus::Pendiente, ReceivableStatus::EnRevision];
+
         return Company::query()
+            ->with(['suscripciones' => fn ($consulta) => $consulta->with('producto')->where('estado', '<>', SubscriptionStatus::Baja)->orderBy('proxima_renovacion')])
             ->withCount([
                 'suscripciones as suscripciones_activas' => fn (Builder $consulta): Builder => $consulta->where('estado', SubscriptionStatus::Activa),
                 'tickets as tickets_abiertos' => fn (Builder $consulta): Builder => $consulta->whereIn('estado', TicketStatus::activos()),
+                'cuentasPorCobrar as cuentas_vencidas' => fn (Builder $consulta): Builder => $consulta->whereIn('estado', $porCobrar)->whereDate('vence', '<', today()),
+                'usuarios as usuarios_portal',
             ])
+            ->withSum([
+                'cuentasPorCobrar as deuda' => fn (Builder $consulta): Builder => $consulta->whereIn('estado', $porCobrar),
+            ], 'monto')
             ->withMin([
                 'suscripciones as proxima_renovacion' => fn (Builder $consulta): Builder => $consulta->where('estado', SubscriptionStatus::Activa),
             ], 'proxima_renovacion')
+            ->when(($filtros['situacion'] ?? null) === 'con_deuda', fn (Builder $consulta): Builder => $consulta->whereHas(
+                'cuentasPorCobrar',
+                fn (Builder $sub): Builder => $sub->whereIn('estado', $porCobrar),
+            ))
+            ->when(($filtros['situacion'] ?? null) === 'vencidos', fn (Builder $consulta): Builder => $consulta->whereHas(
+                'cuentasPorCobrar',
+                fn (Builder $sub): Builder => $sub->whereIn('estado', $porCobrar)->whereDate('vence', '<', today()),
+            ))
+            ->when(($filtros['situacion'] ?? null) === 'sin_suscripcion', fn (Builder $consulta): Builder => $consulta->whereDoesntHave(
+                'suscripciones',
+                fn (Builder $sub): Builder => $sub->where('estado', SubscriptionStatus::Activa),
+            ))
             ->when($filtros['buscar'] ?? null, function (Builder $consulta, string $texto): void {
                 $patron = '%'.$texto.'%';
                 $consulta->where(fn (Builder $grupo): Builder => $grupo
