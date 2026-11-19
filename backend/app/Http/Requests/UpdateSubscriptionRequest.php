@@ -19,6 +19,8 @@ class UpdateSubscriptionRequest extends FormRequest
             'concepto' => ['sometimes', 'nullable', 'string', 'max:200'],
             'cuenta_externa' => ['sometimes', 'nullable', 'string', 'max:120'],
             'periodo' => ['sometimes', Rule::enum(BillingPeriod::class)],
+            'dia_cobro' => ['sometimes', 'nullable', 'integer', 'min:1', 'max:31'],
+            'avisar' => ['sometimes', 'boolean'],
             'proxima_renovacion' => ['sometimes', 'date'],
             'estado' => ['sometimes', Rule::enum(SubscriptionStatus::class)],
         ];
