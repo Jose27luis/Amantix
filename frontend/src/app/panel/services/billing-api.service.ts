@@ -2,9 +2,12 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 import {
+  CambioCuenta,
   CobranzaCliente,
   CuentaCobrar,
+  DatosMetodoPago,
   DatosPago,
+  MetodoPagoCuenta,
   FiltroCuenta,
   NuevaCuenta,
   PagoReportado,
@@ -52,6 +55,26 @@ export class BillingApiService {
     return this.http.post<CuentaCobrar>('/api/admin/billing/receivables', datos);
   }
 
+  editarCuenta(cuentaId: number, datos: CambioCuenta): Observable<CuentaCobrar> {
+    return this.http.patch<CuentaCobrar>(`/api/admin/billing/receivables/${cuentaId}`, datos);
+  }
+
+  metodos(): Observable<{ readonly data: readonly MetodoPagoCuenta[] }> {
+    return this.http.get<{ readonly data: readonly MetodoPagoCuenta[] }>('/api/admin/billing/payment-accounts');
+  }
+
+  crearMetodo(datos: DatosMetodoPago): Observable<MetodoPagoCuenta> {
+    return this.http.post<MetodoPagoCuenta>('/api/admin/billing/payment-accounts', datos);
+  }
+
+  editarMetodo(id: number, datos: Partial<DatosMetodoPago>): Observable<MetodoPagoCuenta> {
+    return this.http.patch<MetodoPagoCuenta>(`/api/admin/billing/payment-accounts/${id}`, datos);
+  }
+
+  eliminarMetodo(id: number): Observable<void> {
+    return this.http.delete<void>(`/api/admin/billing/payment-accounts/${id}`);
+  }
+
   anular(cuentaId: number, motivo: string): Observable<CuentaCobrar> {
     return this.http.post<CuentaCobrar>(`/api/admin/billing/receivables/${cuentaId}/void`, { motivo });
   }
@@ -92,7 +115,11 @@ export class BillingApiService {
 
   private cuerpoPago(datos: DatosPago, captura: File | null): FormData {
     const cuerpo = new FormData();
-    cuerpo.append('metodo', datos.metodo);
+    if (datos.metodo_pago_id !== '') {
+      cuerpo.append('metodo_pago_id', datos.metodo_pago_id);
+    } else {
+      cuerpo.append('metodo', datos.metodo);
+    }
     cuerpo.append('fecha_pago', datos.fecha_pago);
     if (datos.numero_operacion.trim() !== '') {
       cuerpo.append('numero_operacion', datos.numero_operacion.trim());
