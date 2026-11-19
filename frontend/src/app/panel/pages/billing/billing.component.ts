@@ -5,9 +5,18 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 import { BillingApiService } from '../../services/billing-api.service';
 import { CompaniesApiService } from '../../services/companies-api.service';
-import { CuentaCobrar, DatosPago, Empresa, FiltroCuenta, MetodoPago, PagoReportado, Paginado, ResumenCobranza } from '../../models/panel.models';
 import {
-  METODOS_PAGO,
+  CuentaCobrar,
+  DatosPago,
+  Empresa,
+  FiltroCuenta,
+  MetodoPago,
+  MetodoPagoCuenta,
+  PagoReportado,
+  Paginado,
+  ResumenCobranza,
+} from '../../models/panel.models';
+import {
   enlaceWhatsapp,
   etiquetaEstadoCuenta,
   etiquetaMetodoPago,
@@ -17,7 +26,7 @@ import {
   mensajeError,
 } from '../../models/labels';
 
-type Accion = { readonly tipo: 'cobrar' | 'anular'; readonly cuenta: CuentaCobrar };
+type Accion = { readonly tipo: 'cobrar' | 'anular' | 'editar'; readonly cuenta: CuentaCobrar };
 
 const FILTROS: readonly { readonly valor: FiltroCuenta; readonly etiqueta: string }[] = [
   { valor: 'por_cobrar', etiqueta: 'Por cobrar' },
@@ -42,7 +51,6 @@ export class BillingComponent {
   private readonly capturasAbiertas: string[] = [];
 
   protected readonly filtros = FILTROS;
-  protected readonly metodos = METODOS_PAGO;
   protected readonly formatoSoles = formatoSoles;
   protected readonly fechaCorta = fechaCorta;
   protected readonly etiquetaEstado = etiquetaEstadoCuenta;
@@ -68,8 +76,11 @@ export class BillingComponent {
   protected readonly accion = signal<Accion | null>(null);
   protected readonly errorAccion = signal<string | null>(null);
   protected pago: DatosPago = this.pagoVacio();
+  protected cobroCon = '';
   protected captura: File | null = null;
   protected motivoAnulacion = '';
+  protected edicion = { concepto: '', monto: '', vence: '' };
+  protected readonly metodosPago = signal<readonly MetodoPagoCuenta[]>([]);
 
   protected readonly creando = signal(false);
   protected readonly errorNueva = signal<string | null>(null);
@@ -84,6 +95,10 @@ export class BillingComponent {
       this.estado = 'por_cobrar';
     }
     inject(DestroyRef).onDestroy(() => this.capturasAbiertas.forEach((url: string) => URL.revokeObjectURL(url)));
+    this.api.metodos().subscribe({
+      next: (respuesta: { readonly data: readonly MetodoPagoCuenta[] }) =>
+        this.metodosPago.set(respuesta.data.filter((metodo: MetodoPagoCuenta) => metodo.activo)),
+    });
     this.recargarTodo();
   }
 
@@ -153,8 +168,31 @@ export class BillingComponent {
     this.accion.set({ tipo, cuenta });
     this.errorAccion.set(null);
     this.pago = { ...this.pagoVacio(), monto: String(cuenta.monto) };
+    this.cobroCon = this.metodosPago().length > 0 ? String(this.metodosPago()[0].id) : 'efectivo';
     this.captura = null;
     this.motivoAnulacion = '';
+    this.edicion = { concepto: cuenta.concepto, monto: String(cuenta.monto), vence: cuenta.vence };
+  }
+
+  protected confirmarEdicion(cuenta: CuentaCobrar): void {
+    const monto = Number(this.edicion.monto);
+    if (this.edicion.concepto.trim().length < 3 || !(monto > 0) || this.edicion.vence === '') {
+      this.errorAccion.set('Completa concepto, monto y vencimiento.');
+      return;
+    }
+    this.ocupado.set(cuenta.id);
+    this.errorAccion.set(null);
+    this.api
+      .editarCuenta(cuenta.id, { concepto: this.edicion.concepto.trim(), monto, vence: this.edicion.vence })
+      .pipe(finalize(() => this.ocupado.set(null)))
+      .subscribe({
+        next: () => {
+          this.accion.set(null);
+          this.aviso.set('Cuenta actualizada.');
+          this.recargarTodo();
+        },
+        error: (error: HttpErrorResponse) => this.errorAccion.set(mensajeError(error, 'No pudimos guardar la cuenta.')),
+      });
   }
 
   protected elegirCaptura(evento: Event): void {
@@ -165,8 +203,12 @@ export class BillingComponent {
   protected confirmarCobro(cuenta: CuentaCobrar): void {
     this.ocupado.set(cuenta.id);
     this.errorAccion.set(null);
+    const datos: DatosPago =
+      this.cobroCon === 'efectivo'
+        ? { ...this.pago, metodo_pago_id: '', metodo: 'efectivo' }
+        : { ...this.pago, metodo_pago_id: this.cobroCon };
     this.api
-      .cobrar(cuenta.id, this.pago, this.captura)
+      .cobrar(cuenta.id, datos, this.captura)
       .pipe(finalize(() => this.ocupado.set(null)))
       .subscribe({
         next: (actualizada: CuentaCobrar) => {
@@ -275,7 +317,7 @@ export class BillingComponent {
   }
 
   private pagoVacio(): DatosPago {
-    return { metodo: 'yape' as MetodoPago, numero_operacion: '', fecha_pago: fechaHoy(), monto: '' };
+    return { metodo_pago_id: '', metodo: 'otro' as MetodoPago, numero_operacion: '', fecha_pago: fechaHoy(), monto: '' };
   }
 
   private guardarCaptura(pagoId: number, contenido: Blob): string {
