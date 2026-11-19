@@ -29,6 +29,44 @@
   cursor: pointer;
 }
 
+.num {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.productos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.productos .chip {
+  font-size: 0.7rem;
+  padding: 3px 9px;
+}
+
+.dia {
+  display: block;
+  font-size: 0.84rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.deuda {
+  font-weight: 700;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.deuda.vencida,
+.vencida-texto {
+  color: var(--danger);
+}
+
+.mono {
+  font-family: var(--font-mono);
+}
+
 .row:focus-visible {
   outline: 2px solid var(--teal);
   outline-offset: -2px;
