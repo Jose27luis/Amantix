@@ -8,6 +8,8 @@ use App\Enums\PaymentMethod;
 use App\Enums\PaymentReportStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class PaymentReport extends Model
 {
@@ -18,12 +20,15 @@ class PaymentReport extends Model
     protected $table = 'pagos_cobranza';
 
     protected $fillable = [
+        'clave_idempotencia',
         'cuenta_id',
         'empresa_id',
         'monto',
+        'monto_reportado',
         'metodo',
         'metodo_pago_id',
         'numero_operacion',
+        'operacion_activa',
         'fecha_pago',
         'captura_ruta',
         'captura_tipo',
@@ -41,6 +46,7 @@ class PaymentReport extends Model
     {
         return [
             'monto' => 'decimal:2',
+            'monto_reportado' => 'decimal:2',
             'metodo' => PaymentMethod::class,
             'fecha_pago' => 'date',
             'estado' => PaymentReportStatus::class,
@@ -61,6 +67,16 @@ class PaymentReport extends Model
     public function metodoPago(): BelongsTo
     {
         return $this->belongsTo(PaymentAccount::class, 'metodo_pago_id');
+    }
+
+    public function aplicaciones(): HasMany
+    {
+        return $this->hasMany(PaymentApplication::class, 'pago_id');
+    }
+
+    public function comprobante(): HasOne
+    {
+        return $this->hasOne(BillingInvoice::class, 'pago_id');
     }
 
     public function integracion(): BelongsTo
