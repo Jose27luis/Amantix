@@ -29,6 +29,8 @@ class SubscriptionService
             'producto_id' => (int) $datos['producto_id'],
             'plan_id' => $plan->id,
             'precio' => $datos['precio'] ?? $plan->precio,
+            'concepto' => $datos['concepto'] ?? null,
+            'cuenta_externa' => $datos['cuenta_externa'] ?? null,
             'periodo' => $periodo,
             'fecha_alta' => $alta->toDateString(),
             'proxima_renovacion' => $datos['proxima_renovacion'] ?? $alta->addMonthsNoOverflow($periodo->meses())->toDateString(),
@@ -51,7 +53,7 @@ class SubscriptionService
             $suscripcion->plan_id = (int) $datos['plan_id'];
         }
 
-        $suscripcion->fill(array_intersect_key($datos, array_flip(['precio', 'periodo', 'proxima_renovacion', 'estado'])));
+        $suscripcion->fill(array_intersect_key($datos, array_flip(['precio', 'concepto', 'cuenta_externa', 'periodo', 'proxima_renovacion', 'estado'])));
         $cambios = array_keys($suscripcion->getDirty());
         $suscripcion->save();
 
