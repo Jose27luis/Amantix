@@ -7,7 +7,9 @@ namespace App\Http\Controllers\Api;
 use App\Enums\ReceivableStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ReportPaymentRequest;
+use App\Http\Resources\PaymentAccountResource;
 use App\Http\Resources\ReceivableResource;
+use App\Models\PaymentAccount;
 use App\Models\PaymentReport;
 use App\Models\Receivable;
 use App\Models\User;
@@ -17,7 +19,7 @@ use Illuminate\Http\Request;
 
 class ClientBillingController extends Controller
 {
-    private const RELACIONES = ['suscripcion.producto', 'pagos', 'comprobante'];
+    private const RELACIONES = ['suscripcion.producto', 'pagos.metodoPago', 'comprobante'];
 
     public function index(Request $request): JsonResponse
     {
@@ -41,6 +43,9 @@ class ClientBillingController extends Controller
         return response()->json([
             'por_pagar' => ReceivableResource::collection($porPagar)->resolve($request),
             'pagadas' => ReceivableResource::collection($pagadas)->resolve($request),
+            'metodos_pago' => PaymentAccountResource::collection(
+                PaymentAccount::query()->where('activo', true)->orderBy('orden')->orderBy('id')->get()
+            )->resolve($request),
         ]);
     }
 
