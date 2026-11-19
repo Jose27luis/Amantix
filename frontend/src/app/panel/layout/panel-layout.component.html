@@ -37,6 +37,13 @@
           <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 17V5l6-2v14M9 17V8l8 2v7M2 17h16M5.5 7.5h1M5.5 10.5h1M5.5 13.5h1M12 12h2M12 14.5h2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
           <span class="nav-text">Clientes</span>
         </a>
+        <a routerLink="/panel/billing" routerLinkActive="active" class="nav-link" data-label="Cobranza" (click)="cerrarMenu()">
+          <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 5h14v10H3V5Zm0 3h14M6 12h3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
+          <span class="nav-text">Cobranza</span>
+          @if (cobranza.pagosEnRevision() > 0) {
+            <span class="badge" [attr.aria-label]="cobranza.pagosEnRevision() + ' pagos por revisar'">{{ cobranza.pagosEnRevision() }}</span>
+          }
+        </a>
         <a routerLink="/panel/tickets" routerLinkActive="active" class="nav-link" data-label="Soporte" (click)="cerrarMenu()">
           <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 4h14v10H8l-4 3v-3H3V4Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" /></svg>
           <span class="nav-text">Soporte</span>
@@ -61,6 +68,10 @@
         <a routerLink="/panel" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link" data-label="Inicio" (click)="cerrarMenu()">
           <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 9.5 10 3l7 6.5V17h-5v-5H8v5H3V9.5Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" /></svg>
           <span class="nav-text">Inicio</span>
+        </a>
+        <a routerLink="/panel/billing" routerLinkActive="active" class="nav-link" data-label="Mis pagos" (click)="cerrarMenu()">
+          <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 5h14v10H3V5Zm0 3h14M6 12h3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
+          <span class="nav-text">Mis pagos</span>
         </a>
         <a routerLink="/panel/tickets" routerLinkActive="active" class="nav-link" data-label="Soporte" (click)="cerrarMenu()">
           <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 4h14v10H8l-4 3v-3H3V4Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" /></svg>
