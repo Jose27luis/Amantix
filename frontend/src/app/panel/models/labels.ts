@@ -1,5 +1,39 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { ErrorApi, EstadoLead, EstadoSuscripcion, EstadoTicket, OrigenLead, PrioridadTicket } from './panel.models';
+import { ErrorApi, EstadoCuenta, EstadoLead, EstadoPago, EstadoSuscripcion, EstadoTicket, MetodoPago, OrigenLead, PrioridadTicket } from './panel.models';
+
+export const METODOS_PAGO: readonly { readonly valor: MetodoPago; readonly etiqueta: string }[] = [
+  { valor: 'yape', etiqueta: 'Yape' },
+  { valor: 'plin', etiqueta: 'Plin' },
+  { valor: 'transferencia', etiqueta: 'Transferencia' },
+  { valor: 'deposito', etiqueta: 'Depósito' },
+  { valor: 'efectivo', etiqueta: 'Efectivo' },
+  { valor: 'otro', etiqueta: 'Otro' },
+];
+
+const ESTADOS_CUENTA: Readonly<Record<EstadoCuenta, string>> = {
+  pendiente: 'Pendiente',
+  en_revision: 'Pago en revisión',
+  pagada: 'Pagada',
+  anulada: 'Anulada',
+};
+
+const ESTADOS_PAGO: Readonly<Record<EstadoPago, string>> = {
+  en_revision: 'En revisión',
+  aceptado: 'Aceptado',
+  rechazado: 'Rechazado',
+};
+
+export function etiquetaMetodoPago(metodo: MetodoPago): string {
+  return METODOS_PAGO.find((item) => item.valor === metodo)?.etiqueta ?? metodo;
+}
+
+export function etiquetaEstadoCuenta(estado: EstadoCuenta): string {
+  return ESTADOS_CUENTA[estado];
+}
+
+export function etiquetaEstadoPago(estado: EstadoPago): string {
+  return ESTADOS_PAGO[estado];
+}
 
 export const ESTADOS_TICKET: readonly { readonly valor: EstadoTicket; readonly etiqueta: string }[] = [
   { valor: 'abierto', etiqueta: 'Abierto' },
