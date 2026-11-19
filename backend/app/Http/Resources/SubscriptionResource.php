@@ -31,6 +31,8 @@ class SubscriptionResource extends JsonResource
                 'nombre' => $suscripcion->plan->nombre,
             ],
             'precio' => (float) $suscripcion->precio,
+            'concepto' => $suscripcion->concepto,
+            'cuenta_externa' => $suscripcion->cuenta_externa,
             'periodo' => $suscripcion->periodo->value,
             'fecha_alta' => $suscripcion->fecha_alta?->toDateString(),
             'proxima_renovacion' => $suscripcion->proxima_renovacion?->toDateString(),
