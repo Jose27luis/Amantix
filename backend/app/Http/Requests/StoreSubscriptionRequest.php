@@ -19,6 +19,8 @@ class StoreSubscriptionRequest extends FormRequest
             'concepto' => ['nullable', 'string', 'max:200'],
             'cuenta_externa' => ['nullable', 'string', 'max:120'],
             'periodo' => ['nullable', Rule::enum(BillingPeriod::class)],
+            'dia_cobro' => ['nullable', 'integer', 'min:1', 'max:31'],
+            'avisar' => ['nullable', 'boolean'],
             'fecha_alta' => ['required', 'date'],
             'proxima_renovacion' => ['nullable', 'date', 'after:fecha_alta'],
         ];
