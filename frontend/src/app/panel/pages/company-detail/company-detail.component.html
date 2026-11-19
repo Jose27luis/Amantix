@@ -263,6 +263,78 @@
       </div>
     </div>
 
+    @if (estadoCuenta(); as estado) {
+      <div class="card">
+        <div class="section-head">
+          <div>
+            <h2 class="card-title">Estado de cuenta</h2>
+            <p class="card-sub">Debe {{ formatoSoles(estado.deuda) }} · pagado en total {{ formatoSoles(estado.pagado_total) }}</p>
+          </div>
+          <a class="btn btn-ghost btn-sm" routerLink="/panel/billing" [queryParams]="{ empresa_id: datos.empresa.id }">Cobrar</a>
+        </div>
+        <div class="grid-2 spaced">
+          <div class="table-wrap">
+            <table class="table">
+              <thead>
+                <tr><th>Cargo</th><th class="num">Monto</th><th class="num">Saldo</th><th>Estado</th></tr>
+              </thead>
+              <tbody>
+                @for (cuenta of estado.cuentas; track cuenta.id) {
+                  <tr>
+                    <td>
+                      {{ cuenta.concepto }}
+                      <span class="sub">Vence {{ fechaCorta(cuenta.vence) }}</span>
+                    </td>
+                    <td class="mono num">{{ formatoSoles(cuenta.monto) }}</td>
+                    <td class="mono num">{{ formatoSoles(cuenta.saldo) }}</td>
+                    <td>
+                      @if (cuenta.vencida) {
+                        <span class="chip chip-vencida">Vencida</span>
+                      } @else {
+                        <span [class]="'chip chip-' + cuenta.estado">{{ etiquetaEstadoCuenta(cuenta.estado) }}</span>
+                      }
+                    </td>
+                  </tr>
+                } @empty {
+                  <tr><td colspan="4" class="empty">Sin cargos.</td></tr>
+                }
+              </tbody>
+            </table>
+          </div>
+          <div class="table-wrap">
+            <table class="table">
+              <thead>
+                <tr><th>Pago</th><th class="num">Monto</th><th>Aplicado a</th></tr>
+              </thead>
+              <tbody>
+                @for (pago of estado.pagos; track pago.id) {
+                  <tr>
+                    <td>
+                      <span [class]="'chip chip-' + pago.estado">{{ etiquetaEstadoPago(pago.estado) }}</span>
+                      <span class="sub">{{ fechaCorta(pago.fecha_pago) }} · {{ pago.metodo_nombre ?? pago.metodo }}</span>
+                      @if (pago.comprobante?.pdf_url) {
+                        <a class="sub link" [href]="pago.comprobante?.pdf_url" target="_blank" rel="noopener">{{ pago.comprobante?.numero }}</a>
+                      }
+                    </td>
+                    <td class="mono num">{{ formatoSoles(pago.monto) }}</td>
+                    <td>
+                      @for (a of pago.aplicaciones; track a.cuenta_id) {
+                        <span class="sub">{{ a.concepto }}: {{ formatoSoles(a.monto) }}</span>
+                      } @empty {
+                        <span class="sub">{{ pago.estado === 'rechazado' ? pago.motivo_rechazo : 'En revisión' }}</span>
+                      }
+                    </td>
+                  </tr>
+                } @empty {
+                  <tr><td colspan="3" class="empty">Sin pagos.</td></tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    }
+
     <div class="grid-2">
       <div class="card">
         <div class="section-head">
