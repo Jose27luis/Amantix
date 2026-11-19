@@ -2,6 +2,47 @@
   margin-top: 14px;
 }
 
+.avisos {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.aviso {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--brass);
+  border-radius: 10px;
+  background: var(--surface);
+}
+
+.aviso-datos {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1 1 320px;
+}
+
+.aviso-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.atrasado {
+  font-weight: 700;
+  color: var(--danger);
+}
+
 .head-actions {
   display: flex;
   flex-wrap: wrap;
