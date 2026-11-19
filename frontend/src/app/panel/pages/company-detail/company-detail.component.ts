@@ -100,6 +100,8 @@ export class CompanyDetailComponent implements OnInit {
     precio: [0, [Validators.required, Validators.min(0)]],
     periodo: ['mensual' as Periodo, [Validators.required]],
     fecha_alta: [fechaHoy(), [Validators.required]],
+    proxima_renovacion: [''],
+    concepto: ['', [Validators.maxLength(200)]],
   });
 
   protected readonly usuarioForm = this.fb.nonNullable.group({
@@ -187,6 +189,8 @@ export class CompanyDetailComponent implements OnInit {
         precio: Number(valores.precio),
         periodo: valores.periodo,
         fecha_alta: valores.fecha_alta,
+        ...(valores.proxima_renovacion !== '' ? { proxima_renovacion: valores.proxima_renovacion } : {}),
+        ...(valores.concepto.trim() !== '' ? { concepto: valores.concepto.trim() } : {}),
       })
       .pipe(finalize(() => this.guardandoSuscripcion.set(false)))
       .subscribe({
