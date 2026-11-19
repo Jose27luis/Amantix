@@ -231,6 +231,7 @@ export interface PagoReportado {
   readonly cuenta_id: number;
   readonly monto: number;
   readonly metodo: MetodoPago;
+  readonly metodo_nombre: string | null;
   readonly numero_operacion: string | null;
   readonly fecha_pago: string;
   readonly tiene_captura: boolean;
@@ -281,12 +282,43 @@ export interface ResumenCobranza {
   readonly cobrado_mes: number;
 }
 
+export interface MetodoPagoCuenta {
+  readonly id: number;
+  readonly nombre: string;
+  readonly tipo: MetodoPago;
+  readonly titular: string | null;
+  readonly numero: string | null;
+  readonly cci: string | null;
+  readonly instrucciones: string | null;
+  readonly activo: boolean;
+  readonly orden: number;
+}
+
+export interface DatosMetodoPago {
+  readonly nombre: string;
+  readonly tipo: MetodoPago;
+  readonly titular: string | null;
+  readonly numero: string | null;
+  readonly cci: string | null;
+  readonly instrucciones: string | null;
+  readonly activo: boolean;
+  readonly orden: number;
+}
+
 export interface CobranzaCliente {
   readonly por_pagar: readonly CuentaCobrar[];
   readonly pagadas: readonly CuentaCobrar[];
+  readonly metodos_pago: readonly MetodoPagoCuenta[];
+}
+
+export interface CambioCuenta {
+  readonly concepto: string;
+  readonly monto: number;
+  readonly vence: string;
 }
 
 export interface DatosPago {
+  readonly metodo_pago_id: string;
   readonly metodo: MetodoPago;
   readonly numero_operacion: string;
   readonly fecha_pago: string;
