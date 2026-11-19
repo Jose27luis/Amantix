@@ -1,0 +1,120 @@
+.back {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--teal);
+  align-self: flex-start;
+}
+
+.spaced {
+  margin-top: 14px;
+}
+
+.corto {
+  max-width: 420px;
+}
+
+.con-sufijo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.con-sufijo input {
+  width: 96px;
+}
+
+.con-sufijo span {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--slate);
+}
+
+.dias {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.dia-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px 6px 12px;
+  border-radius: 999px;
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--teal);
+  background: var(--teal-50);
+}
+
+.dia-chip.antes {
+  color: var(--steel);
+  background: var(--steel-50);
+}
+
+.dia-chip.despues {
+  color: #8a3b39;
+  background: var(--danger-50);
+}
+
+.dia-chip button {
+  width: 22px;
+  height: 22px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(15, 29, 46, 0.08);
+  font-size: 0.95rem;
+  line-height: 1;
+  color: inherit;
+  cursor: pointer;
+}
+
+.agregar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.agregar .btn {
+  margin-top: 26px;
+}
+
+.variables {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.variable {
+  padding: 4px 10px;
+  border: 1px solid var(--line-2);
+  border-radius: 6px;
+  background: var(--cloud);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.vista {
+  padding: 14px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.vista-titulo {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--slate);
+}
+
+.vista p {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
