@@ -27,7 +27,7 @@ class NoticeAgenda
 
         $cuentas = Receivable::query()
             ->with(['empresa', 'suscripcion'])
-            ->whereIn('estado', [ReceivableStatus::Pendiente, ReceivableStatus::EnRevision])
+            ->whereIn('estado', ReceivableStatus::cobrables())
             ->whereDate('vence', '<=', $hoy->subDays(min($dias))->toDateString())
             ->where(fn (Builder $q): Builder => $q->whereNull('suscripcion_id')->orWhereHas('suscripcion', fn (Builder $s): Builder => $s->where('avisar', true)))
             ->orderBy('vence')
