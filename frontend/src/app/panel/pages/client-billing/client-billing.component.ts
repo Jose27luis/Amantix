@@ -3,8 +3,8 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { finalize } from 'rxjs';
 import { BillingApiService } from '../../services/billing-api.service';
-import { CobranzaCliente, CuentaCobrar, DatosPago, MetodoPago, PagoReportado } from '../../models/panel.models';
-import { METODOS_PAGO, etiquetaEstadoCuenta, etiquetaMetodoPago, fechaCorta, fechaHoy, formatoSoles, mensajeError } from '../../models/labels';
+import { CobranzaCliente, CuentaCobrar, DatosPago, MetodoPago, MetodoPagoCuenta, PagoReportado } from '../../models/panel.models';
+import { etiquetaEstadoCuenta, etiquetaMetodoPago, fechaCorta, fechaHoy, formatoSoles, mensajeError } from '../../models/labels';
 
 const MAXIMO_BYTES = 5 * 1024 * 1024;
 const TIPOS = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
@@ -20,7 +20,7 @@ const TIPOS = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
 export class ClientBillingComponent {
   private readonly api = inject(BillingApiService);
 
-  protected readonly metodos = METODOS_PAGO.filter((item) => item.valor !== 'efectivo');
+  protected readonly copiado = signal<string | null>(null);
   protected readonly formatoSoles = formatoSoles;
   protected readonly fechaCorta = fechaCorta;
   protected readonly etiquetaEstado = etiquetaEstadoCuenta;
@@ -75,7 +75,12 @@ export class ClientBillingComponent {
       this.errorReporte.set('Adjunta la captura del pago.');
       return;
     }
-    if (this.pago.numero_operacion.trim() === '' && this.pago.metodo !== 'otro') {
+    const elegido = this.datos()?.metodos_pago.find((metodo: MetodoPagoCuenta) => String(metodo.id) === this.pago.metodo_pago_id);
+    if (elegido === undefined) {
+      this.errorReporte.set('Elige a qué cuenta pagaste.');
+      return;
+    }
+    if (this.pago.numero_operacion.trim() === '' && elegido.tipo !== 'otro' && elegido.tipo !== 'efectivo') {
       this.errorReporte.set('Escribe el número de operación.');
       return;
     }
@@ -95,8 +100,26 @@ export class ClientBillingComponent {
       });
   }
 
+  protected copiar(valor: string): void {
+    navigator.clipboard
+      .writeText(valor)
+      .then(() => {
+        this.copiado.set(valor);
+        setTimeout(() => this.copiado.set(null), 2000);
+      })
+      .catch(() => this.copiado.set(null));
+  }
+
   private pagoVacio(): DatosPago {
-    return { metodo: 'yape' as MetodoPago, numero_operacion: '', fecha_pago: fechaHoy(), monto: '' };
+    const primero = this.datos()?.metodos_pago[0];
+
+    return {
+      metodo_pago_id: primero ? String(primero.id) : '',
+      metodo: 'otro' as MetodoPago,
+      numero_operacion: '',
+      fecha_pago: fechaHoy(),
+      monto: '',
+    };
   }
 
   private cargar(): void {
