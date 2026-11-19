@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 use App\Http\Controllers\Api\AttachmentController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\BillingController;
+use App\Http\Controllers\Api\ClientBillingController;
 use App\Http\Controllers\Api\ClientSummaryController;
 use App\Http\Controllers\Api\CompanyController;
 use App\Http\Controllers\Api\CompanyUserController;
@@ -12,6 +14,7 @@ use App\Http\Controllers\Api\LeadController;
 use App\Http\Controllers\Api\LeadConversionController;
 use App\Http\Controllers\Api\LeadNoteController;
 use App\Http\Controllers\Api\NewsController;
+use App\Http\Controllers\Api\PaymentCaptureController;
 use App\Http\Controllers\Api\PlanController;
 use App\Http\Controllers\Api\PublicLeadController;
 use App\Http\Controllers\Api\PublicNewsController;
@@ -47,9 +50,12 @@ Route::middleware(['auth:sanctum', 'active'])->group(function (): void {
     Route::post('tickets/{ticket}/messages', [TicketMessageController::class, 'store'])->middleware('throttle:tickets');
     Route::post('tickets/{ticket}/close', [TicketController::class, 'cerrar']);
     Route::get('tickets/{ticket}/attachments/{attachment}', [AttachmentController::class, 'show']);
+    Route::get('billing/payments/{payment}/capture', PaymentCaptureController::class);
 
     Route::middleware('role:cliente')->prefix('client')->group(function (): void {
         Route::get('summary', ClientSummaryController::class);
+        Route::get('billing', [ClientBillingController::class, 'index']);
+        Route::post('billing/receivables/{receivable}/payments', [ClientBillingController::class, 'reportar'])->middleware('throttle:tickets');
         Route::post('tickets', [TicketController::class, 'store'])->middleware('throttle:tickets');
     });
 
@@ -70,6 +76,16 @@ Route::middleware(['auth:sanctum', 'active'])->group(function (): void {
         Route::post('companies/{company}/subscriptions', [SubscriptionController::class, 'store']);
         Route::post('companies/{company}/users', [CompanyUserController::class, 'store']);
         Route::patch('subscriptions/{subscription}', [SubscriptionController::class, 'update']);
+
+        Route::get('billing/summary', [BillingController::class, 'resumen']);
+        Route::get('billing/receivables', [BillingController::class, 'index']);
+        Route::post('billing/receivables', [BillingController::class, 'store']);
+        Route::post('billing/receivables/{receivable}/void', [BillingController::class, 'anular']);
+        Route::post('billing/receivables/{receivable}/payments', [BillingController::class, 'cobrar']);
+        Route::post('billing/receivables/{receivable}/invoice', [BillingController::class, 'emitir']);
+        Route::get('billing/payments/pending', [BillingController::class, 'pagosEnRevision']);
+        Route::post('billing/payments/{payment}/accept', [BillingController::class, 'aceptar']);
+        Route::post('billing/payments/{payment}/reject', [BillingController::class, 'rechazar']);
 
         Route::get('tickets/pending', [TicketController::class, 'pendientes']);
         Route::patch('tickets/{ticket}', [TicketController::class, 'update']);
