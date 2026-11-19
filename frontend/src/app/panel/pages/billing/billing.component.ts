@@ -6,6 +6,8 @@ import { finalize } from 'rxjs';
 import { BillingApiService } from '../../services/billing-api.service';
 import { CompaniesApiService } from '../../services/companies-api.service';
 import {
+  AjustesCobranza,
+  AvisoCobranza,
   CuentaCobrar,
   DatosPago,
   Empresa,
@@ -24,6 +26,7 @@ import {
   fechaHoy,
   formatoSoles,
   mensajeError,
+  textoDia,
 } from '../../models/labels';
 
 type Accion = { readonly tipo: 'cobrar' | 'anular' | 'editar'; readonly cuenta: CuentaCobrar };
@@ -81,6 +84,9 @@ export class BillingComponent {
   protected motivoAnulacion = '';
   protected edicion = { concepto: '', monto: '', vence: '' };
   protected readonly metodosPago = signal<readonly MetodoPagoCuenta[]>([]);
+  protected readonly avisos = signal<readonly AvisoCobranza[]>([]);
+  protected readonly textoDia = textoDia;
+  private plantilla = '';
 
   protected readonly creando = signal(false);
   protected readonly errorNueva = signal<string | null>(null);
@@ -99,6 +105,7 @@ export class BillingComponent {
       next: (respuesta: { readonly data: readonly MetodoPagoCuenta[] }) =>
         this.metodosPago.set(respuesta.data.filter((metodo: MetodoPagoCuenta) => metodo.activo)),
     });
+    this.api.ajustes().subscribe({ next: (ajustes: AjustesCobranza) => (this.plantilla = ajustes.mensaje) });
     this.recargarTodo();
   }
 
@@ -255,12 +262,33 @@ export class BillingComponent {
     if (base === null) {
       return null;
     }
-    const texto =
-      `Hola, ${cuenta.empresa?.razon_social ?? ''}. Le recordamos que tiene pendiente: ${cuenta.concepto}, ` +
-      `por ${formatoSoles(cuenta.monto)}, con vencimiento el ${fechaCorta(cuenta.vence)}. ` +
-      'Puede reportar su pago con la captura en https://amantix.pe/panel/billing. Gracias, Amantix.';
+    const valores: Readonly<Record<string, string>> = {
+      '{cliente}': cuenta.empresa?.razon_social ?? '',
+      '{concepto}': cuenta.concepto,
+      '{monto}': formatoSoles(cuenta.monto),
+      '{vence}': fechaCorta(cuenta.vence),
+      '{enlace}': 'https://amantix.pe/panel/billing',
+    };
+    const texto = Object.entries(valores).reduce(
+      (actual: string, [variable, valor]: [string, string]) => actual.split(variable).join(valor),
+      this.plantilla,
+    );
 
     return `${base}?text=${encodeURIComponent(texto)}`;
+  }
+
+  protected enviarAviso(aviso: AvisoCobranza): void {
+    if (aviso.whatsapp !== null) {
+      window.open(aviso.whatsapp, '_blank', 'noopener');
+    }
+    this.marcarAviso(aviso);
+  }
+
+  protected marcarAviso(aviso: AvisoCobranza): void {
+    this.api.marcarAviso(aviso.cuenta.id, aviso.dia_relativo).subscribe({
+      next: () => this.avisos.update((lista: readonly AvisoCobranza[]) => lista.filter((item: AvisoCobranza) => item.cuenta.id !== aviso.cuenta.id)),
+      error: (error: HttpErrorResponse) => this.error.set(mensajeError(error, 'No pudimos registrar el aviso.')),
+    });
   }
 
   protected alternarNueva(): void {
@@ -329,6 +357,10 @@ export class BillingComponent {
   }
 
   private recargarTodo(): void {
+    this.api.avisos().subscribe({
+      next: (respuesta: { readonly data: readonly AvisoCobranza[] }) => this.avisos.set(respuesta.data),
+      error: (error: HttpErrorResponse) => this.error.set(mensajeError(error, 'No pudimos cargar los avisos de hoy.')),
+    });
     this.api.resumen().subscribe({
       next: (resumen: ResumenCobranza) => this.resumen.set(resumen),
       error: (error: HttpErrorResponse) => this.error.set(mensajeError(error, 'No pudimos cargar el resumen.')),
