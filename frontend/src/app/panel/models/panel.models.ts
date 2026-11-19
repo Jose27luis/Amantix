@@ -176,6 +176,36 @@ export interface Empresa {
   readonly tickets_abiertos: number | null;
   readonly proxima_renovacion: string | null;
   readonly creado: string | null;
+  readonly deuda?: number | null;
+  readonly cuentas_vencidas?: number | null;
+  readonly usuarios_portal?: number | null;
+  readonly monto_mensual?: number | null;
+  readonly productos?: readonly ProductoEmpresa[] | null;
+}
+
+export interface ProductoEmpresa {
+  readonly nombre: string;
+  readonly estado: EstadoSuscripcion;
+  readonly precio: number;
+  readonly periodo: Periodo;
+  readonly dia_cobro: number | null;
+  readonly proxima_renovacion: string | null;
+}
+
+export interface AjustesCobranza {
+  readonly dias_anticipacion: number;
+  readonly recordatorios: readonly number[];
+  readonly mensaje: string;
+  readonly variables: readonly string[];
+}
+
+export interface AvisoCobranza {
+  readonly cuenta: CuentaCobrar;
+  readonly dia_relativo: number;
+  readonly dias_para_vencer: number;
+  readonly mensaje: string;
+  readonly whatsapp: string | null;
+  readonly ultimo_aviso: string | null;
 }
 
 export interface DatosEmpresa {
@@ -197,6 +227,8 @@ export interface Suscripcion {
   readonly concepto: string | null;
   readonly cuenta_externa: string | null;
   readonly periodo: Periodo;
+  readonly dia_cobro: number | null;
+  readonly avisar: boolean;
   readonly fecha_alta: string;
   readonly proxima_renovacion: string;
   readonly estado: EstadoSuscripcion;
@@ -208,6 +240,7 @@ export interface NuevaSuscripcion {
   readonly precio: number;
   readonly concepto?: string;
   readonly periodo: Periodo;
+  readonly dia_cobro?: number;
   readonly fecha_alta: string;
   readonly proxima_renovacion?: string;
 }
@@ -216,6 +249,8 @@ export interface CambioSuscripcion {
   readonly plan_id?: number;
   readonly precio?: number;
   readonly concepto?: string | null;
+  readonly dia_cobro?: number | null;
+  readonly avisar?: boolean;
   readonly periodo?: Periodo;
   readonly proxima_renovacion?: string;
   readonly estado?: EstadoSuscripcion;
