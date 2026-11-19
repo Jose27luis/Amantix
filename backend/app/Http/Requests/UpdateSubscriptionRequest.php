@@ -16,6 +16,8 @@ class UpdateSubscriptionRequest extends FormRequest
         return [
             'plan_id' => ['sometimes', 'integer', 'exists:planes,id'],
             'precio' => ['sometimes', 'numeric', 'min:0', 'max:999999'],
+            'concepto' => ['sometimes', 'nullable', 'string', 'max:200'],
+            'cuenta_externa' => ['sometimes', 'nullable', 'string', 'max:120'],
             'periodo' => ['sometimes', Rule::enum(BillingPeriod::class)],
             'proxima_renovacion' => ['sometimes', 'date'],
             'estado' => ['sometimes', Rule::enum(SubscriptionStatus::class)],
