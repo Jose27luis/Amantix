@@ -44,9 +44,12 @@ Route::post('leads', [PublicLeadController::class, 'store'])->middleware('thrott
 
 Route::post('auth/login', [AuthController::class, 'login'])->middleware('throttle:login');
 
+Route::get('payment-accounts/{paymentAccount}/qr', [PaymentAccountController::class, 'verQr'])->whereNumber('paymentAccount');
+
 Route::prefix('integration/v1')->middleware(['integration', 'throttle:240,1'])->group(function (): void {
     Route::get('accounts/{cuenta}/billing', [IntegrationBillingController::class, 'show'])->where('cuenta', '[A-Za-z0-9._-]+');
-    Route::post('accounts/{cuenta}/receivables/{receivable}/payments', [IntegrationBillingController::class, 'reportar'])->where('cuenta', '[A-Za-z0-9._-]+');
+    Route::post('accounts/{cuenta}/payments', [IntegrationBillingController::class, 'reportarPago'])->where('cuenta', '[A-Za-z0-9._-]+');
+    Route::post('accounts/{cuenta}/receivables/{receivable}/payments', [IntegrationBillingController::class, 'reportarCuenta'])->where('cuenta', '[A-Za-z0-9._-]+');
 });
 
 Route::middleware(['auth:sanctum', 'active'])->group(function (): void {
@@ -64,7 +67,7 @@ Route::middleware(['auth:sanctum', 'active'])->group(function (): void {
     Route::middleware('role:cliente')->prefix('client')->group(function (): void {
         Route::get('summary', ClientSummaryController::class);
         Route::get('billing', [ClientBillingController::class, 'index']);
-        Route::post('billing/receivables/{receivable}/payments', [ClientBillingController::class, 'reportar'])->middleware('throttle:tickets');
+        Route::post('billing/payments', [ClientBillingController::class, 'reportar'])->middleware('throttle:tickets');
         Route::post('tickets', [TicketController::class, 'store'])->middleware('throttle:tickets');
     });
 
@@ -103,11 +106,15 @@ Route::middleware(['auth:sanctum', 'active'])->group(function (): void {
         Route::post('billing/payment-accounts', [PaymentAccountController::class, 'store']);
         Route::patch('billing/payment-accounts/{paymentAccount}', [PaymentAccountController::class, 'update']);
         Route::delete('billing/payment-accounts/{paymentAccount}', [PaymentAccountController::class, 'destroy']);
+        Route::post('billing/payment-accounts/{paymentAccount}/qr', [PaymentAccountController::class, 'subirQr']);
+        Route::delete('billing/payment-accounts/{paymentAccount}/qr', [PaymentAccountController::class, 'quitarQr']);
         Route::post('billing/receivables/{receivable}/payments', [BillingController::class, 'cobrar']);
-        Route::post('billing/receivables/{receivable}/invoice', [BillingController::class, 'emitir']);
-        Route::get('billing/payments/pending', [BillingController::class, 'pagosEnRevision']);
+        Route::get('billing/payments', [BillingController::class, 'pagos']);
+        Route::get('billing/payments/pending', [BillingController::class, 'pendientes']);
         Route::post('billing/payments/{payment}/accept', [BillingController::class, 'aceptar']);
         Route::post('billing/payments/{payment}/reject', [BillingController::class, 'rechazar']);
+        Route::post('billing/payments/{payment}/invoice', [BillingController::class, 'emitir']);
+        Route::get('companies/{company}/statement', [BillingController::class, 'estadoCuenta']);
 
         Route::get('tickets/pending', [TicketController::class, 'pendientes']);
         Route::patch('tickets/{ticket}', [TicketController::class, 'update']);
