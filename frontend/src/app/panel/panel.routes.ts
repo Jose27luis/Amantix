@@ -54,6 +54,12 @@ export const PANEL_ROUTES: Routes = [
         loadComponent: () => import('./pages/company-detail/company-detail.component').then((m) => m.CompanyDetailComponent),
       },
       {
+        path: 'billing/settings',
+        canActivate: [passwordGuard, adminGuard],
+        title: 'Configuración de cobros · Panel Amantix',
+        loadComponent: () => import('./pages/billing-settings/billing-settings.component').then((m) => m.BillingSettingsComponent),
+      },
+      {
         path: 'billing/payment-methods',
         canActivate: [passwordGuard, adminGuard],
         title: 'Métodos de pago · Panel Amantix',
