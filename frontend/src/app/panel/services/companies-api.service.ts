@@ -16,6 +16,7 @@ export interface FiltrosEmpresa {
   readonly buscar: string;
   readonly producto_id: string;
   readonly renueva_en: string;
+  readonly situacion?: string;
   readonly page: number;
 }
 
@@ -31,6 +32,9 @@ export class CompaniesApiService {
       if (valor !== '') {
         parametros = parametros.set(clave, valor);
       }
+    }
+    if (filtros.situacion !== undefined && filtros.situacion !== '') {
+      parametros = parametros.set('situacion', filtros.situacion);
     }
 
     return this.http.get<Paginado<Empresa>>('/api/admin/companies', { params: parametros });
