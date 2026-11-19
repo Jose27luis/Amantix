@@ -35,4 +35,15 @@ return [
         ],
     ],
 
+    'pro8' => [
+        'url' => env('PRO8_URL', 'https://amantix.factix.cloud'),
+        'token' => env('PRO8_TOKEN'),
+        'serie_factura' => env('PRO8_SERIE_FACTURA', 'F001'),
+        'serie_boleta' => env('PRO8_SERIE_BOLETA', 'B001'),
+    ],
+
+    'cobranza' => [
+        'dias_anticipacion' => (int) env('COBRANZA_DIAS_ANTICIPACION', 3),
+    ],
+
 ];
