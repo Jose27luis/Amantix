@@ -37,6 +37,7 @@ export class PaymentMethodsComponent {
   protected readonly error = signal<string | null>(null);
   protected readonly aviso = signal<string | null>(null);
   protected readonly guardando = signal(false);
+  protected readonly subiendoQr = signal<number | null>(null);
 
   protected readonly editando = signal<number | 'nuevo' | null>(null);
   protected readonly errorForm = signal<string | null>(null);
@@ -117,6 +118,37 @@ export class PaymentMethodsComponent {
         this.cargar();
       },
       error: (error: HttpErrorResponse) => this.error.set(mensajeError(error, 'No pudimos eliminar el método de pago.')),
+    });
+  }
+
+  protected subirQr(metodo: MetodoPagoCuenta, evento: Event): void {
+    const entrada = evento.target as HTMLInputElement;
+    const archivo = entrada.files?.item(0) ?? null;
+    entrada.value = '';
+    if (archivo === null) {
+      return;
+    }
+    if (!['image/png', 'image/jpeg', 'image/webp'].includes(archivo.type) || archivo.size > 2 * 1024 * 1024) {
+      this.error.set('El QR debe ser una imagen PNG, JPG o WEBP de hasta 2 MB.');
+      return;
+    }
+    this.subiendoQr.set(metodo.id);
+    this.api
+      .subirQr(metodo.id, archivo)
+      .pipe(finalize(() => this.subiendoQr.set(null)))
+      .subscribe({
+        next: () => {
+          this.aviso.set('QR guardado.');
+          this.cargar();
+        },
+        error: (error: HttpErrorResponse) => this.error.set(mensajeError(error, 'No pudimos subir el QR.')),
+      });
+  }
+
+  protected quitarQr(metodo: MetodoPagoCuenta): void {
+    this.api.quitarQr(metodo.id).subscribe({
+      next: () => this.cargar(),
+      error: (error: HttpErrorResponse) => this.error.set(mensajeError(error, 'No pudimos quitar el QR.')),
     });
   }
 
