@@ -3,7 +3,7 @@
     <div>
       <span class="eyebrow">Clientes · Empresas</span>
       <h1 class="page-title">Clientes</h1>
-      <p class="page-lead">Empresas con productos contratados, sus suscripciones y sus usuarios.</p>
+      <p class="page-lead">Empresas con productos contratados, su día de cobro, lo que deben y cómo contactarlas.</p>
     </div>
     <button type="button" class="btn btn-primary btn-sm" (click)="alternarAlta()">
       {{ mostrandoAlta() ? 'Cancelar' : 'Nueva empresa' }}
@@ -81,7 +81,16 @@
       </select>
     </div>
     <div class="field">
-      <label for="renueva">Renueva en</label>
+      <label for="situacion">Situación</label>
+      <select id="situacion" name="situacion" [(ngModel)]="situacion">
+        <option value="">Todos</option>
+        <option value="con_deuda">Con deuda</option>
+        <option value="vencidos">Con pagos vencidos</option>
+        <option value="sin_suscripcion">Sin suscripción activa</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="renueva">Próximo cobro</label>
       <select id="renueva" name="renueva" [(ngModel)]="renuevaEn">
         <option value="">Cualquier fecha</option>
         <option value="7">Próximos 7 días</option>
@@ -104,10 +113,13 @@
         <thead>
           <tr>
             <th>Empresa</th>
-            <th>RUC</th>
-            <th>Suscripciones activas</th>
-            <th>Próxima renovación</th>
-            <th>Tickets abiertos</th>
+            <th>Productos</th>
+            <th class="num">Mensual</th>
+            <th>Día de cobro</th>
+            <th>Próximo cobro</th>
+            <th class="num">Deuda</th>
+            <th>Contacto</th>
+            <th class="num">Tickets</th>
           </tr>
         </thead>
         <tbody>
@@ -115,16 +127,49 @@
             <tr class="row" tabindex="0" (click)="abrir(empresa)" (keydown.enter)="abrir(empresa)">
               <td>
                 <a [routerLink]="['/panel/companies', empresa.id]" class="link" (click)="$event.stopPropagation()">{{ empresa.razon_social }}</a>
-                <span class="sub">{{ empresa.contacto ?? empresa.correo ?? '—' }}</span>
+                <span class="sub mono">{{ empresa.ruc }}</span>
               </td>
-              <td class="mono">{{ empresa.ruc }}</td>
-              <td class="mono">{{ empresa.suscripciones_activas ?? 0 }}</td>
+              <td>
+                <div class="productos">
+                  @for (producto of empresa.productos ?? []; track $index) {
+                    <span [class]="'chip chip-' + producto.estado" [attr.title]="etiquetaEstado(producto.estado)">{{ producto.nombre }}</span>
+                  } @empty {
+                    <span class="muted">Sin suscripción</span>
+                  }
+                </div>
+              </td>
+              <td class="mono num">{{ empresa.monto_mensual ? formatoSoles(empresa.monto_mensual) : '—' }}</td>
+              <td>
+                @for (producto of empresa.productos ?? []; track $index) {
+                  @if (producto.estado === 'activa' && producto.dia_cobro) {
+                    <span class="dia">Día {{ producto.dia_cobro }}</span>
+                  }
+                }
+              </td>
               <td class="mono">{{ fechaCorta(empresa.proxima_renovacion) }}</td>
-              <td class="mono">{{ empresa.tickets_abiertos ?? 0 }}</td>
+              <td class="num">
+                @if (empresa.deuda) {
+                  <a class="deuda mono" [class.vencida]="(empresa.cuentas_vencidas ?? 0) > 0" routerLink="/panel/billing" [queryParams]="{ empresa_id: empresa.id }" (click)="$event.stopPropagation()">{{ formatoSoles(empresa.deuda) }}</a>
+                  @if ((empresa.cuentas_vencidas ?? 0) > 0) {
+                    <span class="sub vencida-texto">{{ empresa.cuentas_vencidas }} vencida{{ empresa.cuentas_vencidas === 1 ? '' : 's' }}</span>
+                  }
+                } @else {
+                  <span class="muted">Al día</span>
+                }
+              </td>
+              <td>
+                @if (enlaceWhatsapp(empresa.telefono); as enlace) {
+                  <a [href]="enlace" target="_blank" rel="noopener" class="link mono" (click)="$event.stopPropagation()">{{ empresa.telefono }}</a>
+                } @else {
+                  <span class="mono">{{ empresa.telefono ?? '—' }}</span>
+                }
+                <span class="sub">{{ empresa.contacto ?? empresa.correo ?? '' }}</span>
+              </td>
+              <td class="mono num">{{ empresa.tickets_abiertos ?? 0 }}</td>
             </tr>
           } @empty {
             <tr>
-              <td colspan="5" class="empty">No hay clientes con estos filtros.</td>
+              <td colspan="8" class="empty">No hay clientes con estos filtros.</td>
             </tr>
           }
         </tbody>
