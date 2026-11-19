@@ -1,0 +1,81 @@
+<section class="page">
+  <a routerLink="/panel/billing" class="back">← Cobranza</a>
+  <header class="page-head">
+    <div>
+      <span class="eyebrow">Cobranza · Configuración</span>
+      <h1 class="page-title">Configuración de cobros</h1>
+      <p class="page-lead">Cuándo se genera cada cuenta, qué días se avisa al cliente y con qué mensaje. El día de cobro de cada cliente se cambia en su ficha.</p>
+    </div>
+  </header>
+
+  @if (aviso(); as texto) {
+    <p class="alert alert-ok" role="status">{{ texto }}</p>
+  }
+  @if (error(); as texto) {
+    <p class="alert alert-error" role="alert">{{ texto }}</p>
+  }
+
+  @if (!cargando()) {
+    <div class="card">
+      <h2 class="card-title">Generación de cuentas</h2>
+      <div class="field spaced corto">
+        <label for="anticipacion">Generar la cuenta</label>
+        <div class="con-sufijo">
+          <input id="anticipacion" type="number" min="0" max="30" name="anticipacion" [(ngModel)]="diasAnticipacion" />
+          <span>días antes del cobro</span>
+        </div>
+        <span class="field-help">La cuenta aparece en Cobranza y en "Mis pagos" del cliente desde ese día.</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">Avisos al cliente</h2>
+      <p class="card-sub">Cada día, Cobranza muestra en "Avisos de hoy" a quién toca avisar según estos días. Si un aviso no se envía, se vuelve a mostrar hasta el siguiente.</p>
+      <div class="dias spaced">
+        @for (dia of recordatorios(); track dia) {
+          <span class="dia-chip" [class.antes]="dia < 0" [class.despues]="dia > 0">
+            {{ textoDia(dia) }}
+            <button type="button" (click)="quitarDia(dia)" [attr.aria-label]="'Quitar ' + textoDia(dia)">×</button>
+          </span>
+        } @empty {
+          <span class="muted">Sin avisos configurados.</span>
+        }
+      </div>
+      <div class="agregar spaced">
+        <div class="field">
+          <label for="nuevo-dia">Agregar aviso</label>
+          <div class="con-sufijo">
+            <input id="nuevo-dia" type="number" min="-30" max="60" name="nuevoDia" [(ngModel)]="nuevoDia" />
+            <span>{{ textoDia(+nuevoDia || 0) }}</span>
+          </div>
+          <span class="field-help">Número negativo: días antes del cobro. 0: el mismo día. Positivo: días después.</span>
+        </div>
+        <button type="button" class="btn btn-ghost btn-sm" (click)="agregarDia()">Agregar</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">Mensaje del aviso</h2>
+      <div class="variables spaced">
+        @for (variable of variables(); track variable) {
+          <button type="button" class="variable" (click)="insertar(variable)">{{ variable }}</button>
+        }
+      </div>
+      <div class="field spaced">
+        <label for="mensaje">Texto</label>
+        <textarea id="mensaje" rows="5" maxlength="800" name="mensaje" [ngModel]="mensaje()" (ngModelChange)="mensaje.set($event)"></textarea>
+        <span class="field-help">Toca una variable para agregarla. Se reemplaza con los datos de cada cliente.</span>
+      </div>
+      <div class="vista spaced">
+        <span class="vista-titulo">Así lo verá el cliente</span>
+        <p>{{ vistaPrevia() }}</p>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="btn btn-primary btn-sm" [disabled]="guardando()" (click)="guardar()">{{ guardando() ? 'Guardando…' : 'Guardar configuración' }}</button>
+    </div>
+  } @else {
+    <p class="muted">Cargando configuración…</p>
+  }
+</section>
