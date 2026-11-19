@@ -19,6 +19,7 @@ class BillingInvoice extends Model
     protected $table = 'comprobantes_cobranza';
 
     protected $fillable = [
+        'pago_id',
         'cuenta_id',
         'empresa_id',
         'tipo',
@@ -39,6 +40,11 @@ class BillingInvoice extends Model
             'total' => 'decimal:2',
             'emitido_at' => 'datetime',
         ];
+    }
+
+    public function pago(): BelongsTo
+    {
+        return $this->belongsTo(PaymentReport::class, 'pago_id');
     }
 
     public function cuenta(): BelongsTo
