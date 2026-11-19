@@ -1,0 +1,57 @@
+.spaced {
+  margin-top: 14px;
+}
+
+.mono {
+  font-family: var(--font-mono);
+}
+
+.cuentas {
+  display: grid;
+  gap: 12px;
+}
+
+.cuenta {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--brass);
+  border-radius: 10px;
+  background: var(--surface);
+}
+
+.cuenta.vencida {
+  border-left-color: var(--danger);
+}
+
+.cuenta-cabeza {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.cuenta-concepto {
+  display: block;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.cuenta-monto {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.cuenta-monto strong {
+  font-size: 1.3rem;
+  color: var(--ink);
+}
+
+.concepto {
+  max-width: 420px;
+  font-size: 0.86rem;
+}
