@@ -2,12 +2,18 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { finalize } from 'rxjs';
-import { BillingApiService } from '../../services/billing-api.service';
-import { CobranzaCliente, CuentaCobrar, DatosPago, MetodoPago, MetodoPagoCuenta, PagoReportado } from '../../models/panel.models';
-import { etiquetaEstadoCuenta, etiquetaMetodoPago, fechaCorta, fechaHoy, formatoSoles, mensajeError } from '../../models/labels';
+import { BillingApiService, nuevaClaveIdempotencia } from '../../services/billing-api.service';
+import { CobranzaCliente, CuentaCobrar, DatosPago, MetodoPago, MetodoPagoCuenta } from '../../models/panel.models';
+import { etiquetaEstadoCuenta, etiquetaEstadoPago, fechaCorta, fechaHoy, formatoSoles, mensajeError } from '../../models/labels';
 
 const MAXIMO_BYTES = 5 * 1024 * 1024;
 const TIPOS = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
+
+interface Formulario {
+  readonly titulo: string;
+  readonly cuentaId: number | null;
+  readonly maximo: number;
+}
 
 @Component({
   selector: 'app-client-billing',
@@ -20,41 +26,35 @@ const TIPOS = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
 export class ClientBillingComponent {
   private readonly api = inject(BillingApiService);
 
-  protected readonly copiado = signal<string | null>(null);
   protected readonly formatoSoles = formatoSoles;
   protected readonly fechaCorta = fechaCorta;
   protected readonly etiquetaEstado = etiquetaEstadoCuenta;
-  protected readonly etiquetaMetodo = etiquetaMetodoPago;
+  protected readonly etiquetaEstadoPago = etiquetaEstadoPago;
+  protected readonly hoy = fechaHoy();
 
   protected readonly datos = signal<CobranzaCliente | null>(null);
   protected readonly cargando = signal(true);
   protected readonly error = signal<string | null>(null);
   protected readonly aviso = signal<string | null>(null);
+  protected readonly copiado = signal<string | null>(null);
 
-  protected readonly reportando = signal<number | null>(null);
+  protected readonly formulario = signal<Formulario | null>(null);
   protected readonly enviando = signal(false);
   protected readonly errorReporte = signal<string | null>(null);
-  protected pago: DatosPago = this.pagoVacio();
+  protected pago: DatosPago = this.pagoVacio(null, 0);
   protected captura: File | null = null;
 
   constructor() {
     this.cargar();
   }
 
-  protected ultimoRechazo(cuenta: CuentaCobrar): PagoReportado | null {
-    if (cuenta.estado !== 'pendiente') {
-      return null;
-    }
-    const rechazados = cuenta.pagos.filter((pago: PagoReportado) => pago.estado === 'rechazado');
-
-    return rechazados.length > 0 ? rechazados[rechazados.length - 1] : null;
+  protected abrirTodo(datos: CobranzaCliente): void {
+    this.abrir({ titulo: 'Pagar mi deuda', cuentaId: null, maximo: datos.deuda });
   }
 
-  protected abrirReporte(cuenta: CuentaCobrar): void {
-    this.reportando.set(cuenta.id);
-    this.errorReporte.set(null);
-    this.pago = this.pagoVacio();
-    this.captura = null;
+  protected abrirCuenta(cuenta: CuentaCobrar, datos: CobranzaCliente): void {
+    this.abrir({ titulo: cuenta.concepto, cuentaId: cuenta.id, maximo: datos.deuda });
+    this.pago = { ...this.pago, monto: String(cuenta.saldo) };
   }
 
   protected elegirCaptura(evento: Event): void {
@@ -70,29 +70,39 @@ export class ClientBillingComponent {
     this.captura = archivo;
   }
 
-  protected enviar(cuenta: CuentaCobrar): void {
-    if (this.captura === null) {
-      this.errorReporte.set('Adjunta la captura del pago.');
+  protected enviar(): void {
+    const actual = this.formulario();
+    const metodo = this.datos()?.metodos_pago.find((item: MetodoPagoCuenta) => String(item.id) === this.pago.metodo_pago_id);
+    const monto = Number(this.pago.monto);
+
+    if (actual === null) {
       return;
     }
-    const elegido = this.datos()?.metodos_pago.find((metodo: MetodoPagoCuenta) => String(metodo.id) === this.pago.metodo_pago_id);
-    if (elegido === undefined) {
+    if (metodo === undefined) {
       this.errorReporte.set('Elige a qué cuenta pagaste.');
       return;
     }
-    if (this.pago.numero_operacion.trim() === '' && elegido.tipo !== 'otro' && elegido.tipo !== 'efectivo') {
+    if (!(monto > 0) || monto - actual.maximo > 0.001) {
+      this.errorReporte.set(`El monto debe ser mayor a cero y no superar tu deuda (${formatoSoles(actual.maximo)}).`);
+      return;
+    }
+    if (this.pago.numero_operacion.trim() === '' && metodo.tipo !== 'otro' && metodo.tipo !== 'efectivo') {
       this.errorReporte.set('Escribe el número de operación.');
+      return;
+    }
+    if (this.captura === null) {
+      this.errorReporte.set('Adjunta la captura del pago.');
       return;
     }
 
     this.enviando.set(true);
     this.errorReporte.set(null);
     this.api
-      .reportar(cuenta.id, this.pago, this.captura)
+      .reportar(this.pago, this.captura)
       .pipe(finalize(() => this.enviando.set(false)))
       .subscribe({
         next: () => {
-          this.reportando.set(null);
+          this.formulario.set(null);
           this.aviso.set('Recibimos tu pago. Lo revisaremos y te enviaremos tu comprobante.');
           this.cargar();
         },
@@ -110,7 +120,14 @@ export class ClientBillingComponent {
       .catch(() => this.copiado.set(null));
   }
 
-  private pagoVacio(): DatosPago {
+  private abrir(formulario: Formulario): void {
+    this.formulario.set(formulario);
+    this.errorReporte.set(null);
+    this.captura = null;
+    this.pago = this.pagoVacio(formulario.cuentaId, formulario.maximo);
+  }
+
+  private pagoVacio(cuentaId: number | null, monto: number): DatosPago {
     const primero = this.datos()?.metodos_pago[0];
 
     return {
@@ -118,7 +135,9 @@ export class ClientBillingComponent {
       metodo: 'otro' as MetodoPago,
       numero_operacion: '',
       fecha_pago: fechaHoy(),
-      monto: '',
+      monto: monto > 0 ? String(monto) : '',
+      cuenta_id: cuentaId,
+      clave_idempotencia: nuevaClaveIdempotencia(),
     };
   }
 
