@@ -5,7 +5,10 @@
       <h1 class="page-title">Cobranza</h1>
       <p class="page-lead">Las cuentas se generan solas 3 días antes de cada vencimiento. Al aceptar un pago se emite la factura en pro8 con el RUC de Amantix.</p>
     </div>
-    <button type="button" class="btn btn-primary btn-sm" (click)="alternarNueva()">{{ creando() ? 'Cancelar' : 'Nueva cuenta' }}</button>
+    <div class="head-actions">
+      <a routerLink="/panel/billing/payment-methods" class="btn btn-ghost btn-sm">Métodos de pago</a>
+      <button type="button" class="btn btn-primary btn-sm" (click)="alternarNueva()">{{ creando() ? 'Cancelar' : 'Nueva cuenta' }}</button>
+    </div>
   </header>
 
   @if (resumen(); as datos) {
@@ -106,7 +109,7 @@
               <dl class="pago-detalle">
                 <div><dt>Monto</dt><dd class="mono">{{ formatoSoles(pago.monto) }}</dd></div>
                 <div><dt>Debe</dt><dd class="mono">{{ formatoSoles(pago.cuenta?.monto ?? 0) }}</dd></div>
-                <div><dt>Medio</dt><dd>{{ etiquetaMetodo(pago.metodo) }}</dd></div>
+                <div><dt>Pagó a</dt><dd>{{ pago.metodo_nombre ?? etiquetaMetodo(pago.metodo) }}</dd></div>
                 <div><dt>N.° operación</dt><dd class="mono">{{ pago.numero_operacion ?? '—' }}</dd></div>
                 <div><dt>Fecha de pago</dt><dd class="mono">{{ fechaCorta(pago.fecha_pago) }}</dd></div>
                 <div><dt>Reportó</dt><dd>{{ pago.reportado_por ?? '—' }}</dd></div>
@@ -157,18 +160,19 @@
   @if (accion(); as activa) {
     <div class="card accion">
       <div class="section-head">
-        <h2 class="card-title">{{ activa.tipo === 'cobrar' ? 'Registrar cobro' : 'Anular cuenta' }}</h2>
+        <h2 class="card-title">{{ activa.tipo === 'cobrar' ? 'Registrar cobro' : activa.tipo === 'editar' ? 'Editar cuenta' : 'Anular cuenta' }}</h2>
         <button type="button" class="btn btn-ghost btn-sm" (click)="accion.set(null)">Cancelar</button>
       </div>
       <p class="card-sub">{{ activa.cuenta.empresa?.razon_social }} · {{ activa.cuenta.concepto }} · {{ formatoSoles(activa.cuenta.monto) }}</p>
       @if (activa.tipo === 'cobrar') {
         <div class="form-grid spaced">
           <div class="field">
-            <label for="cobro-metodo">Medio de pago</label>
-            <select id="cobro-metodo" name="metodo" [(ngModel)]="pago.metodo">
-              @for (item of metodos; track item.valor) {
-                <option [value]="item.valor">{{ item.etiqueta }}</option>
+            <label for="cobro-metodo">Pagó a</label>
+            <select id="cobro-metodo" name="cobroCon" [(ngModel)]="cobroCon">
+              @for (metodo of metodosPago(); track metodo.id) {
+                <option [value]="metodo.id">{{ metodo.nombre }}</option>
               }
+              <option value="efectivo">Efectivo</option>
             </select>
           </div>
           <div class="field">
@@ -191,6 +195,24 @@
         <p class="field-help spaced">Al guardar, la cuenta queda pagada y se emite el comprobante en pro8.</p>
         <div class="form-actions spaced">
           <button type="button" class="btn btn-primary btn-sm" [disabled]="ocupado() === activa.cuenta.id" (click)="confirmarCobro(activa.cuenta)">{{ ocupado() === activa.cuenta.id ? 'Emitiendo…' : 'Registrar y facturar' }}</button>
+        </div>
+      } @else if (activa.tipo === 'editar') {
+        <div class="form-grid spaced">
+          <div class="field full">
+            <label for="editar-concepto">Concepto</label>
+            <input id="editar-concepto" type="text" name="edicionConcepto" maxlength="255" [(ngModel)]="edicion.concepto" />
+          </div>
+          <div class="field">
+            <label for="editar-monto">Monto (S/)</label>
+            <input id="editar-monto" type="number" name="edicionMonto" min="0.01" step="0.01" [(ngModel)]="edicion.monto" />
+          </div>
+          <div class="field">
+            <label for="editar-vence">Vence</label>
+            <input id="editar-vence" type="date" name="edicionVence" [(ngModel)]="edicion.vence" />
+          </div>
+        </div>
+        <div class="form-actions spaced">
+          <button type="button" class="btn btn-primary btn-sm" [disabled]="ocupado() === activa.cuenta.id" (click)="confirmarEdicion(activa.cuenta)">Guardar cambios</button>
         </div>
       } @else {
         <div class="field spaced">
@@ -268,6 +290,7 @@
               <td class="acciones">
                 @if (cuenta.estado === 'pendiente' || cuenta.estado === 'en_revision') {
                   <button type="button" class="text-btn" (click)="abrirAccion('cobrar', cuenta)">Cobrar</button>
+                  <button type="button" class="text-btn" (click)="abrirAccion('editar', cuenta)">Editar</button>
                   @if (recordatorio(cuenta); as enlace) {
                     <a [href]="enlace" target="_blank" rel="noopener" class="text-btn">Recordar</a>
                   }
