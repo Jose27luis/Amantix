@@ -9,6 +9,7 @@ use App\Enums\PaymentReportStatus;
 use App\Enums\ReceivableStatus;
 use App\Models\BillingInvoice;
 use App\Models\Company;
+use App\Models\Integration;
 use App\Models\PaymentAccount;
 use App\Models\PaymentReport;
 use App\Models\Receivable;
@@ -83,13 +84,19 @@ class BillingService
         return $cuenta;
     }
 
-    public function reportar(Receivable $cuenta, array $datos, ?UploadedFile $captura, User $autor, string $origen): PaymentReport
-    {
+    public function reportar(
+        Receivable $cuenta,
+        array $datos,
+        ?UploadedFile $captura,
+        ?User $autor,
+        string $origen,
+        ?Integration $integracion = null,
+    ): PaymentReport {
         if (! $cuenta->estado->cobrable()) {
             throw ValidationException::withMessages(['cuenta' => 'Esta cuenta ya no admite pagos.']);
         }
 
-        $pago = DB::transaction(function () use ($cuenta, $datos, $captura, $autor, $origen): PaymentReport {
+        $pago = DB::transaction(function () use ($cuenta, $datos, $captura, $autor, $origen, $integracion): PaymentReport {
             $archivo = $captura === null ? [] : $this->capturas->guardar($cuenta->empresa_id, $captura);
             $metodoPago = isset($datos['metodo_pago_id']) ? PaymentAccount::query()->findOrFail((int) $datos['metodo_pago_id']) : null;
 
@@ -101,7 +108,9 @@ class BillingService
                 'numero_operacion' => $datos['numero_operacion'] ?? null,
                 'fecha_pago' => $datos['fecha_pago'],
                 'origen' => $origen,
-                'reportado_por' => $autor->id,
+                'reportado_por' => $autor?->id,
+                'reportado_nombre' => isset($datos['reportado_nombre']) ? mb_substr((string) $datos['reportado_nombre'], 0, 120) : null,
+                'integracion_id' => $integracion?->id,
                 'estado' => PaymentReportStatus::EnRevision,
                 ...$archivo,
             ]);
@@ -111,7 +120,11 @@ class BillingService
             return $pago;
         });
 
-        $this->auditoria->registrar($autor, 'pago_reportado', $pago, ['cuenta_id' => $cuenta->id, 'origen' => $origen]);
+        $this->auditoria->registrar($autor, 'pago_reportado', $pago, array_filter([
+            'cuenta_id' => $cuenta->id,
+            'origen' => $origen,
+            'integracion' => $integracion?->nombre,
+        ]));
 
         return $pago;
     }
