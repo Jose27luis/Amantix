@@ -13,13 +13,16 @@ use Illuminate\Support\Facades\DB;
 
 class ReceivableGenerator
 {
-    public function __construct(private readonly BillingConcept $concepto)
-    {
+    public function __construct(
+        private readonly BillingConcept $concepto,
+        private readonly BillingSettings $ajustes,
+        private readonly BillingCalendar $calendario,
+    ) {
     }
 
     public function generarPendientes(CarbonImmutable $hoy): int
     {
-        $limite = $hoy->addDays((int) config('services.cobranza.dias_anticipacion'));
+        $limite = $hoy->addDays($this->ajustes->diasAnticipacion());
         $creadas = 0;
 
         Subscription::query()
@@ -41,7 +44,7 @@ class ReceivableGenerator
         while (CarbonImmutable::parse($suscripcion->proxima_renovacion)->lessThanOrEqualTo($limite)) {
             DB::transaction(function () use ($suscripcion, &$creadas): void {
                 $inicio = CarbonImmutable::parse($suscripcion->proxima_renovacion);
-                $siguiente = $inicio->addMonthsNoOverflow($suscripcion->periodo->meses());
+                $siguiente = $this->calendario->siguiente($inicio, $suscripcion->periodo->meses(), $suscripcion->dia_cobro);
                 $fin = $siguiente->subDay();
 
                 $cuenta = Receivable::query()->firstOrCreate(
