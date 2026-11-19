@@ -11,6 +11,8 @@ use App\Http\Controllers\Api\ClientSummaryController;
 use App\Http\Controllers\Api\CompanyController;
 use App\Http\Controllers\Api\CompanyUserController;
 use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\IntegrationBillingController;
+use App\Http\Controllers\Api\IntegrationController;
 use App\Http\Controllers\Api\LeadController;
 use App\Http\Controllers\Api\LeadConversionController;
 use App\Http\Controllers\Api\LeadNoteController;
@@ -41,6 +43,11 @@ Route::get('news/{slug}', [PublicNewsController::class, 'show']);
 Route::post('leads', [PublicLeadController::class, 'store'])->middleware('throttle:leads');
 
 Route::post('auth/login', [AuthController::class, 'login'])->middleware('throttle:login');
+
+Route::prefix('integration/v1')->middleware(['integration', 'throttle:240,1'])->group(function (): void {
+    Route::get('accounts/{cuenta}/billing', [IntegrationBillingController::class, 'show'])->where('cuenta', '[A-Za-z0-9._-]+');
+    Route::post('accounts/{cuenta}/receivables/{receivable}/payments', [IntegrationBillingController::class, 'reportar'])->where('cuenta', '[A-Za-z0-9._-]+');
+});
 
 Route::middleware(['auth:sanctum', 'active'])->group(function (): void {
     Route::get('auth/me', [AuthController::class, 'me'])->name('auth.me');
@@ -84,6 +91,10 @@ Route::middleware(['auth:sanctum', 'active'])->group(function (): void {
         Route::post('billing/receivables', [BillingController::class, 'store']);
         Route::patch('billing/receivables/{receivable}', [BillingController::class, 'update']);
         Route::post('billing/receivables/{receivable}/void', [BillingController::class, 'anular']);
+        Route::get('billing/integrations', [IntegrationController::class, 'index']);
+        Route::post('billing/integrations', [IntegrationController::class, 'store']);
+        Route::patch('billing/integrations/{integration}', [IntegrationController::class, 'update']);
+        Route::post('billing/integrations/{integration}/renew', [IntegrationController::class, 'renovar']);
         Route::get('billing/settings', [BillingSettingsController::class, 'show']);
         Route::put('billing/settings', [BillingSettingsController::class, 'update']);
         Route::get('billing/notices', [BillingSettingsController::class, 'avisos']);
