@@ -194,6 +194,8 @@ export interface Suscripcion {
   readonly producto: { readonly id: number; readonly nombre: string; readonly url_produccion: string } | null;
   readonly plan: { readonly id: number; readonly nombre: string } | null;
   readonly precio: number;
+  readonly concepto: string | null;
+  readonly cuenta_externa: string | null;
   readonly periodo: Periodo;
   readonly fecha_alta: string;
   readonly proxima_renovacion: string;
@@ -204,16 +206,98 @@ export interface NuevaSuscripcion {
   readonly producto_id: number;
   readonly plan_id: number;
   readonly precio: number;
+  readonly concepto?: string;
   readonly periodo: Periodo;
   readonly fecha_alta: string;
+  readonly proxima_renovacion?: string;
 }
 
 export interface CambioSuscripcion {
   readonly plan_id?: number;
   readonly precio?: number;
+  readonly concepto?: string | null;
   readonly periodo?: Periodo;
   readonly proxima_renovacion?: string;
   readonly estado?: EstadoSuscripcion;
+}
+
+export type EstadoCuenta = 'pendiente' | 'en_revision' | 'pagada' | 'anulada';
+export type EstadoPago = 'en_revision' | 'aceptado' | 'rechazado';
+export type MetodoPago = 'yape' | 'plin' | 'transferencia' | 'deposito' | 'efectivo' | 'otro';
+export type FiltroCuenta = EstadoCuenta | 'por_cobrar' | 'vencidas';
+
+export interface PagoReportado {
+  readonly id: number;
+  readonly cuenta_id: number;
+  readonly monto: number;
+  readonly metodo: MetodoPago;
+  readonly numero_operacion: string | null;
+  readonly fecha_pago: string;
+  readonly tiene_captura: boolean;
+  readonly captura_es_imagen: boolean;
+  readonly origen: string;
+  readonly estado: EstadoPago;
+  readonly motivo_rechazo: string | null;
+  readonly reportado_por: string | null;
+  readonly revisado_por: string | null;
+  readonly revisado_at: string | null;
+  readonly creado_at: string;
+  readonly cuenta: CuentaCobrar | null;
+}
+
+export interface ComprobanteCobranza {
+  readonly tipo: string;
+  readonly numero: string | null;
+  readonly estado: 'pendiente' | 'emitido' | 'error';
+  readonly estado_sunat: string | null;
+  readonly pdf_url: string | null;
+  readonly error: string | null;
+}
+
+export interface CuentaCobrar {
+  readonly id: number;
+  readonly empresa: { readonly id: number; readonly razon_social: string; readonly ruc: string; readonly telefono: string | null } | null;
+  readonly producto: string | null;
+  readonly concepto: string;
+  readonly periodo_inicio: string | null;
+  readonly periodo_fin: string | null;
+  readonly monto: number;
+  readonly vence: string;
+  readonly vencida: boolean;
+  readonly estado: EstadoCuenta;
+  readonly origen: string;
+  readonly pagada_at: string | null;
+  readonly motivo_anulacion: string | null;
+  readonly pagos: readonly PagoReportado[];
+  readonly comprobante: ComprobanteCobranza | null;
+}
+
+export interface ResumenCobranza {
+  readonly por_cobrar: number;
+  readonly cuentas_por_cobrar: number;
+  readonly vencidas: number;
+  readonly monto_vencido: number;
+  readonly pagos_en_revision: number;
+  readonly cobrado_mes: number;
+}
+
+export interface CobranzaCliente {
+  readonly por_pagar: readonly CuentaCobrar[];
+  readonly pagadas: readonly CuentaCobrar[];
+}
+
+export interface DatosPago {
+  readonly metodo: MetodoPago;
+  readonly numero_operacion: string;
+  readonly fecha_pago: string;
+  readonly monto: string;
+}
+
+export interface NuevaCuenta {
+  readonly empresa_id: number;
+  readonly concepto: string;
+  readonly monto: number;
+  readonly vence: string;
 }
 
 export interface Ticket {
