@@ -15,6 +15,39 @@
   }
 
   @if (datos(); as cobranza) {
+    @if (cobranza.metodos_pago.length > 0) {
+      <div class="card">
+        <h2 class="card-title">Dónde pagar</h2>
+        <div class="destinos spaced">
+          @for (metodo of cobranza.metodos_pago; track metodo.id) {
+            <article class="destino">
+              <strong class="destino-nombre">{{ metodo.nombre }}</strong>
+              @if (metodo.numero) {
+                <div class="dato">
+                  <span class="dato-etiqueta">{{ metodo.tipo === 'yape' || metodo.tipo === 'plin' ? 'Celular' : 'Cuenta' }}</span>
+                  <span class="mono">{{ metodo.numero }}</span>
+                  <button type="button" class="copiar" (click)="copiar(metodo.numero)">{{ copiado() === metodo.numero ? 'Copiado' : 'Copiar' }}</button>
+                </div>
+              }
+              @if (metodo.cci) {
+                <div class="dato">
+                  <span class="dato-etiqueta">CCI</span>
+                  <span class="mono">{{ metodo.cci }}</span>
+                  <button type="button" class="copiar" (click)="copiar(metodo.cci)">{{ copiado() === metodo.cci ? 'Copiado' : 'Copiar' }}</button>
+                </div>
+              }
+              @if (metodo.titular) {
+                <span class="sub">Titular: {{ metodo.titular }}</span>
+              }
+              @if (metodo.instrucciones) {
+                <span class="sub">{{ metodo.instrucciones }}</span>
+              }
+            </article>
+          }
+        </div>
+      </div>
+    }
+
     <div class="card">
       <h2 class="card-title">Por pagar</h2>
       <div class="cuentas spaced">
@@ -44,10 +77,10 @@
             } @else if (reportando() === cuenta.id) {
               <div class="form-grid spaced">
                 <div class="field">
-                  <label [for]="'metodo-' + cuenta.id">Medio de pago</label>
-                  <select [id]="'metodo-' + cuenta.id" name="metodo" [(ngModel)]="pago.metodo">
-                    @for (item of metodos; track item.valor) {
-                      <option [value]="item.valor">{{ item.etiqueta }}</option>
+                  <label [for]="'metodo-' + cuenta.id">Pagaste a</label>
+                  <select [id]="'metodo-' + cuenta.id" name="metodo_pago_id" [(ngModel)]="pago.metodo_pago_id">
+                    @for (metodo of cobranza.metodos_pago; track metodo.id) {
+                      <option [value]="metodo.id">{{ metodo.nombre }}</option>
                     }
                   </select>
                 </div>
