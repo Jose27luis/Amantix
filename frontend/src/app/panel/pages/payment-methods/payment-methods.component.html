@@ -1,0 +1,110 @@
+<section class="page">
+  <a routerLink="/panel/billing" class="back">← Cobranza</a>
+  <header class="page-head">
+    <div>
+      <span class="eyebrow">Cobranza · Métodos de pago</span>
+      <h1 class="page-title">Métodos de pago</h1>
+      <p class="page-lead">Las cuentas y billeteras que ven tus clientes en "Mis pagos". Cuando reportan un pago eligen a cuál pagaron.</p>
+    </div>
+    <button type="button" class="btn btn-primary btn-sm" (click)="nuevo()">Nuevo método</button>
+  </header>
+
+  @if (aviso(); as mensaje) {
+    <p class="alert alert-ok" role="status">{{ mensaje }}</p>
+  }
+  @if (error(); as mensaje) {
+    <p class="alert alert-error" role="alert">{{ mensaje }}</p>
+  }
+
+  @if (editando() !== null) {
+    <div class="card">
+      <div class="section-head">
+        <h2 class="card-title">{{ editando() === 'nuevo' ? 'Nuevo método de pago' : 'Editar método de pago' }}</h2>
+        <button type="button" class="btn btn-ghost btn-sm" (click)="editando.set(null)">Cancelar</button>
+      </div>
+      <div class="form-grid spaced">
+        <div class="field">
+          <label for="mp-nombre">Nombre</label>
+          <input id="mp-nombre" type="text" name="nombre" maxlength="80" [(ngModel)]="formulario.nombre" />
+          <span class="field-help">Lo que ve el cliente, por ejemplo "BCP Soles" o "Yape".</span>
+        </div>
+        <div class="field">
+          <label for="mp-tipo">Tipo</label>
+          <select id="mp-tipo" name="tipo" [(ngModel)]="formulario.tipo">
+            @for (item of tipos; track item.valor) {
+              <option [value]="item.valor">{{ item.etiqueta }}</option>
+            }
+          </select>
+        </div>
+        <div class="field">
+          <label for="mp-numero">Número de cuenta o celular</label>
+          <input id="mp-numero" type="text" name="numero" maxlength="40" [(ngModel)]="formulario.numero" />
+        </div>
+        <div class="field">
+          <label for="mp-cci">CCI</label>
+          <input id="mp-cci" type="text" name="cci" inputmode="numeric" maxlength="30" [(ngModel)]="formulario.cci" />
+          <span class="field-help">Solo para cuentas bancarias.</span>
+        </div>
+        <div class="field">
+          <label for="mp-titular">Titular</label>
+          <input id="mp-titular" type="text" name="titular" maxlength="160" [(ngModel)]="formulario.titular" />
+        </div>
+        <div class="field">
+          <label for="mp-orden">Orden</label>
+          <input id="mp-orden" type="number" name="orden" min="0" max="999" [(ngModel)]="formulario.orden" />
+        </div>
+        <div class="field full">
+          <label for="mp-instrucciones">Instrucciones</label>
+          <input id="mp-instrucciones" type="text" name="instrucciones" maxlength="255" [(ngModel)]="formulario.instrucciones" />
+        </div>
+        <label class="check full">
+          <input type="checkbox" name="activo" [(ngModel)]="formulario.activo" />
+          Visible para los clientes
+        </label>
+      </div>
+      @if (errorForm(); as mensaje) {
+        <p class="alert alert-error spaced" role="alert">{{ mensaje }}</p>
+      }
+      <div class="form-actions spaced">
+        <button type="button" class="btn btn-primary btn-sm" [disabled]="guardando()" (click)="guardar()">{{ guardando() ? 'Guardando…' : 'Guardar' }}</button>
+      </div>
+    </div>
+  }
+
+  <div class="metodos">
+    @for (metodo of metodos(); track metodo.id) {
+      <article class="card metodo" [class.inactivo]="!metodo.activo">
+        <header class="metodo-cabeza">
+          <div>
+            <h2 class="card-title">{{ metodo.nombre }}</h2>
+            <span class="sub">{{ etiquetaTipo(metodo.tipo) }}</span>
+          </div>
+          <span [class]="metodo.activo ? 'chip chip-activa' : 'chip chip-baja'">{{ metodo.activo ? 'Visible' : 'Oculto' }}</span>
+        </header>
+        <dl class="metodo-datos">
+          @if (metodo.numero) {
+            <div><dt>Número</dt><dd class="mono">{{ metodo.numero }}</dd></div>
+          }
+          @if (metodo.cci) {
+            <div><dt>CCI</dt><dd class="mono">{{ metodo.cci }}</dd></div>
+          }
+          @if (metodo.titular) {
+            <div><dt>Titular</dt><dd>{{ metodo.titular }}</dd></div>
+          }
+          @if (metodo.instrucciones) {
+            <div class="full"><dt>Instrucciones</dt><dd>{{ metodo.instrucciones }}</dd></div>
+          }
+        </dl>
+        <div class="metodo-acciones">
+          <button type="button" class="btn btn-ghost btn-sm" (click)="editar(metodo)">Editar</button>
+          <button type="button" class="btn btn-ghost btn-sm" (click)="alternarActivo(metodo)">{{ metodo.activo ? 'Ocultar' : 'Mostrar' }}</button>
+          <button type="button" class="text-btn danger" (click)="eliminar(metodo)">Eliminar</button>
+        </div>
+      </article>
+    } @empty {
+      @if (!cargando()) {
+        <p class="muted">Todavía no hay métodos de pago.</p>
+      }
+    }
+  </div>
+</section>
