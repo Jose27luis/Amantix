@@ -23,6 +23,7 @@ class PaymentReportResource extends JsonResource
             'cuenta_id' => $pago->cuenta_id,
             'monto' => (float) $pago->monto,
             'metodo' => $pago->metodo->value,
+            'metodo_nombre' => $pago->relationLoaded('metodoPago') ? $pago->metodoPago?->nombre : null,
             'numero_operacion' => $pago->numero_operacion,
             'fecha_pago' => $pago->fecha_pago?->toDateString(),
             'tiene_captura' => $pago->captura_ruta !== null,
