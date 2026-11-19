@@ -256,15 +256,38 @@ export interface CambioSuscripcion {
   readonly estado?: EstadoSuscripcion;
 }
 
-export type EstadoCuenta = 'pendiente' | 'en_revision' | 'pagada' | 'anulada';
+export type EstadoCuenta = 'pendiente' | 'parcial' | 'en_revision' | 'pagada' | 'anulada';
 export type EstadoPago = 'en_revision' | 'aceptado' | 'rechazado';
 export type MetodoPago = 'yape' | 'plin' | 'transferencia' | 'deposito' | 'efectivo' | 'otro';
 export type FiltroCuenta = EstadoCuenta | 'por_cobrar' | 'vencidas';
 
+export interface EmpresaResumen {
+  readonly id: number;
+  readonly razon_social: string;
+  readonly ruc: string;
+  readonly telefono: string | null;
+}
+
+export interface AplicacionPago {
+  readonly cuenta_id: number;
+  readonly concepto: string | null;
+  readonly monto: number;
+}
+
+export interface AplicacionCuenta {
+  readonly pago_id: number;
+  readonly monto: number;
+  readonly fecha: string | null;
+  readonly comprobante: ComprobanteCobranza | null;
+}
+
 export interface PagoReportado {
   readonly id: number;
-  readonly cuenta_id: number;
+  readonly cuenta_id: number | null;
+  readonly empresa: EmpresaResumen | null;
+  readonly deuda_empresa: number | null;
   readonly monto: number;
+  readonly monto_reportado: number | null;
   readonly metodo: MetodoPago;
   readonly metodo_nombre: string | null;
   readonly numero_operacion: string | null;
@@ -278,7 +301,16 @@ export interface PagoReportado {
   readonly revisado_por: string | null;
   readonly revisado_at: string | null;
   readonly creado_at: string;
-  readonly cuenta: CuentaCobrar | null;
+  readonly cuenta: { readonly id: number; readonly concepto: string; readonly saldo: number } | null;
+  readonly aplicaciones: readonly AplicacionPago[];
+  readonly comprobante: ComprobanteCobranza | null;
+}
+
+export interface EstadoCuentaEmpresa {
+  readonly deuda: number;
+  readonly pagado_total: number;
+  readonly cuentas: readonly CuentaCobrar[];
+  readonly pagos: readonly PagoReportado[];
 }
 
 export interface ComprobanteCobranza {
@@ -292,20 +324,21 @@ export interface ComprobanteCobranza {
 
 export interface CuentaCobrar {
   readonly id: number;
-  readonly empresa: { readonly id: number; readonly razon_social: string; readonly ruc: string; readonly telefono: string | null } | null;
+  readonly empresa: EmpresaResumen | null;
   readonly producto: string | null;
   readonly concepto: string;
   readonly periodo_inicio: string | null;
   readonly periodo_fin: string | null;
   readonly monto: number;
+  readonly monto_pagado: number;
+  readonly saldo: number;
   readonly vence: string;
   readonly vencida: boolean;
   readonly estado: EstadoCuenta;
   readonly origen: string;
   readonly pagada_at: string | null;
   readonly motivo_anulacion: string | null;
-  readonly pagos: readonly PagoReportado[];
-  readonly comprobante: ComprobanteCobranza | null;
+  readonly aplicaciones: readonly AplicacionCuenta[];
 }
 
 export interface ResumenCobranza {
@@ -325,6 +358,7 @@ export interface MetodoPagoCuenta {
   readonly numero: string | null;
   readonly cci: string | null;
   readonly instrucciones: string | null;
+  readonly qr_url: string | null;
   readonly activo: boolean;
   readonly orden: number;
 }
@@ -341,8 +375,9 @@ export interface DatosMetodoPago {
 }
 
 export interface CobranzaCliente {
+  readonly deuda: number;
   readonly por_pagar: readonly CuentaCobrar[];
-  readonly pagadas: readonly CuentaCobrar[];
+  readonly pagos: readonly PagoReportado[];
   readonly metodos_pago: readonly MetodoPagoCuenta[];
 }
 
@@ -358,6 +393,13 @@ export interface DatosPago {
   readonly numero_operacion: string;
   readonly fecha_pago: string;
   readonly monto: string;
+  readonly cuenta_id: number | null;
+  readonly clave_idempotencia: string;
+}
+
+export interface AjustePago {
+  readonly monto?: number;
+  readonly numero_operacion?: string;
 }
 
 export interface NuevaCuenta {
