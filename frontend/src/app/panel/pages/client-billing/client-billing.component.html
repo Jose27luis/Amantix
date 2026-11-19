@@ -3,7 +3,7 @@
     <div>
       <span class="eyebrow">Mi empresa · Pagos</span>
       <h1 class="page-title">Mis pagos</h1>
-      <p class="page-lead">Paga por Yape, Plin o transferencia y sube aquí la captura con el número de operación. Cuando lo revisemos, te emitimos el comprobante.</p>
+      <p class="page-lead">Paga por Yape, Plin o transferencia y sube aquí la captura con el número de operación. Puedes pagar todo o una parte; lo aplicamos primero a lo más antiguo.</p>
     </div>
   </header>
 
@@ -15,6 +15,62 @@
   }
 
   @if (datos(); as cobranza) {
+    <div class="card resumen">
+      <div>
+        <span class="resumen-etiqueta">Debes en total</span>
+        <strong class="resumen-monto mono">{{ formatoSoles(cobranza.deuda) }}</strong>
+      </div>
+      @if (cobranza.deuda > 0 && cobranza.metodos_pago.length > 0) {
+        <button type="button" class="btn btn-primary" (click)="abrirTodo(cobranza)">Reportar pago</button>
+      }
+    </div>
+
+    @if (formulario(); as form) {
+      <div class="card formulario">
+        <div class="section-head">
+          <div>
+            <h2 class="card-title">Reportar pago</h2>
+            <p class="card-sub">{{ form.titulo }}</p>
+          </div>
+          <button type="button" class="btn btn-ghost btn-sm" [disabled]="enviando()" (click)="formulario.set(null)">Cancelar</button>
+        </div>
+        <div class="form-grid spaced">
+          <div class="field">
+            <label for="metodo">Pagaste a</label>
+            <select id="metodo" name="metodo_pago_id" [(ngModel)]="pago.metodo_pago_id">
+              @for (metodo of cobranza.metodos_pago; track metodo.id) {
+                <option [value]="metodo.id">{{ metodo.nombre }}</option>
+              }
+            </select>
+          </div>
+          <div class="field">
+            <label for="monto">Monto pagado (S/)</label>
+            <input id="monto" type="number" min="0.01" step="0.01" [max]="form.maximo" name="monto" [(ngModel)]="pago.monto" />
+            <span class="field-help">Hasta {{ formatoSoles(form.maximo) }}.</span>
+          </div>
+          <div class="field">
+            <label for="operacion">N.° de operación</label>
+            <input id="operacion" type="text" maxlength="60" name="numero_operacion" [(ngModel)]="pago.numero_operacion" />
+          </div>
+          <div class="field">
+            <label for="fecha">Fecha del pago</label>
+            <input id="fecha" type="date" [max]="hoy" name="fecha_pago" [(ngModel)]="pago.fecha_pago" />
+          </div>
+          <div class="field full">
+            <label for="captura">Captura del pago</label>
+            <input id="captura" type="file" accept="image/jpeg,image/png,image/webp,application/pdf" (change)="elegirCaptura($event)" />
+            <span class="field-help">Imagen o PDF de hasta 5 MB.</span>
+          </div>
+        </div>
+        @if (errorReporte(); as mensaje) {
+          <p class="alert alert-error spaced" role="alert">{{ mensaje }}</p>
+        }
+        <div class="form-actions spaced">
+          <button type="button" class="btn btn-primary btn-sm" [disabled]="enviando()" (click)="enviar()">{{ enviando() ? 'Enviando…' : 'Enviar pago' }}</button>
+        </div>
+      </div>
+    }
+
     @if (cobranza.metodos_pago.length > 0) {
       <div class="card">
         <h2 class="card-title">Dónde pagar</h2>
@@ -22,6 +78,9 @@
           @for (metodo of cobranza.metodos_pago; track metodo.id) {
             <article class="destino">
               <strong class="destino-nombre">{{ metodo.nombre }}</strong>
+              @if (metodo.qr_url) {
+                <img class="qr" [src]="metodo.qr_url" [alt]="'Código QR de ' + metodo.nombre" loading="lazy" />
+              }
               @if (metodo.numero) {
                 <div class="dato">
                   <span class="dato-etiqueta">{{ metodo.tipo === 'yape' || metodo.tipo === 'plin' ? 'Celular' : 'Cuenta' }}</span>
@@ -57,57 +116,22 @@
               <div>
                 <span class="cuenta-concepto">{{ cuenta.concepto }}</span>
                 <span class="sub">Vence el {{ fechaCorta(cuenta.vence) }}</span>
+                @if (cuenta.monto_pagado > 0) {
+                  <span class="sub">Pagaste {{ formatoSoles(cuenta.monto_pagado) }} de {{ formatoSoles(cuenta.monto) }}</span>
+                }
               </div>
               <div class="cuenta-monto">
-                <strong class="mono">{{ formatoSoles(cuenta.monto) }}</strong>
-                @if (cuenta.vencida && cuenta.estado === 'pendiente') {
+                <strong class="mono">{{ formatoSoles(cuenta.saldo) }}</strong>
+                @if (cuenta.vencida) {
                   <span class="chip chip-vencida">Vencida</span>
                 } @else {
                   <span [class]="'chip chip-' + cuenta.estado">{{ etiquetaEstado(cuenta.estado) }}</span>
                 }
               </div>
             </div>
-
-            @if (ultimoRechazo(cuenta); as rechazo) {
-              <p class="alert alert-error">No pudimos validar tu pago anterior: {{ rechazo.motivo_rechazo }}. Puedes reportarlo de nuevo.</p>
-            }
-
-            @if (cuenta.estado === 'en_revision') {
-              <p class="muted">Recibimos tu pago y lo estamos revisando.</p>
-            } @else if (reportando() === cuenta.id) {
-              <div class="form-grid spaced">
-                <div class="field">
-                  <label [for]="'metodo-' + cuenta.id">Pagaste a</label>
-                  <select [id]="'metodo-' + cuenta.id" name="metodo_pago_id" [(ngModel)]="pago.metodo_pago_id">
-                    @for (metodo of cobranza.metodos_pago; track metodo.id) {
-                      <option [value]="metodo.id">{{ metodo.nombre }}</option>
-                    }
-                  </select>
-                </div>
-                <div class="field">
-                  <label [for]="'operacion-' + cuenta.id">N.° de operación</label>
-                  <input [id]="'operacion-' + cuenta.id" type="text" name="numero_operacion" maxlength="60" [(ngModel)]="pago.numero_operacion" />
-                </div>
-                <div class="field">
-                  <label [for]="'fecha-' + cuenta.id">Fecha del pago</label>
-                  <input [id]="'fecha-' + cuenta.id" type="date" name="fecha_pago" [(ngModel)]="pago.fecha_pago" />
-                </div>
-                <div class="field">
-                  <label [for]="'captura-' + cuenta.id">Captura del pago</label>
-                  <input [id]="'captura-' + cuenta.id" type="file" accept="image/jpeg,image/png,image/webp,application/pdf" (change)="elegirCaptura($event)" />
-                  <span class="field-help">Imagen o PDF de hasta 5 MB.</span>
-                </div>
-              </div>
-              @if (errorReporte(); as mensaje) {
-                <p class="alert alert-error spaced" role="alert">{{ mensaje }}</p>
-              }
-              <div class="form-actions spaced">
-                <button type="button" class="btn btn-primary btn-sm" [disabled]="enviando()" (click)="enviar(cuenta)">{{ enviando() ? 'Enviando…' : 'Enviar pago' }}</button>
-                <button type="button" class="btn btn-ghost btn-sm" [disabled]="enviando()" (click)="reportando.set(null)">Cancelar</button>
-              </div>
-            } @else {
+            @if (cobranza.metodos_pago.length > 0) {
               <div class="form-actions">
-                <button type="button" class="btn btn-primary btn-sm" (click)="abrirReporte(cuenta)">Reportar pago</button>
+                <button type="button" class="btn btn-ghost btn-sm" (click)="abrirCuenta(cuenta, cobranza)">Pagar esta cuenta</button>
               </div>
             }
           </article>
@@ -118,33 +142,47 @@
     </div>
 
     <div class="card">
-      <h2 class="card-title">Pagos realizados</h2>
+      <h2 class="card-title">Tus pagos</h2>
       <div class="table-wrap spaced">
         <table class="table">
           <thead>
             <tr>
-              <th>Concepto</th>
+              <th>Fecha</th>
               <th>Monto</th>
-              <th>Pagado</th>
+              <th>Estado</th>
+              <th>Detalle</th>
               <th>Comprobante</th>
             </tr>
           </thead>
           <tbody>
-            @for (cuenta of cobranza.pagadas; track cuenta.id) {
+            @for (item of cobranza.pagos; track item.id) {
               <tr>
-                <td class="concepto">{{ cuenta.concepto }}</td>
-                <td class="mono">{{ formatoSoles(cuenta.monto) }}</td>
-                <td class="mono">{{ fechaCorta(cuenta.pagada_at) }}</td>
-                <td>
-                  @if (cuenta.comprobante?.estado === 'emitido' && cuenta.comprobante?.pdf_url) {
-                    <a [href]="cuenta.comprobante?.pdf_url" target="_blank" rel="noopener" class="link mono">{{ cuenta.comprobante?.numero }}</a>
+                <td class="mono">{{ fechaCorta(item.fecha_pago) }}</td>
+                <td class="mono">{{ formatoSoles(item.monto) }}</td>
+                <td><span [class]="'chip chip-' + item.estado">{{ etiquetaEstadoPago(item.estado) }}</span></td>
+                <td class="concepto">
+                  @if (item.estado === 'rechazado') {
+                    <span class="error-text">{{ item.motivo_rechazo }}</span>
+                  } @else if (item.estado === 'en_revision') {
+                    Lo estamos revisando.
                   } @else {
+                    @for (a of item.aplicaciones; track a.cuenta_id) {
+                      <span class="sub">{{ a.concepto }}: {{ formatoSoles(a.monto) }}</span>
+                    }
+                  }
+                </td>
+                <td>
+                  @if (item.comprobante?.estado === 'emitido' && item.comprobante?.pdf_url) {
+                    <a [href]="item.comprobante?.pdf_url" target="_blank" rel="noopener" class="link mono">{{ item.comprobante?.numero }}</a>
+                  } @else if (item.estado === 'aceptado') {
                     <span class="muted">En proceso</span>
+                  } @else {
+                    <span class="muted">—</span>
                   }
                 </td>
               </tr>
             } @empty {
-              <tr><td colspan="4" class="empty">Todavía no hay pagos registrados.</td></tr>
+              <tr><td colspan="5" class="empty">Todavía no hay pagos registrados.</td></tr>
             }
           </tbody>
         </table>
