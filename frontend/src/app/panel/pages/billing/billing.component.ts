@@ -3,7 +3,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
-import { BillingApiService } from '../../services/billing-api.service';
+import { BillingApiService, nuevaClaveIdempotencia } from '../../services/billing-api.service';
 import { CompaniesApiService } from '../../services/companies-api.service';
 import {
   AjustesCobranza,
@@ -11,6 +11,7 @@ import {
   CuentaCobrar,
   DatosPago,
   Empresa,
+  EstadoPago,
   FiltroCuenta,
   MetodoPago,
   MetodoPagoCuenta,
@@ -21,6 +22,7 @@ import {
 import {
   enlaceWhatsapp,
   etiquetaEstadoCuenta,
+  etiquetaEstadoPago,
   etiquetaMetodoPago,
   fechaCorta,
   fechaHoy,
@@ -30,14 +32,22 @@ import {
 } from '../../models/labels';
 
 type Accion = { readonly tipo: 'cobrar' | 'anular' | 'editar'; readonly cuenta: CuentaCobrar };
+type Pestana = 'cuentas' | 'pagos';
+type Revision = { monto: string; numero: string; motivo: string; rechazando: boolean };
 
 const FILTROS: readonly { readonly valor: FiltroCuenta; readonly etiqueta: string }[] = [
   { valor: 'por_cobrar', etiqueta: 'Por cobrar' },
   { valor: 'vencidas', etiqueta: 'Vencidas' },
   { valor: 'pendiente', etiqueta: 'Pendientes' },
-  { valor: 'en_revision', etiqueta: 'Pago en revisión' },
+  { valor: 'parcial', etiqueta: 'Pago parcial' },
   { valor: 'pagada', etiqueta: 'Pagadas' },
   { valor: 'anulada', etiqueta: 'Anuladas' },
+];
+
+const ESTADOS_PAGO: readonly { readonly valor: EstadoPago; readonly etiqueta: string }[] = [
+  { valor: 'en_revision', etiqueta: 'Por revisar' },
+  { valor: 'aceptado', etiqueta: 'Aceptados' },
+  { valor: 'rechazado', etiqueta: 'Rechazados' },
 ];
 
 @Component({
@@ -52,41 +62,46 @@ export class BillingComponent {
   private readonly api = inject(BillingApiService);
   private readonly empresasApi = inject(CompaniesApiService);
   private readonly capturasAbiertas: string[] = [];
+  private plantilla = '';
 
   protected readonly filtros = FILTROS;
+  protected readonly estadosPago = ESTADOS_PAGO;
   protected readonly formatoSoles = formatoSoles;
   protected readonly fechaCorta = fechaCorta;
   protected readonly etiquetaEstado = etiquetaEstadoCuenta;
+  protected readonly etiquetaEstadoPago = etiquetaEstadoPago;
   protected readonly etiquetaMetodo = etiquetaMetodoPago;
+  protected readonly textoDia = textoDia;
 
+  protected readonly pestana = signal<Pestana>('cuentas');
   protected buscar = '';
   protected estado: FiltroCuenta = 'por_cobrar';
+  protected buscarPago = '';
+  protected readonly estadoPago = signal<EstadoPago>('en_revision');
   protected readonly empresaId: string;
   private pagina = 1;
+  private paginaPagos = 1;
 
   protected readonly resumen = signal<ResumenCobranza | null>(null);
   protected readonly cuentas = signal<Paginado<CuentaCobrar> | null>(null);
-  protected readonly pagos = signal<readonly PagoReportado[]>([]);
+  protected readonly pagos = signal<Paginado<PagoReportado> | null>(null);
+  protected readonly avisos = signal<readonly AvisoCobranza[]>([]);
+  protected readonly metodosPago = signal<readonly MetodoPagoCuenta[]>([]);
   protected readonly capturas = signal<Readonly<Record<number, string>>>({});
+  protected readonly revisiones = signal<Readonly<Record<number, Revision>>>({});
   protected readonly cargando = signal(true);
+  protected readonly cargandoPagos = signal(false);
   protected readonly error = signal<string | null>(null);
   protected readonly aviso = signal<string | null>(null);
-  protected readonly ocupado = signal<number | null>(null);
-
-  protected readonly rechazando = signal<number | null>(null);
-  protected motivoRechazo = '';
+  protected readonly ocupado = signal<string | null>(null);
 
   protected readonly accion = signal<Accion | null>(null);
   protected readonly errorAccion = signal<string | null>(null);
-  protected pago: DatosPago = this.pagoVacio();
+  protected pago: DatosPago = this.pagoVacio(null);
   protected cobroCon = '';
   protected captura: File | null = null;
   protected motivoAnulacion = '';
   protected edicion = { concepto: '', monto: '', vence: '' };
-  protected readonly metodosPago = signal<readonly MetodoPagoCuenta[]>([]);
-  protected readonly avisos = signal<readonly AvisoCobranza[]>([]);
-  protected readonly textoDia = textoDia;
-  private plantilla = '';
 
   protected readonly creando = signal(false);
   protected readonly errorNueva = signal<string | null>(null);
@@ -95,10 +110,11 @@ export class BillingComponent {
   protected nueva = { empresa_id: '', concepto: '', monto: '', vence: fechaHoy() };
 
   constructor() {
-    const empresa = inject(ActivatedRoute).snapshot.queryParamMap.get('empresa_id');
+    const parametros = inject(ActivatedRoute).snapshot.queryParamMap;
+    const empresa = parametros.get('empresa_id');
     this.empresaId = empresa && /^\d+$/.test(empresa) ? empresa : '';
-    if (this.empresaId !== '') {
-      this.estado = 'por_cobrar';
+    if (parametros.get('vista') === 'pagos') {
+      this.pestana.set('pagos');
     }
     inject(DestroyRef).onDestroy(() => this.capturasAbiertas.forEach((url: string) => URL.revokeObjectURL(url)));
     this.api.metodos().subscribe({
@@ -107,6 +123,10 @@ export class BillingComponent {
     });
     this.api.ajustes().subscribe({ next: (ajustes: AjustesCobranza) => (this.plantilla = ajustes.mensaje) });
     this.recargarTodo();
+  }
+
+  protected cambiarPestana(pestana: Pestana): void {
+    this.pestana.set(pestana);
   }
 
   protected filtrar(): void {
@@ -119,6 +139,30 @@ export class BillingComponent {
     this.cargarCuentas();
   }
 
+  protected filtrarPagos(estado: EstadoPago): void {
+    this.estadoPago.set(estado);
+    this.paginaPagos = 1;
+    this.cargarPagos();
+  }
+
+  protected buscarPagos(): void {
+    this.paginaPagos = 1;
+    this.cargarPagos();
+  }
+
+  protected irAPagos(pagina: number): void {
+    this.paginaPagos = pagina;
+    this.cargarPagos();
+  }
+
+  protected revision(pago: PagoReportado): Revision {
+    return this.revisiones()[pago.id] ?? { monto: String(pago.monto), numero: pago.numero_operacion ?? '', motivo: '', rechazando: false };
+  }
+
+  protected cambiarRevision(pago: PagoReportado, cambio: Partial<Revision>): void {
+    this.revisiones.update((actual: Readonly<Record<number, Revision>>) => ({ ...actual, [pago.id]: { ...this.revision(pago), ...cambio } }));
+  }
+
   protected verCaptura(pago: PagoReportado): void {
     const abierta = this.capturas()[pago.id];
     if (abierta) {
@@ -126,59 +170,106 @@ export class BillingComponent {
       return;
     }
     this.api.captura(pago.id).subscribe({
-      next: (contenido: Blob) => {
-        const url = this.guardarCaptura(pago.id, contenido);
-        window.open(url, '_blank', 'noopener');
-      },
+      next: (contenido: Blob) => window.open(this.guardarCaptura(pago.id, contenido), '_blank', 'noopener'),
       error: (error: HttpErrorResponse) => this.error.set(mensajeError(error, 'No pudimos abrir la captura.')),
     });
   }
 
   protected aceptar(pago: PagoReportado): void {
-    this.ocupado.set(pago.id);
+    const revision = this.revision(pago);
+    const monto = Number(revision.monto);
+    if (!(monto > 0)) {
+      this.error.set('Escribe un monto válido antes de aceptar.');
+      return;
+    }
+
+    this.ocupado.set(`pago-${pago.id}`);
     this.api
-      .aceptar(pago.id)
+      .aceptar(pago.id, {
+        ...(Math.abs(monto - pago.monto) > 0.001 ? { monto } : {}),
+        ...(revision.numero.trim() !== (pago.numero_operacion ?? '') ? { numero_operacion: revision.numero.trim() } : {}),
+      })
       .pipe(finalize(() => this.ocupado.set(null)))
       .subscribe({
-        next: (cuenta: CuentaCobrar) => {
-          this.aviso.set(this.mensajeComprobante(cuenta));
+        next: (aceptado: PagoReportado) => {
+          this.aviso.set(this.mensajeComprobante(aceptado));
           this.recargarTodo();
         },
-        error: (error: HttpErrorResponse) => this.error.set(mensajeError(error, 'No pudimos aceptar el pago.')),
+        error: (error: HttpErrorResponse) => {
+          this.error.set(mensajeError(error, 'No pudimos aceptar el pago.'));
+          this.cargarPagos();
+        },
       });
   }
 
-  protected empezarRechazo(pago: PagoReportado): void {
-    this.rechazando.set(pago.id);
-    this.motivoRechazo = '';
-  }
-
   protected rechazar(pago: PagoReportado): void {
-    if (this.motivoRechazo.trim().length < 3) {
+    const motivo = this.revision(pago).motivo.trim();
+    if (motivo.length < 3) {
       return;
     }
-    this.ocupado.set(pago.id);
+    this.ocupado.set(`pago-${pago.id}`);
     this.api
-      .rechazar(pago.id, this.motivoRechazo.trim())
+      .rechazar(pago.id, motivo)
       .pipe(finalize(() => this.ocupado.set(null)))
       .subscribe({
         next: () => {
-          this.rechazando.set(null);
           this.aviso.set('Pago rechazado. El cliente verá el motivo y podrá reportarlo de nuevo.');
           this.recargarTodo();
         },
-        error: (error: HttpErrorResponse) => this.error.set(mensajeError(error, 'No pudimos rechazar el pago.')),
+        error: (error: HttpErrorResponse) => {
+          this.error.set(mensajeError(error, 'No pudimos rechazar el pago.'));
+          this.cargarPagos();
+        },
+      });
+  }
+
+  protected reintentar(pago: PagoReportado): void {
+    this.ocupado.set(`pago-${pago.id}`);
+    this.api
+      .emitir(pago.id)
+      .pipe(finalize(() => this.ocupado.set(null)))
+      .subscribe({
+        next: (actualizado: PagoReportado) => {
+          this.aviso.set(this.mensajeComprobante(actualizado));
+          this.cargarPagos();
+        },
+        error: (error: HttpErrorResponse) => this.error.set(mensajeError(error, 'No pudimos emitir el comprobante.')),
       });
   }
 
   protected abrirAccion(tipo: Accion['tipo'], cuenta: CuentaCobrar): void {
     this.accion.set({ tipo, cuenta });
     this.errorAccion.set(null);
-    this.pago = { ...this.pagoVacio(), monto: String(cuenta.monto) };
+    this.pago = { ...this.pagoVacio(cuenta.id), monto: String(cuenta.saldo) };
     this.cobroCon = this.metodosPago().length > 0 ? String(this.metodosPago()[0].id) : 'efectivo';
     this.captura = null;
     this.motivoAnulacion = '';
     this.edicion = { concepto: cuenta.concepto, monto: String(cuenta.monto), vence: cuenta.vence };
+  }
+
+  protected elegirCaptura(evento: Event): void {
+    const entrada = evento.target as HTMLInputElement;
+    this.captura = entrada.files?.item(0) ?? null;
+  }
+
+  protected confirmarCobro(cuenta: CuentaCobrar): void {
+    const datos: DatosPago =
+      this.cobroCon === 'efectivo'
+        ? { ...this.pago, metodo_pago_id: '', metodo: 'efectivo' }
+        : { ...this.pago, metodo_pago_id: this.cobroCon };
+    this.ocupado.set(`cuenta-${cuenta.id}`);
+    this.errorAccion.set(null);
+    this.api
+      .cobrar(cuenta.id, datos, this.captura)
+      .pipe(finalize(() => this.ocupado.set(null)))
+      .subscribe({
+        next: (pago: PagoReportado) => {
+          this.accion.set(null);
+          this.aviso.set(this.mensajeComprobante(pago));
+          this.recargarTodo();
+        },
+        error: (error: HttpErrorResponse) => this.errorAccion.set(mensajeError(error, 'No pudimos registrar el cobro.')),
+      });
   }
 
   protected confirmarEdicion(cuenta: CuentaCobrar): void {
@@ -187,7 +278,7 @@ export class BillingComponent {
       this.errorAccion.set('Completa concepto, monto y vencimiento.');
       return;
     }
-    this.ocupado.set(cuenta.id);
+    this.ocupado.set(`cuenta-${cuenta.id}`);
     this.errorAccion.set(null);
     this.api
       .editarCuenta(cuenta.id, { concepto: this.edicion.concepto.trim(), monto, vence: this.edicion.vence })
@@ -202,33 +293,8 @@ export class BillingComponent {
       });
   }
 
-  protected elegirCaptura(evento: Event): void {
-    const entrada = evento.target as HTMLInputElement;
-    this.captura = entrada.files?.item(0) ?? null;
-  }
-
-  protected confirmarCobro(cuenta: CuentaCobrar): void {
-    this.ocupado.set(cuenta.id);
-    this.errorAccion.set(null);
-    const datos: DatosPago =
-      this.cobroCon === 'efectivo'
-        ? { ...this.pago, metodo_pago_id: '', metodo: 'efectivo' }
-        : { ...this.pago, metodo_pago_id: this.cobroCon };
-    this.api
-      .cobrar(cuenta.id, datos, this.captura)
-      .pipe(finalize(() => this.ocupado.set(null)))
-      .subscribe({
-        next: (actualizada: CuentaCobrar) => {
-          this.accion.set(null);
-          this.aviso.set(this.mensajeComprobante(actualizada));
-          this.recargarTodo();
-        },
-        error: (error: HttpErrorResponse) => this.errorAccion.set(mensajeError(error, 'No pudimos registrar el cobro.')),
-      });
-  }
-
   protected confirmarAnulacion(cuenta: CuentaCobrar): void {
-    this.ocupado.set(cuenta.id);
+    this.ocupado.set(`cuenta-${cuenta.id}`);
     this.errorAccion.set(null);
     this.api
       .anular(cuenta.id, this.motivoAnulacion.trim())
@@ -243,20 +309,6 @@ export class BillingComponent {
       });
   }
 
-  protected reintentar(cuenta: CuentaCobrar): void {
-    this.ocupado.set(cuenta.id);
-    this.api
-      .emitir(cuenta.id)
-      .pipe(finalize(() => this.ocupado.set(null)))
-      .subscribe({
-        next: (actualizada: CuentaCobrar) => {
-          this.aviso.set(this.mensajeComprobante(actualizada));
-          this.cargarCuentas();
-        },
-        error: (error: HttpErrorResponse) => this.error.set(mensajeError(error, 'No pudimos emitir el comprobante.')),
-      });
-  }
-
   protected recordatorio(cuenta: CuentaCobrar): string | null {
     const base = enlaceWhatsapp(cuenta.empresa?.telefono ?? null);
     if (base === null) {
@@ -265,7 +317,7 @@ export class BillingComponent {
     const valores: Readonly<Record<string, string>> = {
       '{cliente}': cuenta.empresa?.razon_social ?? '',
       '{concepto}': cuenta.concepto,
-      '{monto}': formatoSoles(cuenta.monto),
+      '{monto}': formatoSoles(cuenta.saldo),
       '{vence}': fechaCorta(cuenta.vence),
       '{enlace}': 'https://amantix.pe/panel/billing',
     };
@@ -315,7 +367,7 @@ export class BillingComponent {
       return;
     }
     this.errorNueva.set(null);
-    this.ocupado.set(-1);
+    this.ocupado.set('nueva');
     this.api
       .crearCuenta({ empresa_id: Number(this.nueva.empresa_id), concepto: this.nueva.concepto.trim(), monto, vence: this.nueva.vence })
       .pipe(finalize(() => this.ocupado.set(null)))
@@ -332,20 +384,30 @@ export class BillingComponent {
       });
   }
 
-  private mensajeComprobante(cuenta: CuentaCobrar): string {
-    const comprobante = cuenta.comprobante;
+  private mensajeComprobante(pago: PagoReportado): string {
+    const aplicado = pago.aplicaciones.map((a) => `${a.concepto ?? 'cuenta'} (${formatoSoles(a.monto)})`).join(', ');
+    const base = aplicado !== '' ? `Pago de ${formatoSoles(pago.monto)} aplicado a: ${aplicado}.` : 'Pago registrado.';
+    const comprobante = pago.comprobante;
     if (comprobante === null) {
-      return 'Pago registrado.';
+      return base;
     }
     if (comprobante.estado === 'emitido') {
-      return `Pago registrado. Se emitió ${comprobante.numero ?? 'el comprobante'}.`;
+      return `${base} Se emitió ${comprobante.numero ?? 'el comprobante'}.`;
     }
 
-    return `Pago registrado, pero el comprobante no se emitió: ${comprobante.error ?? 'error desconocido'}. Puedes reintentarlo desde la lista de pagadas.`;
+    return `${base} El comprobante no se emitió: ${comprobante.error ?? 'error desconocido'}. Puedes reintentarlo en Pagos aceptados.`;
   }
 
-  private pagoVacio(): DatosPago {
-    return { metodo_pago_id: '', metodo: 'otro' as MetodoPago, numero_operacion: '', fecha_pago: fechaHoy(), monto: '' };
+  private pagoVacio(cuentaId: number | null): DatosPago {
+    return {
+      metodo_pago_id: '',
+      metodo: 'otro' as MetodoPago,
+      numero_operacion: '',
+      fecha_pago: fechaHoy(),
+      monto: '',
+      cuenta_id: cuentaId,
+      clave_idempotencia: nuevaClaveIdempotencia(),
+    };
   }
 
   private guardarCaptura(pagoId: number, contenido: Blob): string {
@@ -357,26 +419,35 @@ export class BillingComponent {
   }
 
   private recargarTodo(): void {
-    this.api.avisos().subscribe({
-      next: (respuesta: { readonly data: readonly AvisoCobranza[] }) => this.avisos.set(respuesta.data),
-      error: (error: HttpErrorResponse) => this.error.set(mensajeError(error, 'No pudimos cargar los avisos de hoy.')),
-    });
     this.api.resumen().subscribe({
       next: (resumen: ResumenCobranza) => this.resumen.set(resumen),
       error: (error: HttpErrorResponse) => this.error.set(mensajeError(error, 'No pudimos cargar el resumen.')),
     });
-    this.api.pagosPendientes().subscribe({
-      next: (respuesta: { readonly data: readonly PagoReportado[] }) => {
-        this.pagos.set(respuesta.data);
-        respuesta.data
-          .filter((pago: PagoReportado) => pago.tiene_captura && pago.captura_es_imagen && !this.capturas()[pago.id])
-          .forEach((pago: PagoReportado) =>
-            this.api.captura(pago.id).subscribe({ next: (contenido: Blob) => this.guardarCaptura(pago.id, contenido) }),
-          );
-      },
-      error: (error: HttpErrorResponse) => this.error.set(mensajeError(error, 'No pudimos cargar los pagos por revisar.')),
+    this.api.avisos().subscribe({
+      next: (respuesta: { readonly data: readonly AvisoCobranza[] }) => this.avisos.set(respuesta.data),
+      error: (error: HttpErrorResponse) => this.error.set(mensajeError(error, 'No pudimos cargar los avisos de hoy.')),
     });
+    this.revisiones.set({});
     this.cargarCuentas();
+    this.cargarPagos();
+  }
+
+  private cargarPagos(): void {
+    this.cargandoPagos.set(true);
+    this.api
+      .pagos({ buscar: this.buscarPago, estado: this.estadoPago(), empresa_id: this.empresaId, page: this.paginaPagos })
+      .pipe(finalize(() => this.cargandoPagos.set(false)))
+      .subscribe({
+        next: (resultado: Paginado<PagoReportado>) => {
+          this.pagos.set(resultado);
+          resultado.data
+            .filter((pago: PagoReportado) => pago.estado === 'en_revision' && pago.tiene_captura && pago.captura_es_imagen && !this.capturas()[pago.id])
+            .forEach((pago: PagoReportado) =>
+              this.api.captura(pago.id).subscribe({ next: (contenido: Blob) => this.guardarCaptura(pago.id, contenido) }),
+            );
+        },
+        error: (error: HttpErrorResponse) => this.error.set(mensajeError(error, 'No pudimos cargar los pagos.')),
+      });
   }
 
   private cargarCuentas(): void {
