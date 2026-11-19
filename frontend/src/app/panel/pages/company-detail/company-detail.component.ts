@@ -5,6 +5,7 @@ import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angu
 import { RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Observable, finalize } from 'rxjs';
+import { BillingApiService } from '../../services/billing-api.service';
 import { CompaniesApiService } from '../../services/companies-api.service';
 import { CatalogApiService } from '../../services/catalog-api.service';
 import { UsersApiService } from '../../services/users-api.service';
@@ -13,6 +14,7 @@ import {
   DatosEmpresa,
   DetalleEmpresa,
   Empresa,
+  EstadoCuentaEmpresa,
   EstadoSuscripcion,
   Periodo,
   Plan,
@@ -23,6 +25,8 @@ import {
 } from '../../models/panel.models';
 import {
   ESTADOS_SUSCRIPCION,
+  etiquetaEstadoCuenta,
+  etiquetaEstadoPago,
   etiquetaEstadoSuscripcion,
   etiquetaEstadoTicket,
   etiquetaPrioridad,
@@ -52,6 +56,7 @@ export class CompanyDetailComponent implements OnInit {
   private readonly usuariosApi = inject(UsersApiService);
   private readonly fb = inject(FormBuilder);
   private readonly catalogo = inject(CatalogApiService);
+  private readonly cobranza = inject(BillingApiService);
 
   protected readonly productos = toSignal(this.catalogo.productos$, { initialValue: [] as readonly ProductoResumen[] });
   protected readonly planes = toSignal(this.catalogo.planes$, { initialValue: [] as readonly Plan[] });
@@ -66,6 +71,9 @@ export class CompanyDetailComponent implements OnInit {
   protected readonly cargando = signal(true);
   protected readonly error = signal<string | null>(null);
   protected readonly detalle = signal<DetalleEmpresa | null>(null);
+  protected readonly estadoCuenta = signal<EstadoCuentaEmpresa | null>(null);
+  protected readonly etiquetaEstadoCuenta = etiquetaEstadoCuenta;
+  protected readonly etiquetaEstadoPago = etiquetaEstadoPago;
   protected readonly clave = signal<ClaveEntregada | null>(null);
   protected readonly copiado = signal(false);
 
@@ -331,6 +339,11 @@ export class CompanyDetailComponent implements OnInit {
   private cargar(): void {
     this.cargando.set(true);
     this.error.set(null);
+
+    this.cobranza.estadoCuenta(this.id()).subscribe({
+      next: (estado: EstadoCuentaEmpresa) => this.estadoCuenta.set(estado),
+      error: () => this.estadoCuenta.set(null),
+    });
 
     this.api.ver(this.id()).subscribe({
       next: (detalle: DetalleEmpresa) => {
