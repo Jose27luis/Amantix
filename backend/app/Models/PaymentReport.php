@@ -22,6 +22,7 @@ class PaymentReport extends Model
         'empresa_id',
         'monto',
         'metodo',
+        'metodo_pago_id',
         'numero_operacion',
         'fecha_pago',
         'captura_ruta',
@@ -53,6 +54,11 @@ class PaymentReport extends Model
     public function empresa(): BelongsTo
     {
         return $this->belongsTo(Company::class, 'empresa_id');
+    }
+
+    public function metodoPago(): BelongsTo
+    {
+        return $this->belongsTo(PaymentAccount::class, 'metodo_pago_id');
     }
 
     public function reportadoPor(): BelongsTo
