@@ -2,6 +2,8 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 import {
+  AjustesCobranza,
+  AvisoCobranza,
   CambioCuenta,
   CobranzaCliente,
   CuentaCobrar,
@@ -53,6 +55,22 @@ export class BillingApiService {
 
   crearCuenta(datos: NuevaCuenta): Observable<CuentaCobrar> {
     return this.http.post<CuentaCobrar>('/api/admin/billing/receivables', datos);
+  }
+
+  ajustes(): Observable<AjustesCobranza> {
+    return this.http.get<AjustesCobranza>('/api/admin/billing/settings');
+  }
+
+  guardarAjustes(datos: Omit<AjustesCobranza, 'variables'>): Observable<AjustesCobranza> {
+    return this.http.put<AjustesCobranza>('/api/admin/billing/settings', datos);
+  }
+
+  avisos(): Observable<{ readonly data: readonly AvisoCobranza[] }> {
+    return this.http.get<{ readonly data: readonly AvisoCobranza[] }>('/api/admin/billing/notices');
+  }
+
+  marcarAviso(cuentaId: number, diaRelativo: number): Observable<{ readonly ok: boolean }> {
+    return this.http.post<{ readonly ok: boolean }>(`/api/admin/billing/receivables/${cuentaId}/notices`, { dia_relativo: diaRelativo });
   }
 
   editarCuenta(cuentaId: number, datos: CambioCuenta): Observable<CuentaCobrar> {
