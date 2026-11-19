@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Requests;
 
 use App\Enums\PaymentMethod;
+use App\Models\PaymentAccount;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -14,10 +15,21 @@ class ReportPaymentRequest extends FormRequest
     {
         $esCliente = $this->user()?->esAdministrador() !== true;
 
+        $tipo = $this->input('metodo_pago_id') !== null
+            ? PaymentAccount::query()->whereKey((int) $this->input('metodo_pago_id'))->value('tipo')
+            : $this->input('metodo');
+        $tipo = $tipo instanceof PaymentMethod ? $tipo->value : $tipo;
+
         return [
-            'metodo' => ['required', Rule::enum(PaymentMethod::class)],
+            'metodo_pago_id' => [
+                Rule::requiredIf($esCliente),
+                'nullable',
+                'integer',
+                Rule::exists('metodos_pago', 'id')->where('activo', true),
+            ],
+            'metodo' => ['required_without:metodo_pago_id', 'nullable', Rule::enum(PaymentMethod::class)],
             'numero_operacion' => [
-                Rule::requiredIf($esCliente && ! in_array($this->input('metodo'), [PaymentMethod::Efectivo->value, PaymentMethod::Otro->value], true)),
+                Rule::requiredIf($esCliente && ! in_array($tipo, [PaymentMethod::Efectivo->value, PaymentMethod::Otro->value], true)),
                 'nullable',
                 'string',
                 'max:60',
@@ -38,6 +50,7 @@ class ReportPaymentRequest extends FormRequest
     {
         return [
             'metodo' => 'medio de pago',
+            'metodo_pago_id' => 'cuenta a la que pagaste',
             'numero_operacion' => 'número de operación',
             'fecha_pago' => 'fecha de pago',
             'captura' => 'captura del pago',
