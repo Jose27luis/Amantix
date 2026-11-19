@@ -24,6 +24,7 @@ class Receivable extends Model
         'periodo_inicio',
         'periodo_fin',
         'monto',
+        'monto_pagado',
         'vence',
         'estado',
         'origen',
@@ -38,6 +39,7 @@ class Receivable extends Model
             'periodo_inicio' => 'date',
             'periodo_fin' => 'date',
             'monto' => 'decimal:2',
+            'monto_pagado' => 'decimal:2',
             'vence' => 'date',
             'estado' => ReceivableStatus::class,
             'pagada_at' => 'datetime',
@@ -62,5 +64,15 @@ class Receivable extends Model
     public function comprobante(): HasOne
     {
         return $this->hasOne(BillingInvoice::class, 'cuenta_id');
+    }
+
+    public function aplicaciones(): HasMany
+    {
+        return $this->hasMany(PaymentApplication::class, 'cuenta_id');
+    }
+
+    public function saldo(): float
+    {
+        return round((float) $this->monto - (float) $this->monto_pagado, 2);
     }
 }
