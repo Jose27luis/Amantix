@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Resources;
 
 use App\Models\BillingInvoice;
-use App\Models\PaymentReport;
+use App\Models\PaymentApplication;
 use App\Models\Receivable;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -33,23 +33,24 @@ class ReceivableResource extends JsonResource
             'periodo_inicio' => $cuenta->periodo_inicio?->toDateString(),
             'periodo_fin' => $cuenta->periodo_fin?->toDateString(),
             'monto' => (float) $cuenta->monto,
+            'monto_pagado' => (float) $cuenta->monto_pagado,
+            'saldo' => $cuenta->saldo(),
             'vence' => $cuenta->vence?->toDateString(),
             'vencida' => $cuenta->estado->cobrable() && $cuenta->vence !== null && $cuenta->vence->isBefore(today()),
             'estado' => $cuenta->estado->value,
             'origen' => $cuenta->origen,
             'pagada_at' => $cuenta->pagada_at?->toIso8601String(),
             'motivo_anulacion' => $cuenta->motivo_anulacion,
-            'pagos' => $cuenta->relationLoaded('pagos')
-                ? $cuenta->pagos->map(fn (PaymentReport $pago): array => PaymentReportResource::make($pago)->resolve($request))->all()
+            'aplicaciones' => $cuenta->relationLoaded('aplicaciones')
+                ? $cuenta->aplicaciones->map(fn (PaymentApplication $aplicacion): array => [
+                    'pago_id' => $aplicacion->pago_id,
+                    'monto' => (float) $aplicacion->monto,
+                    'fecha' => $aplicacion->created_at?->toIso8601String(),
+                    'comprobante' => $aplicacion->relationLoaded('pago') && $aplicacion->pago?->comprobante instanceof BillingInvoice
+                        ? ComprobanteResource::datos($aplicacion->pago->comprobante, $request)
+                        : null,
+                ])->values()->all()
                 : [],
-            'comprobante' => $cuenta->relationLoaded('comprobante') && $cuenta->comprobante instanceof BillingInvoice ? [
-                'tipo' => $cuenta->comprobante->tipo,
-                'numero' => $cuenta->comprobante->numero,
-                'estado' => $cuenta->comprobante->estado,
-                'estado_sunat' => $cuenta->comprobante->estado_sunat,
-                'pdf_url' => $cuenta->comprobante->pdf_url,
-                'error' => $request->user()?->esAdministrador() === true ? $cuenta->comprobante->error : null,
-            ] : null,
         ];
     }
 }
