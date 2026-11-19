@@ -1,0 +1,39 @@
+<div class="campana">
+  <button
+    type="button"
+    class="boton"
+    [class.activa]="total() > 0"
+    (click)="alternar()"
+    [attr.aria-expanded]="abierto()"
+    [attr.aria-label]="total() + ' pagos por revisar'"
+  >
+    <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3a5 5 0 0 0-5 5v3l-1.5 3h13L15 11V8a5 5 0 0 0-5-5Zm-2 13a2 2 0 0 0 4 0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
+    @if (total() > 0) {
+      <span class="numero">{{ total() > 99 ? '99+' : total() }}</span>
+    }
+  </button>
+
+  @if (abierto()) {
+    <div class="panel" role="dialog" aria-label="Pagos por revisar">
+      <div class="panel-cabeza">
+        <strong>Pagos por revisar</strong>
+        <span>{{ total() }}</span>
+      </div>
+      <ul>
+        @for (pago of ultimos(); track pago.id) {
+          <li>
+            <a routerLink="/panel/billing" [queryParams]="{ vista: 'pagos' }" (click)="cerrar()">
+              <span class="nombre">{{ pago.empresa?.razon_social ?? 'Cliente' }}</span>
+              <span class="detalle">{{ pago.metodo_nombre ?? pago.metodo }} · {{ pago.numero_operacion ?? 'sin número' }}</span>
+              <b>{{ formatoSoles(pago.monto) }}</b>
+            </a>
+          </li>
+        } @empty {
+          <li class="vacio">No hay pagos por revisar.</li>
+        }
+      </ul>
+      <a class="ver-todos" routerLink="/panel/billing" [queryParams]="{ vista: 'pagos' }" (click)="cerrar()">Ver todos los pagos</a>
+    </div>
+    <button type="button" class="fondo" aria-label="Cerrar" (click)="cerrar()"></button>
+  }
+</div>
