@@ -22,6 +22,8 @@ class Subscription extends Model
         'concepto',
         'cuenta_externa',
         'periodo',
+        'dia_cobro',
+        'avisar',
         'fecha_alta',
         'proxima_renovacion',
         'estado',
@@ -32,6 +34,8 @@ class Subscription extends Model
         return [
             'precio' => 'decimal:2',
             'periodo' => BillingPeriod::class,
+            'dia_cobro' => 'integer',
+            'avisar' => 'boolean',
             'fecha_alta' => 'date',
             'proxima_renovacion' => 'date',
             'estado' => SubscriptionStatus::class,
