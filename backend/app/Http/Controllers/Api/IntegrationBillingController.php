@@ -25,25 +25,56 @@ class IntegrationBillingController extends Controller
         return response()->json($estado->estado($suscripcion, CarbonImmutable::today()));
     }
 
-    public function reportar(
+    public function reportarCuenta(
         ReportPaymentRequest $request,
         string $cuenta,
         Receivable $receivable,
         IntegrationStatement $estado,
         BillingService $servicio,
     ): JsonResponse {
+        return $this->reportar($request, $cuenta, $receivable, $estado, $servicio);
+    }
+
+    public function reportarPago(
+        ReportPaymentRequest $request,
+        string $cuenta,
+        IntegrationStatement $estado,
+        BillingService $servicio,
+    ): JsonResponse {
+        $preferida = $request->validated('cuenta_id') !== null
+            ? Receivable::query()->find((int) $request->validated('cuenta_id'))
+            : null;
+
+        return $this->reportar($request, $cuenta, $preferida, $estado, $servicio);
+    }
+
+    private function reportar(
+        ReportPaymentRequest $request,
+        string $cuenta,
+        ?Receivable $preferida,
+        IntegrationStatement $estado,
+        BillingService $servicio,
+    ): JsonResponse {
         $integracion = $this->integracion($request);
         $suscripcion = $estado->suscripcion($integracion, $cuenta);
-        abort_if($suscripcion === null || $receivable->empresa_id !== $suscripcion->empresa_id, 404, 'La cuenta no pertenece a este cliente.');
+        abort_if($suscripcion === null, 404, 'El cliente no está vinculado a la cobranza.');
+        abort_if($preferida !== null && $preferida->empresa_id !== $suscripcion->empresa_id, 404, 'La cuenta no pertenece a este cliente.');
 
         $extra = $request->validate(['reportado_nombre' => ['nullable', 'string', 'max:120']]);
+        $clave = $request->header('Idempotency-Key') ?? $request->validated('clave_idempotencia');
+        $datos = [...$request->validated(), ...$extra];
+        $datos['clave_idempotencia'] = is_string($clave) && trim($clave) !== ''
+            ? mb_substr('i'.$integracion->id.':'.trim($clave), 0, 80)
+            : null;
+
         $servicio->reportar(
-            $receivable,
-            [...$request->validated(), ...$extra],
+            $suscripcion->empresa,
+            $datos,
             $request->file('captura'),
             null,
             PaymentReport::ORIGEN_SISTEMA,
             $integracion,
+            $preferida,
         );
 
         return response()->json($estado->estado($suscripcion->refresh(), CarbonImmutable::today()), 201);
