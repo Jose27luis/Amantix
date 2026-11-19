@@ -12,6 +12,7 @@ export const METODOS_PAGO: readonly { readonly valor: MetodoPago; readonly etiqu
 
 const ESTADOS_CUENTA: Readonly<Record<EstadoCuenta, string>> = {
   pendiente: 'Pendiente',
+  parcial: 'Pago parcial',
   en_revision: 'Pago en revisión',
   pagada: 'Pagada',
   anulada: 'Anulada',
