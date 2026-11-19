@@ -14,6 +14,7 @@ class CompanyIndexRequest extends FormRequest
             'buscar' => ['nullable', 'string', 'max:120'],
             'producto_id' => ['nullable', 'integer', 'exists:productos,id'],
             'renueva_en' => ['nullable', 'integer', 'min:1', 'max:365'],
+            'situacion' => ['nullable', 'in:con_deuda,vencidos,sin_suscripcion'],
         ];
     }
 }
