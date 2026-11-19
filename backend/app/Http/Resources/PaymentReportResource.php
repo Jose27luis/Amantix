@@ -31,7 +31,9 @@ class PaymentReportResource extends JsonResource
             'origen' => $pago->origen,
             'estado' => $pago->estado->value,
             'motivo_rechazo' => $pago->motivo_rechazo,
-            'reportado_por' => $pago->relationLoaded('reportadoPor') ? $pago->reportadoPor?->nombre : null,
+            'reportado_por' => $pago->relationLoaded('reportadoPor') && $pago->reportadoPor !== null
+                ? $pago->reportadoPor->nombre
+                : $pago->reportado_nombre,
             'revisado_por' => $pago->relationLoaded('revisadoPor') ? $pago->revisadoPor?->nombre : null,
             'revisado_at' => $pago->revisado_at?->toIso8601String(),
             'creado_at' => $pago->created_at?->toIso8601String(),
