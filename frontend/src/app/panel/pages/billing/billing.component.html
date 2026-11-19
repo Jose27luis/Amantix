@@ -6,6 +6,7 @@
       <p class="page-lead">Las cuentas se generan solas 3 días antes de cada vencimiento. Al aceptar un pago se emite la factura en pro8 con el RUC de Amantix.</p>
     </div>
     <div class="head-actions">
+      <a routerLink="/panel/billing/settings" class="btn btn-ghost btn-sm">Configuración</a>
       <a routerLink="/panel/billing/payment-methods" class="btn btn-ghost btn-sm">Métodos de pago</a>
       <button type="button" class="btn btn-primary btn-sm" (click)="alternarNueva()">{{ creando() ? 'Cancelar' : 'Nueva cuenta' }}</button>
     </div>
@@ -81,6 +82,39 @@
       <div class="form-actions spaced">
         <button type="button" class="btn btn-primary btn-sm" [disabled]="ocupado() === -1" (click)="crearCuenta()">{{ ocupado() === -1 ? 'Guardando…' : 'Crear cuenta' }}</button>
       </div>
+    </div>
+  }
+
+  @if (avisos().length > 0) {
+    <div class="card">
+      <div class="section-head">
+        <div>
+          <h2 class="card-title">Avisos de hoy</h2>
+          <p class="card-sub">{{ avisos().length }} {{ avisos().length === 1 ? 'cliente para avisar' : 'clientes para avisar' }} según la configuración de cobros.</p>
+        </div>
+      </div>
+      <ul class="avisos spaced">
+        @for (aviso of avisos(); track aviso.cuenta.id) {
+          <li class="aviso">
+            <div class="aviso-datos">
+              <strong>{{ aviso.cuenta.empresa?.razon_social }}</strong>
+              <span class="sub">{{ aviso.cuenta.concepto }}</span>
+              <span class="sub">
+                {{ formatoSoles(aviso.cuenta.monto) }} · vence {{ fechaCorta(aviso.cuenta.vence) }} ·
+                <span [class.atrasado]="aviso.dias_para_vencer < 0">{{ textoDia(aviso.dia_relativo) }}</span>
+              </span>
+            </div>
+            <div class="aviso-acciones">
+              @if (aviso.whatsapp) {
+                <button type="button" class="btn btn-primary btn-sm" (click)="enviarAviso(aviso)">Enviar por WhatsApp</button>
+              } @else {
+                <span class="muted">Sin teléfono</span>
+              }
+              <button type="button" class="text-btn" (click)="marcarAviso(aviso)">Marcar como avisado</button>
+            </div>
+          </li>
+        }
+      </ul>
     </div>
   }
 
