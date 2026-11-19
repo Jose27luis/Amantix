@@ -8,6 +8,7 @@ use App\Enums\BillingPeriod;
 use App\Enums\SubscriptionStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Subscription extends Model
 {
@@ -18,6 +19,8 @@ class Subscription extends Model
         'producto_id',
         'plan_id',
         'precio',
+        'concepto',
+        'cuenta_externa',
         'periodo',
         'fecha_alta',
         'proxima_renovacion',
@@ -48,6 +51,11 @@ class Subscription extends Model
     public function plan(): BelongsTo
     {
         return $this->belongsTo(Plan::class, 'plan_id');
+    }
+
+    public function cuentasPorCobrar(): HasMany
+    {
+        return $this->hasMany(Receivable::class, 'suscripcion_id');
     }
 
     public function montoMensual(): float
